@@ -2,19 +2,19 @@ module Parser
 
 export parseFormula
 
-include("trees.jl")
-include("cleaner.jl")
-using .Trees
-using .Cleaner
+
+using ..Trees
+using ..Cleaner
 
 """
+
   <atom>     ::=  'T' | 'F' | <identifier> | '(' <formula> ')'
   <literal>  ::=  <atom> { '~' <atom> | '◻' <atom> | '◇' <atom> }
  
   <formula>  ::=  <implication> ['<>' <implication> ]
   <implication> ::= <disjunction> [ '->' <disjunction> ]
-  <disjunction> ::= <conjunction> {'|' <conjunction> }
-  <conjunction> ::= <literal> { '&' <literal> }
+  <disjunction> ::= <conjunction> {'^' <conjunction> }
+  <conjunction> ::= <literal> { 'v' <literal> }
 
 
 """
@@ -93,7 +93,7 @@ function acceptLiteral!(s::String, i::Vector{Int})
     if box != undef
         atom = acceptLiteral!(s, i)
         if atom != undef
-            addrigthchild!(box, atom)
+            addrightchild!(box, atom)
             return box
         else 
             return undef
@@ -202,7 +202,7 @@ function printFormula(formulatree::Tree)
     end
 
     if isdefined(formulatree, :left)
-        if !isdefined(formulatree.left, :left) && !isdefined(formulatree.left, :rigth)
+        if !isdefined(formulatree.left, :left) || !isdefined(formulatree.left, :right)
             printFormula(formulatree.left)
         else
             print(" (")
@@ -214,7 +214,7 @@ function printFormula(formulatree::Tree)
     print(" ", formulatree.connective)
 
     if isdefined(formulatree, :right)
-        if !isdefined(formulatree.right, :left) && !isdefined(formulatree.right, :rigth)
+        if !isdefined(formulatree.right, :left) || !isdefined(formulatree.right, :right)
             printFormula(formulatree.right)
         else
             print(" (")
@@ -232,6 +232,7 @@ function parseFormula(formula::String)
         error("Not able to parse the formula")
     else 
         printFormula(formulatree)
+        print("\n")
     end
     return formulatree
 end

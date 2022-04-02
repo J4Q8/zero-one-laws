@@ -11,31 +11,31 @@ function cleanFormula(formula::String)
 end
 
 function cleanChar(c::Char)
-    if c == '^'
+    if c == '^' || c == '∧' || c == '&'
         #takes care of conjunction
         return '∧'
-    elseif c == 'v' || c == 'V'
+    elseif c == 'v' || c == 'V' || c == '|'
         #takes care of disjunction
         return '∨'
-    elseif c == '-' 
+    elseif c == '-' || c == '→'
         #takes care of implication "->"
         return '→'
-    elseif c == '<' 
+    elseif c == '<' || c == '↔'
         #takes care of bimplication"<>"
         return '↔'
-    elseif c == 'b'
+    elseif c == 'b' || c == '◻'
         # takes care of box
         return '◻'
-    elseif c == 'd'
+    elseif c == 'd' || c == '◇'
         # takes care of diamond
         return '◇'
-    elseif c == '~'
+    elseif c == '~' || c == '¬'
         # takes care of negation
         return '¬'
-    elseif c == 'F'
+    elseif c == 'F' || c == '⊥'
         #takes care of contradiction
         return '⊥'
-    elseif c == 'T'
+    elseif c == 'T' || c == '⊤'
         #takes care of truth
         return '⊤'
     elseif c == '(' || c == ')'
