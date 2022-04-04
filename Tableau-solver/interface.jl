@@ -10,19 +10,21 @@ include("solver.jl")
 
 using .Trees
 using .Parser
-using .Tableau
+using .Tableaux
 using .Solver
 
-export startSolver
+export runSolver
 
 function welcomeGetConstraints()
     println("Welcome to modal tableaux solver!")
+
+    restrictions = Char[]
+
     while true
         println("Which modal language would you like to use? (gl, s4, k4, custom):")
 
         language = readline()
 
-        restrictions = Char[]
         if language == "gl"
             push!(restrictions, 'c')
             push!(restrictions, 't')
@@ -30,7 +32,7 @@ function welcomeGetConstraints()
             push!(restrictions, 't')
             push!(restrictions, 'r')
         elseif language == "k4"
-            push!(retrictions, 's')
+            push!(restrictions, 's')
         elseif language == "custom"
             println("Which constraints would you like to impose on the language? (You can choose multiple ones, provide a string)")
             println("transitivity : t, reflexivity : r, symmetry : s, converse well-foundedness : c")
@@ -83,6 +85,7 @@ function loadPremisesConsequent()
     end
     close(io)
     
+    return initlist
 end
 
 function runSolver()

@@ -1,6 +1,6 @@
 module Solver
 
-export solve
+export solve!
 
 using ..Trees
 using ..Tableaux
@@ -79,10 +79,13 @@ function applyModal!(tableau::Tableau, constraints::Vector{Char})
     if flag
         if 't' in constraints
             transitivity!(tableau)
+        end
         if 'r' in constraints
             reflexivity!(tableau)
+        end
         if 's' in constraints
             symmetry!(tableay)
+        end
     end
 
     return flag
@@ -122,8 +125,6 @@ function applyBranching!(tableau::Tableau)
         end
     end
     return flag
-end
-
 end
 
 function isClosed(list::Vector{NamedTuple{(:formula, :world, :applied), Tuple{Tree, Int32, Bool}}})

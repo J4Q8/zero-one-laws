@@ -3,7 +3,7 @@ module PropositionalRules
 export negNeg!, negBiImp!, negCon!, negDis!, negImp!, con!, dis!, imp!, biImp!
 
 using ..Trees
-using ..Tableaus
+using ..Tableaux
 
 function negDisj!(tableau::Tableau, idx::Int64)
     #=

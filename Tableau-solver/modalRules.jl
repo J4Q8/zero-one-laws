@@ -12,6 +12,7 @@ function firstEmptyWorld(tableau::Tableau)
         if new_max > max
             max = new_max
         end
+    end
     return max + 1
 end
 
@@ -195,6 +196,7 @@ function symmetry!(tableau::Tableau)
         if !(relation in tableau.relations)
             push!(tableau.relations, relation)
             flag = true
+        end
     end
     if flag 
         refreshBox!(tableau)
