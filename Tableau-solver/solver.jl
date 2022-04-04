@@ -129,14 +129,14 @@ function applyBranching!(tableau::Tableau)
     return flag
 end
 
-function isClosed(list::Vector{NamedTuple{(:formula, :world), Tuple{Tree, Int32}}})
-    for i in list[1:end-1]
+function isClosed(list::Vector{NamedTuple{(:formula, :world), Tuple{Tree, Int64}}})
+    for (idx, i) in enumerate(list[1:end-1])
         # early stopping criterion in case explicit contradiction is ancountered
         if i.formula.connective == "⊥" || (i.formula.connective == '¬' && i.formula.right.connective == '⊤') 
             return true
         end
 
-        for j in list[i+1:end]
+        for j in list[idx+1:end]
             if isOpposite(i.formula, j.formula)
                 return true
             end
@@ -171,14 +171,14 @@ function solve!(tableau::Tableau, constraints::Vector{Char})
                 # remove irrelevant formulas from the current branch (list)
                 # remove formulas after the most recent branching
                 while length(tableau.list) >= branch.line
-                    _ = pop!(tableau)
+                    _ = pop!(tableau.list)
                 end
                 
                 # while-loop used to accomodate the multiple formulas on a new branch produced by negImp! and imp!
                 # we will add all formulas in a new branch to the current branch (list)
                 while true
                     addFormula!(tableau, branch.formula, branch.world)
-                    if tableau.branches[end].line == branch.line
+                    if length(tableau.branches) > 0 && tableau.branches[end].line == branch.line
                         branch = pop!(tableau.branches)
                     else
                         break
@@ -197,6 +197,7 @@ function solve!(tableau::Tableau, constraints::Vector{Char})
             end
         else
             print("Tableau has at least one open and complete branch:")
+            printBranch(tableau)
             break
         end
     end

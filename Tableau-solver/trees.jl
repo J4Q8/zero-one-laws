@@ -2,7 +2,7 @@ module Trees
 
 #Maybe a good idea to change pointers to arrays
 
-export Tree, addleftchild!, addrightchild!, height, isEqual, isOposite, printFormula
+export Tree, addleftchild!, addrightchild!, height, isEqual, isOpposite, printFormula
 
 """
 Inspiration from https://github.com/JuliaCollections/AbstractTrees.jl/blob/master/examples/binarytree_core.jl

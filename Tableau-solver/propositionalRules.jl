@@ -107,7 +107,7 @@ function negCon!(tableau::Tableau, idx::Int64)
 
     f2 = Tree('¬')
     addrightchild!(f2, formula.right)
-    tuple2 = (formula = f2, world = t.world, line = idx + 1)
+    tuple2 = (formula = f2, world = t.world, line = length(tableau.list))
     push!(tableau.branches, tuple2)
 
     tableau.applied[idx] = true
@@ -128,7 +128,7 @@ function dis!(tableau::Tableau, idx::Int64)
     # rule for ∨
     addFormula!(tableau, formula.left, t.world)
 
-    tuple2 = (formula = formula.right, world = t.world, line = idx + 1)
+    tuple2 = (formula = formula.right, world = t.world, line = length(tableau.list))
     push!(tableau.branches, tuple2)
     
     tableau.applied[idx] = true
@@ -151,7 +151,7 @@ function imp!(tableau::Tableau, idx::Int64)
     addrightchild!(f1, formula.left)
     addFormula!(tableau, f1, t.world)
 
-    tuple2 = (formula = formula.right, world = t.world, line = idx + 1)
+    tuple2 = (formula = formula.right, world = t.world, line = length(tableau.list))
     push!(tableau.branches, tuple2)
 
     tableau.applied[idx] = true
@@ -174,17 +174,17 @@ function biImp!(tableau::Tableau, idx::Int64)
     # rule for ↔
     addFormula!(tableau, formula.left, t.world)
 
-    addFormula!(tableau, formula.right, t.world)
-
     f1 = Tree('¬')
     addrightchild!(f1, formula.left)
-    tuple3 = (formula = f1, world = t.world, line = idx + 1)
+    tuple3 = (formula = f1, world = t.world, line = length(tableau.list))
     push!(tableau.branches, tuple3)
 
     f2 = Tree('¬')
     addrightchild!(f1, formula.right)
-    tuple4 = (formula = f2, world = t.world, line = idx + 1)
-    push!(tableau.branches, tuple4)    
+    tuple4 = (formula = f2, world = t.world, line = length(tableau.list))
+    push!(tableau.branches, tuple4)  
+
+    addFormula!(tableau, formula.right, t.world)  
 
     tableau.applied[idx] = true
 end
@@ -205,18 +205,18 @@ function negBiImp!(tableau::Tableau, idx::Int64)
 
     # rule for ¬↔
     addFormula!(tableau, formula.left, t.world)
+    
+    f3 = Tree('¬')
+    addrightchild!(f2, formula.left)
+    tuple3 = (formula = f3, world = t.world, line = length(tableau.list))
+    push!(tableau.branches, tuple3)   
+
+    tuple4 = (formula = formula.right, world = t.world, line = length(tableau.list))
+    push!(tableau.branches, tuple4)
 
     f2 = Tree('¬')
     addrightchild!(f1, formula.right)
     addFormula!(tableau, f1, t.world)
-
-    f3 = Tree('¬')
-    addrightchild!(f2, formula.left)
-    tuple3 = (formula = f3, world = t.world, line = idx + 1)
-    push!(tableau.branches, tuple3)   
-
-    tuple4 = (formula = formula.right, world = t.world, line = idx + 1)
-    push!(tableau.branches, tuple4)
 
     tableau.applied[idx] = true
 end

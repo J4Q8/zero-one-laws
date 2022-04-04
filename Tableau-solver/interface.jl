@@ -61,9 +61,9 @@ function loadPremisesConsequent()
     println("Loading premises from 'IN_premises.txt'")
 
     for line in eachline("IN_premises.txt")
+        formula = parseFormula(line)
+        addFormula!(tableau, formula, 0)
         try
-            formula = parseFormula(line)
-            addFormula!(tableau, formula, 0)
         catch
             error(line, " :cannot be parsed")
         end
@@ -83,7 +83,7 @@ function loadPremisesConsequent()
     end
     close(io)
     
-    return initlist
+    return tableau
 end
 
 function runSolver!()

@@ -24,7 +24,7 @@ function refreshBox!(tableau::Tableau)
     end
 end
 
-function isOnList(tableau::Tableau, t::NamedTuple{(:formula, :world), Tuple{Tree, Int32}})
+function isOnList(tableau::Tableau, t::NamedTuple{(:formula, :world), Tuple{Tree, Int64}})
     for i in tableau.list
         if isEqual(t.formula,i.formula) && t.world == i.world
             return true
@@ -59,6 +59,7 @@ function box!(tableau::Tableau, idx::Int64)
             tuple1 = (formula = formula.right, world = i.j, applied = false)
             if !isOnList(tableau, tuple1)
                 push!(tableau.list, tuple1)
+                push!(tableau.applied, false)
             end
         end
     end
@@ -124,12 +125,14 @@ function boxGL!(tableau::Tableau, idx::Int64)
 
             f1 = Tree('◻')
             addrightchild!(f1, formula.right)
-            tuple1 = (formula = f1, world = i.j, applied = false)
-            tuple2 = (formula = formula.right, world = i.j, applied = false)
+            tuple1 = (formula = f1, world = i.j)
+            tuple2 = (formula = formula.right, world = i.j)
 
             if !isOnList(tableau, tuple1) && !isOnList(tableau, tuple2)
                 push!(tableau.list, tuple1)
+                push!(tableau.applied, false)
                 push!(tableau.list, tuple2)
+                push!(tableau.applied, false)
             end
         end
     end
@@ -139,15 +142,15 @@ end
 
 function transitivity!(tableau::Tableau)
     flag = false
-    for l in tableau.relations
+    for (idx, l) in tableau.relations
         #I have to use the this case instead of slicing to be able to use dynamic arrays
-        if l > length(tableau.relations) -1
+        if idx > length(tableau.relations) -1
             continue
         end
 
-        for k in tableau.relations
+        for (idx2, k) in tableau.relations
              #I have to use the this case instead of slicing to be able to use dynamic arrays
-            if k <= l
+            if idx2 <= idx
                 continue
             end
 
