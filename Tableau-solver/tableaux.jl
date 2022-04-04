@@ -1,4 +1,4 @@
-module Tableaus
+module Tableaux
 
 export Tableau
 

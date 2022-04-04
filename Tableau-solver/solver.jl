@@ -3,7 +3,7 @@ module Solver
 export solve
 
 using ..Trees
-using ..Tableaus
+using ..Tableaux
 
 function applyNonBranching!(tableau::Tableau)
     #=
@@ -45,8 +45,10 @@ function applyModal(tableau::Tableau, restrictions::Vector{Char})
     iswf = 'c' in restrictions ? true : false
     d! = iswf ? diaGL! : dia!
     b! = iswf ? boxGL! : box!
-    nd! = iswf ? negDiaGL! : negDia!
-    nb! = iswf ? negBoxGL! : negBox!
+    #nd! = iswf ? negDiaGL! : negDia! # I DON' THINK IT IS NECESSARY TO HAVE SPECIAL SHORTCUT RULES FOR GL
+    nd! = negDia!
+    #nb! = iswf ? negBoxGL! : negBox!
+    nb! = negBox!
 
     flag = false
     for (idx, i) in enumerate(tableau.list)
@@ -125,7 +127,12 @@ end
 end
 
 function isClosed(list::Vector{NamedTuple{(:formula, :world, :applied), Tuple{Tree, Int32, Bool}}})
-    for i in list[:end-1]
+    for i in list[1:end-1]
+        # early stopping criterion in case explicit contradiction is ancountered
+        if i.formula.connective == "⊥" || (i.formula.connective == '¬' && i.formula.right.connective == '⊤') 
+            return true
+        end
+
         for j in list[i+1:end]
             if isOpposite(i.formula, j.formula)
                 return true
