@@ -5,6 +5,20 @@ export solve
 using ..Trees
 using ..Tableaux
 
+function printBranch(tableau::Tableau)
+    for (idx, l) in enumerate(tableau.list)
+        print(idx,":\t")
+        printFormula(l)
+        print(", ", l.world, "\t")
+        for r in tableau.relations
+            if r.line == idx
+                print(r.i,"R",r.j,", ")                
+            end    
+        end   
+        print("\n") 
+    end
+end
+
 function applyNonBranching!(tableau::Tableau)
     #=
         Returns true if at least one new rule has been applied
@@ -36,13 +50,13 @@ function applyNonBranching!(tableau::Tableau)
     return flag
 end
 
-function applyModal(tableau::Tableau, restrictions::Vector{Char})
+function applyModal!(tableau::Tableau, constraints::Vector{Char})
     #=
         Returns true if at least one new rule has been applied
     =#    
 
     #Alternative rules for the GL due to converse well foundedness
-    iswf = 'c' in restrictions ? true : false
+    iswf = 'c' in constraints ? true : false
     d! = iswf ? diaGL! : dia!
     b! = iswf ? boxGL! : box!
     #nd! = iswf ? negDiaGL! : negDia! # I DON' THINK IT IS NECESSARY TO HAVE SPECIAL SHORTCUT RULES FOR GL
@@ -77,11 +91,11 @@ function applyModal(tableau::Tableau, restrictions::Vector{Char})
     end
 
     if flag
-        if 't' in restrictions
+        if 't' in constraints
             transitivity!(tableau)
-        if 'r' in restrictions
+        if 'r' in constraints
             reflexivity!(tableau)
-        if 's' in restrictions
+        if 's' in constraints
             symmetry!(tableay)
     end
 
@@ -142,22 +156,22 @@ function isClosed(list::Vector{NamedTuple{(:formula, :world, :applied), Tuple{Tr
     return false
 end
 
-function solveBranch!(tableau::Tableau)
+function solveBranch!(tableau::Tableau, constraints::Vector{Char})
     #=
         returns true when the branch is closed and complete, false when the branch is open and complete
     =#
     
     # this loop makes sure that the rules are applied in a correct order as long as there any rules left to be applied
-    while !(applyNonBranching!(tableau) && applyModal!(tableau) && applyBranching!(tableau))
+    while !(applyNonBranching!(tableau) && applyModal!(tableau, constraints) && applyBranching!(tableau))
     end
     
     return isClosed(tableau.list)
 end
 
-function solve(tableau)
+function solve!(tableau::Tableau, constraints::Vector{Char})
 
     while true
-        if solveBranch!(tableau)
+        if solveBranch!(tableau, constraints)
             if length(tableau.branches) != 0
 
                 branch = pop!(tableau.branches)
@@ -191,7 +205,7 @@ function solve(tableau)
                 break
             end
         else
-            print("Tableau has at least one open and complete branch")
+            print("Tableau has at least one open and complete branch:")
             break
         end
     end

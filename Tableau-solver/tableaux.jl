@@ -13,7 +13,7 @@ mutable struct Tableau
     relations::Vector{NamedTuple{(:i, :j, :line), Tuple{Int32, Int32, Int32}}}
 
     #root constructor
-    Tableau(initiallist) = new(initiallist)
+    Tableau(initiallist) = new(initiallist, NamedTuple{(:formula, :world, :line), Tuple{Tree, Int32, Int32}}[], NamedTuple{(:i, :j, :line), Tuple{Int32, Int32, Int32}}[])
 end
 
 end #module

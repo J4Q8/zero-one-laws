@@ -195,35 +195,6 @@ function acceptFormula!(s::String, i::Vector{Int})
     return undef
 end
 
-function printFormula(formulatree::Tree)
-    if formulatree == undef
-        print("Ups...")
-        return
-    end
-
-    if isdefined(formulatree, :left)
-        if !isdefined(formulatree.left, :left) || !isdefined(formulatree.left, :right)
-            printFormula(formulatree.left)
-        else
-            print(" (")
-            printFormula(formulatree.left)
-            print(" )")
-        end
-    end
-    
-    print(" ", formulatree.connective)
-
-    if isdefined(formulatree, :right)
-        if !isdefined(formulatree.right, :left) || !isdefined(formulatree.right, :right)
-            printFormula(formulatree.right)
-        else
-            print(" (")
-            printFormula(formulatree.right)
-            print(" )")
-        end
-    end
-end
-
 function parseFormula(formula::String)
     formula = cleanFormula(formula)
     wrapper = [1]
