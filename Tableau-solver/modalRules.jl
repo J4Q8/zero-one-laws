@@ -17,16 +17,16 @@ function firstEmptyWorld(tableau::Tableau)
 end
 
 function refreshBox!(tableau::Tableau)
-    for i in tableau.list
+    for (idx, i) in enumerate(tableau.list)
         if i.formula.connective == '◻'
-            i.applied = false
+            tableau.applied[idx] = false
         end
     end
 end
 
-function isOnList(tableau::Tableau, t::NamedTuple{(:formula, :world, :applied), Tuple{Tree, Int32, Bool}})
+function isOnList(tableau::Tableau, t::NamedTuple{(:formula, :world), Tuple{Tree, Int32}})
     for i in tableau.list
-        if isEqual(t.formula,i.formula) && t.world == i.world && t.applied == i.applied
+        if isEqual(t.formula,i.formula) && t.world == i.world
             return true
         end
     end
@@ -42,11 +42,10 @@ function dia!(tableau::Tableau, idx::Int64)
     relation = (i = t.world, j = j, line = idx)
     push!(tableau.relations, relation)
 
-    tuple1 = (formula = formula.right, world = j, applied = false)
-    push!(tableau.list, tuple1)
+    addFormula!(tableau, formula.right, j)
 
     #mark this rule as applied and make sure all boxes are checked for the new relations
-    t.applied = true
+    tableau.applied[idx] = true
     refreshBox!(tableau)
 end
 
@@ -64,7 +63,7 @@ function box!(tableau::Tableau, idx::Int64)
         end
     end
 
-    t.applied = true
+    tableau.applied[idx] = true
 end
 
 function negDia!(tableau::Tableau, idx::Int64)
@@ -75,10 +74,9 @@ function negDia!(tableau::Tableau, idx::Int64)
     f2 = Tree('¬')
     addrightchild!(f1,f2)
     addrightchild!(f2, formula)
-    tuple1 = (formula = f1, world = t.world, applied = false)
-    push!(tableau.list, tuple1)
+    addFormula!(tableau, f1, t.world)
 
-    t.applied = true
+    tableau.applied[idx] = true
 end
 
 function negBox!(tableau::Tableau, idx::Int64)
@@ -89,10 +87,9 @@ function negBox!(tableau::Tableau, idx::Int64)
     f2 = Tree('¬')
     addrightchild!(f1,f2)
     addrightchild!(f2, formula)
-    tuple1 = (formula = f1, world = t.world, applied = false)
-    push!(tableau.list, tuple1)
+    addFormula!(tableau, f1, t.world)
 
-    t.applied = true
+    tableau.applied[idx] = true
 end
 
 function diaGL!(tableau::Tableau, idx::Int64)
@@ -108,14 +105,11 @@ function diaGL!(tableau::Tableau, idx::Int64)
     f2 = Tree('◇')
     addrightchild!(f1,f2)
     addrightchild!(f2, formula.right)
-    tuple1 = (formula = f1, world = j, applied = false)
-    push!(tableau.list, tuple1)
-
-    tuple2 = (formula = formula.right, world = j, applied = false)
-    push!(tableau.list, tuple2)
+    addFormula!(tableau, f1, j)
+    addFormula!(tableau, formula.right, j)
 
     #mark this rule as applied and make sure all boxes are checked for the new relations
-    t.applied = true
+    tableau.applied[idx] = true
     refreshBox!(tableau)
 end
 
@@ -140,7 +134,7 @@ function boxGL!(tableau::Tableau, idx::Int64)
         end
     end
 
-    t.applied = true
+    tableau.applied[idx] = true
 end
 
 function transitivity!(tableau::Tableau)

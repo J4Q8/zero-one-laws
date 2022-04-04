@@ -6,14 +6,22 @@ using ..Trees
 
 mutable struct Tableau
     #keeps track of the current branch
-    list::Vector{NamedTuple{(:formula, :world, :applied), Tuple{Tree, Int32, Bool}}}
+    list::Vector{NamedTuple{(:formula, :world), Tuple{Tree, Int32}}}
+    #keeps track of whick rules have been applied
+    applied::Vector{Bool}
     #this will keep track of branches to be explored
     branches::Vector{NamedTuple{(:formula, :world, :line), Tuple{Tree, Int32, Int32}}}
     #keeps track of relations
     relations::Vector{NamedTuple{(:i, :j, :line), Tuple{Int32, Int32, Int32}}}
 
     #root constructor
-    Tableau(initiallist) = new(initiallist, NamedTuple{(:formula, :world, :line), Tuple{Tree, Int32, Int32}}[], NamedTuple{(:i, :j, :line), Tuple{Int32, Int32, Int32}}[])
+    Tableau() = new(NamedTuple{(:formula, :world), Tuple{Tree, Int32}}[], Vector{Char}, NamedTuple{(:formula, :world, :line), Tuple{Tree, Int32, Int32}}[], NamedTuple{(:i, :j, :line), Tuple{Int32, Int32, Int32}}[])
+end
+
+function addFormula!(tableau::Tableau, formula::Tree, world::Int32)
+    tuple1 = (formula = formula, world = world)
+    push!(tableau.list, tuple1)
+    push!(tableau.applied, false)
 end
 
 function printBranch(tableau::Tableau)

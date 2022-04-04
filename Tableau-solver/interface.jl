@@ -13,7 +13,7 @@ using .Parser
 using .Tableaux
 using .Solver
 
-export runSolver
+export runSolver!
 
 function welcomeGetConstraints()
     println("Welcome to modal tableaux solver!")
@@ -56,15 +56,14 @@ end
 
 function loadPremisesConsequent()
 
-    println("Loading premises from 'IN_premises.txt'")
+    tableau = Tableau()
 
-    initlist = NamedTuple{(:formula, :world, :applied), Tuple{Tree, Int32, Bool}}[]
+    println("Loading premises from 'IN_premises.txt'")
 
     for line in eachline("IN_premises.txt")
         try
             formula = parseFormula(line)
-            ttuple = (formula = formula, world = 0, applied = false)
-            push!(initlist, ttuple)
+            addFormula!(tableau, formula, 0)
         catch
             error(line, " :cannot be parsed")
         end
@@ -78,8 +77,7 @@ function loadPremisesConsequent()
         formula = parseFormula(consequent)
         negformula = Tree('¬')
         addrightchild!(negformula, formula)
-        ttuple = (formula = negformula, world = 0, applied = false)
-        push!(initlist, ttuple)
+        addFormula!(tableau, negformula, 0)
     catch
         error(consequent, " :cannot be parsed")
     end
@@ -88,13 +86,11 @@ function loadPremisesConsequent()
     return initlist
 end
 
-function runSolver()
+function runSolver!()
 
     constraints = welcomeGetConstraints()
 
-    initlist = loadPremisesConsequent()
-
-    tableau = Tableau(initlist)
+    tableau = loadPremisesConsequent()
 
     solve!(tableau, constraints)
 

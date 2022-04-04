@@ -4,6 +4,8 @@ export solve!
 
 using ..Trees
 using ..Tableaux
+using ..ModalRules
+using ..PropositionalRules
 
 function applyNonBranching!(tableau::Tableau)
     #=
@@ -12,7 +14,7 @@ function applyNonBranching!(tableau::Tableau)
     flag = false
     for (idx, i) in enumerate(tableau.list)
 
-        if i.applied
+        if tableau.applied[idx]
             continue
         end
 
@@ -53,7 +55,7 @@ function applyModal!(tableau::Tableau, constraints::Vector{Char})
     flag = false
     for (idx, i) in enumerate(tableau.list)
 
-        if i.applied
+        if tableau.applied[idx]
             continue
         end
 
@@ -99,7 +101,7 @@ function applyBranching!(tableau::Tableau)
     flag = false
     for (idx, i) in enumerate(tableau.list)
 
-        if i.applied
+        if tableau.applied[idx]
             continue
         end
 
@@ -127,7 +129,7 @@ function applyBranching!(tableau::Tableau)
     return flag
 end
 
-function isClosed(list::Vector{NamedTuple{(:formula, :world, :applied), Tuple{Tree, Int32, Bool}}})
+function isClosed(list::Vector{NamedTuple{(:formula, :world), Tuple{Tree, Int32}}})
     for i in list[1:end-1]
         # early stopping criterion in case explicit contradiction is ancountered
         if i.formula.connective == "⊥" || (i.formula.connective == '¬' && i.formula.right.connective == '⊤') 
@@ -149,7 +151,10 @@ function solveBranch!(tableau::Tableau, constraints::Vector{Char})
     =#
     
     # this loop makes sure that the rules are applied in a correct order as long as there any rules left to be applied
-    while !(applyNonBranching!(tableau) && applyModal!(tableau, constraints) && applyBranching!(tableau))
+    while true
+        if !applyNonBranching!(tableau) && !applyModal!(tableau, constraints) && !applyBranching!(tableau)
+            break
+        end
     end
     
     return isClosed(tableau.list)
@@ -172,8 +177,7 @@ function solve!(tableau::Tableau, constraints::Vector{Char})
                 # while-loop used to accomodate the multiple formulas on a new branch produced by negImp! and imp!
                 # we will add all formulas in a new branch to the current branch (list)
                 while true
-                    tuple1 = (formula = branch.formula, world = branch.world, applied = false)
-                    push!(tableau.list, tuple1)
+                    addFormula!(tableau, branch.formula, branch.world)
                     if tableau.branches[end].line == branch.line
                         branch = pop!(tableau.branches)
                     else

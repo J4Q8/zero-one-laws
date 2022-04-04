@@ -20,15 +20,13 @@ function negDisj!(tableau::Tableau, idx::Int64)
     # rule for ¬∨
     f1 = Tree('¬')
     addrightchild!(f1, formula.left)
-    tuple1 = (formula = f1, world = t.world, applied = false)
-    push!(tableau.list, tuple1)
+    addFormula!(tableau, f1, t.world)
 
     f2 = Tree('¬')
     addrightchild!(f2, formula.right)
-    tuple2 = (formula = f2, world = t.world, applied = false)
-    push!(tableau.list, tuple2) 
+    addFormula!(tableau, f2, t.world)
 
-    t.applied = true
+    tableau.applied[idx] = true
 end
 
 function negNeg!(tableau::Tableau, idx::Int64)
@@ -44,10 +42,9 @@ function negNeg!(tableau::Tableau, idx::Int64)
     formula = t.formula.right
 
     # rule for ¬¬
-    tuple = (formula = formula.right, world = t.world, applied = false)
-    push!(tableau.list, tuple)
+    addFormula!(tableau, formula.right, t.world)
 
-    t.applied = true
+    tableau.applied[idx] = true
 end
 
 function con!(tableau::Tableau, idx::Int64)
@@ -62,13 +59,11 @@ function con!(tableau::Tableau, idx::Int64)
     formula = t.formula
 
     # rule for ∧
-    tuple1 = (formula = formula.right, world = t.world, applied = false)
-    push!(tableau.list, tuple1)
+    addFormula!(tableau, formula.right, t.world)
 
-    tuple2 = (formula = formula.left, world = t.world, applied = false)
-    push!(tableau.list, tuple2) 
+    addFormula!(tableau, formula.left, t.world)
 
-    t.applied = true
+    tableau.applied[idx] = true
 end
 
 function negImp!(tableau::Tableau, idx::Int64)
@@ -84,15 +79,13 @@ function negImp!(tableau::Tableau, idx::Int64)
     formula = t.formula.right
 
     # rule for ¬→
-    tuple1 = (formula = formula.left, world = t.world, applied = false)
-    push!(tableau.list, tuple1)
+    addFormula!(tableau, formula.left, t.world)
 
     f2 = Tree('¬')
     addrightchild!(f2, formula.right)
-    tuple2 = (formula = f2, world = t.world, applied = false)
-    push!(tableau.list, tuple2) 
+    addFormula!(tableau, f2, t.world)
 
-    t.applied = true
+    tableau.applied[idx] = true
 end
 
 function negCon!(tableau::Tableau, idx::Int64)
@@ -110,15 +103,14 @@ function negCon!(tableau::Tableau, idx::Int64)
     # rule for ¬∧
     f1 = Tree('¬')
     addrightchild!(f1, formula.left)
-    tuple1 = (formula = f1, world = t.world, applied = false)
-    push!(tableau.list, tuple1)
+    addFormula!(tableau, f1, t.world)
 
     f2 = Tree('¬')
     addrightchild!(f2, formula.right)
     tuple2 = (formula = f2, world = t.world, line = idx + 1)
     push!(tableau.branches, tuple2)
 
-    t.applied = true
+    tableau.applied[idx] = true
 end
 
 function dis!(tableau::Tableau, idx::Int64)
@@ -134,13 +126,12 @@ function dis!(tableau::Tableau, idx::Int64)
     formula = t.formula
 
     # rule for ∨
-    tuple1 = (formula = formula.left, world = t.world, applied = false)
-    push!(tableau.list, tuple1)
+    addFormula!(tableau, formula.left, t.world)
 
     tuple2 = (formula = formula.right, world = t.world, line = idx + 1)
     push!(tableau.branches, tuple2)
     
-    t.applied = true
+    tableau.applied[idx] = true
 end
 
 function imp!(tableau::Tableau, idx::Int64)
@@ -158,13 +149,12 @@ function imp!(tableau::Tableau, idx::Int64)
     # rule for →
     f1 = Tree('¬')
     addrightchild!(f1, formula.left)
-    tuple1 = (formula = f1, world = t.world, applied = false)
-    push!(tableau.list, tuple1)
+    addFormula!(tableau, f1, t.world)
 
     tuple2 = (formula = formula.right, world = t.world, line = idx + 1)
     push!(tableau.branches, tuple2)
-    
-    t.applied = true
+
+    tableau.applied[idx] = true
 end
 
 function biImp!(tableau::Tableau, idx::Int64)
@@ -182,11 +172,9 @@ function biImp!(tableau::Tableau, idx::Int64)
     formula = t.formula
 
     # rule for ↔
-    tuple1 = (formula = formula.left, world = t.world, applied = false)
-    push!(tableau.list, tuple1)
+    addFormula!(tableau, formula.left, t.world)
 
-    tuple2 = (formula = formula.right, world = t.world, applied = false)
-    push!(tableau.list, tuple2) 
+    addFormula!(tableau, formula.right, t.world)
 
     f1 = Tree('¬')
     addrightchild!(f1, formula.left)
@@ -198,7 +186,7 @@ function biImp!(tableau::Tableau, idx::Int64)
     tuple4 = (formula = f2, world = t.world, line = idx + 1)
     push!(tableau.branches, tuple4)    
 
-    t.applied = true
+    tableau.applied[idx] = true
 end
 
 function negBiImp!(tableau::Tableau, idx::Int64)
@@ -216,13 +204,11 @@ function negBiImp!(tableau::Tableau, idx::Int64)
     formula = t.formula.right
 
     # rule for ¬↔
-    tuple1 = (formula = formula.left, world = t.world, applied = false)
-    push!(tableau.list, tuple1)
+    addFormula!(tableau, formula.left, t.world)
 
     f2 = Tree('¬')
     addrightchild!(f1, formula.right)
-    tuple2 = (formula = f2, world = t.world, applied = false)
-    push!(tableau.list, tuple2)
+    addFormula!(tableau, f1, t.world)
 
     f3 = Tree('¬')
     addrightchild!(f2, formula.left)
@@ -232,7 +218,7 @@ function negBiImp!(tableau::Tableau, idx::Int64)
     tuple4 = (formula = formula.right, world = t.world, line = idx + 1)
     push!(tableau.branches, tuple4)
 
-    t.applied = true
+    tableau.applied[idx] = true
 end
     
 end #module
