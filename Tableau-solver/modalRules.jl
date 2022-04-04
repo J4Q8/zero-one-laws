@@ -8,7 +8,7 @@ using ..Tableaux
 function firstEmptyWorld(tableau::Tableau)
     max = 0
     for i in tableau.relations
-        new_max = max(i.i, i.j)
+        new_max = maximum([i.i, i.j])
         if new_max > max
             max = new_max
         end
@@ -142,20 +142,20 @@ end
 
 function transitivity!(tableau::Tableau)
     flag = false
-    for (idx, l) in tableau.relations
+    for (idx, l) in enumerate(tableau.relations)
         #I have to use the this case instead of slicing to be able to use dynamic arrays
         if idx > length(tableau.relations) -1
             continue
         end
 
-        for (idx2, k) in tableau.relations
+        for (idx2, k) in enumerate(tableau.relations)
              #I have to use the this case instead of slicing to be able to use dynamic arrays
             if idx2 <= idx
                 continue
             end
 
             if l.j == k.i
-                relation = (i = l.i, j = k.j, line = max(l.line, k.line))
+                relation = (i = l.i, j = k.j, line = maximum([l.line, k.line]))
                 if !(relation in tableau.relations)
                     push!(tableau.relations, relation)
                     flag = true
@@ -166,6 +166,7 @@ function transitivity!(tableau::Tableau)
     if flag
         refreshBox!(tableau)
     end
+    return flag
 end
 
 function reflexivity!(tableau::Tableau)
@@ -184,6 +185,7 @@ function reflexivity!(tableau::Tableau)
     if flag 
         refreshBox!(tableau)
     end
+    return flag
 end
 
 function symmetry!(tableau::Tableau)
@@ -198,6 +200,7 @@ function symmetry!(tableau::Tableau)
     if flag 
         refreshBox!(tableau)
     end
+    return flag
 end
 
 end #module

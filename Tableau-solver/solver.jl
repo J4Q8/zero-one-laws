@@ -78,15 +78,17 @@ function applyModal!(tableau::Tableau, constraints::Vector{Char})
         end
     end
 
+    #reflexivity has to be applied even if there are no relations introduced yet
+    #if new relations have been added we need to run the algorithm again
+    if 'r' in constraints
+        flag = reflexivity!(tableau) || flag
+    end
     if flag
         if 't' in constraints
-            transitivity!(tableau)
-        end
-        if 'r' in constraints
-            reflexivity!(tableau)
+            flag = transitivity!(tableau) || flag
         end
         if 's' in constraints
-            symmetry!(tableay)
+            flag = symmetry!(tableau) || flag
         end
     end
 
@@ -137,7 +139,7 @@ function isClosed(list::Vector{NamedTuple{(:formula, :world), Tuple{Tree, Int64}
         end
 
         for j in list[idx+1:end]
-            if isOpposite(i.formula, j.formula)
+            if isOpposite(i.formula, j.formula) && i.world == j.world
                 return true
             end
         end

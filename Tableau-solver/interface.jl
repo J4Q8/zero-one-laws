@@ -16,7 +16,7 @@ using .Solver
 export runSolver!
 
 function welcomeGetConstraints()
-    println("Welcome to modal tableaux solver!")
+    println("Welcome to Jakub's modal tableaux solver!")
 
     restrictions = Char[]
 

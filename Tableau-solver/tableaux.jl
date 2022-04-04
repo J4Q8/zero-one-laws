@@ -28,7 +28,7 @@ function printBranch(tableau::Tableau)
     for (idx, l) in enumerate(tableau.list)
         print(idx,":\t")
         printFormula(l.formula)
-        print(", ", l.world, "\t")
+        print(", ", l.world, "\t\t")
         for r in tableau.relations
             if r.line == idx
                 print(r.i,"R",r.j,", ")                
