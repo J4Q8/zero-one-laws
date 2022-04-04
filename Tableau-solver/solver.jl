@@ -5,20 +5,6 @@ export solve
 using ..Trees
 using ..Tableaux
 
-function printBranch(tableau::Tableau)
-    for (idx, l) in enumerate(tableau.list)
-        print(idx,":\t")
-        printFormula(l)
-        print(", ", l.world, "\t")
-        for r in tableau.relations
-            if r.line == idx
-                print(r.i,"R",r.j,", ")                
-            end    
-        end   
-        print("\n") 
-    end
-end
-
 function applyNonBranching!(tableau::Tableau)
     #=
         Returns true if at least one new rule has been applied

@@ -1,6 +1,6 @@
 module Tableaux
 
-export Tableau
+export Tableau, printBranch
 
 using ..Trees
 
@@ -14,6 +14,20 @@ mutable struct Tableau
 
     #root constructor
     Tableau(initiallist) = new(initiallist, NamedTuple{(:formula, :world, :line), Tuple{Tree, Int32, Int32}}[], NamedTuple{(:i, :j, :line), Tuple{Int32, Int32, Int32}}[])
+end
+
+function printBranch(tableau::Tableau)
+    for (idx, l) in enumerate(tableau.list)
+        print(idx,":\t")
+        printFormula(l)
+        print(", ", l.world, "\t")
+        for r in tableau.relations
+            if r.line == idx
+                print(r.i,"R",r.j,", ")                
+            end    
+        end   
+        print("\n") 
+    end
 end
 
 end #module
