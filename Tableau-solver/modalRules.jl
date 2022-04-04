@@ -56,7 +56,7 @@ function box!(tableau::Tableau, idx::Int64)
     # rule for '◻'
     for i in tableau.relations
         if t.world == i.i
-            tuple1 = (formula = formula.right, world = i.j, applied = false)
+            tuple1 = (formula = formula.right, world = i.j)
             if !isOnList(tableau, tuple1)
                 push!(tableau.list, tuple1)
                 push!(tableau.applied, false)
@@ -73,8 +73,8 @@ function negDia!(tableau::Tableau, idx::Int64)
 
     f1 = Tree('◻')
     f2 = Tree('¬')
-    addrightchild!(f1,f2)
     addrightchild!(f2, formula)
+    addrightchild!(f1,f2)
     addFormula!(tableau, f1, t.world)
 
     tableau.applied[idx] = true
@@ -86,8 +86,8 @@ function negBox!(tableau::Tableau, idx::Int64)
 
     f1 = Tree('◇')
     f2 = Tree('¬')
-    addrightchild!(f1,f2)
     addrightchild!(f2, formula)
+    addrightchild!(f1,f2)
     addFormula!(tableau, f1, t.world)
 
     tableau.applied[idx] = true
@@ -104,8 +104,8 @@ function diaGL!(tableau::Tableau, idx::Int64)
 
     f1 = Tree('¬')
     f2 = Tree('◇')
-    addrightchild!(f1,f2)
     addrightchild!(f2, formula.right)
+    addrightchild!(f1,f2)
     addFormula!(tableau, f1, j)
     addFormula!(tableau, formula.right, j)
 

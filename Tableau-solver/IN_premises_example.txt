@@ -4,3 +4,7 @@ bp <> dq
 ~p <> ~q
 ~~p
 (~p) -> (p -> (q -> p)) 
+
+
+ ◻ ( a → b ) ∧ ◻ ( b → c ) |-  ◻ ( a → c )
+ ◇ ◻ ◇ p |/- ◇ p #no constraints

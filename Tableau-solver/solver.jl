@@ -172,6 +172,7 @@ function solve!(tableau::Tableau, constraints::Vector{Char})
                 # remove formulas after the most recent branching
                 while length(tableau.list) >= branch.line
                     _ = pop!(tableau.list)
+                    _ = pop!(tableau.applied)
                 end
                 
                 # while-loop used to accomodate the multiple formulas on a new branch produced by negImp! and imp!
@@ -196,7 +197,7 @@ function solve!(tableau::Tableau, constraints::Vector{Char})
                 break
             end
         else
-            print("Tableau has at least one open and complete branch:")
+            print("Tableau has at least one open and complete branch:\n")
             printBranch(tableau)
             break
         end
