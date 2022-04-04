@@ -3,11 +3,15 @@ module Interface
 include("cleaner.jl")
 include("trees.jl")
 include("parser.jl")
+include("tableau.jl")
+include("propositionalRules.jl")
 #include("solver.jl")
 
 using .Trees
 using .Parser
-#using .Solver
+# using .Tableau
+# using .PropositionalRules
+# using .Solver
 
 export startSolver
 
