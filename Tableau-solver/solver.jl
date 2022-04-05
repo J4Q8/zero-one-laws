@@ -147,6 +147,49 @@ function isClosed(list::Vector{NamedTuple{(:formula, :world), Tuple{Tree, Int64}
     return false
 end
 
+function isInfinite(tableau::Tableau)
+    #after this many worlds are introduced the infinite check will be called
+    THRESHOLD = 10
+
+    worlds = Int64[]
+    for r in tableau.relations
+        if !(r.i in worlds)
+            push!(worlds, r.i)
+        end
+        if !(r.j in worlds)
+            push!(worlds, r.j)
+        end
+    end
+
+    if length(worlds) > THRESHOLD
+        counter = 0
+        last = tableau.list[end]
+        f2check = NamedTuple{(:formula, :world), Tuple{Tree, Int64}}[]
+        for l in tableau.list
+            if l.world == last.world
+                push!(f2check, l)
+            end
+        end
+        for w in worlds
+            check = 0
+            for f in f2check
+                for l in tableau.list
+                    if isEqual(f.formula, l.formula) && w == l.world
+                        check = 1 + check
+                    end
+                end
+            end
+            if check == length(f2check)
+                counter = 1 + counter
+            end
+        end
+    
+        return counter > THRESHOLD ? true : false
+    else
+        return false
+    end
+end
+
 function solveBranch!(tableau::Tableau, constraints::Vector{Char})
     #=
         returns true when the branch is closed and complete, false when the branch is open and complete
@@ -154,12 +197,15 @@ function solveBranch!(tableau::Tableau, constraints::Vector{Char})
     
     # this loop makes sure that the rules are applied in a correct order as long as there any rules left to be applied
     while true
+        if isInfinite(tableau)
+            break
+        end
         if !applyNonBranching!(tableau) && !applyModal!(tableau, constraints) && !applyBranching!(tableau)
             break
         end
     end
     
-    return isClosed(tableau.list)
+    return isClosed(tableau.list) 
 end
 
 function solve!(tableau::Tableau, constraints::Vector{Char})

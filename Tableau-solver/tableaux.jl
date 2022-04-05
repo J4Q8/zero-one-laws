@@ -31,7 +31,7 @@ function printBranch(tableau::Tableau)
         print(", ", l.world, "\t\t")
         for r in tableau.relations
             if r.line == idx
-                print(r.i,"R",r.j,", ")                
+                print(r.i,"r",r.j,", ")                
             end    
         end   
         print("\n") 
