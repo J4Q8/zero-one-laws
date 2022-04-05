@@ -1,1 +1,1 @@
-~(dp^bdp)
+b(A ↔ (b(A ∨ b⊥) → b(A → b⊥))) → b(A ↔ (bbb⊥ → bb⊥))

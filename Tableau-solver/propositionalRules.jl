@@ -5,7 +5,7 @@ export negNeg!, negBiImp!, negCon!, negDis!, negImp!, con!, dis!, imp!, biImp!
 using ..Trees
 using ..Tableaux
 
-function negDisj!(tableau::Tableau, idx::Int64)
+function negDis!(tableau::Tableau, idx::Int64)
     #=
         tableau:    takes a current tableau
         idx:        takes an index of formula to which we apply this rule
@@ -176,13 +176,13 @@ function biImp!(tableau::Tableau, idx::Int64)
 
     f1 = Tree('¬')
     addrightchild!(f1, formula.left)
-    tuple3 = (formula = f1, world = t.world, line = length(tableau.list))
-    push!(tableau.branches, tuple3)
+    tuple1 = (formula = f1, world = t.world, line = length(tableau.list))
+    push!(tableau.branches, tuple1)
 
     f2 = Tree('¬')
-    addrightchild!(f1, formula.right)
-    tuple4 = (formula = f2, world = t.world, line = length(tableau.list))
-    push!(tableau.branches, tuple4)  
+    addrightchild!(f2, formula.right)
+    tuple2 = (formula = f2, world = t.world, line = length(tableau.list))
+    push!(tableau.branches, tuple2)  
 
     addFormula!(tableau, formula.right, t.world)  
 
@@ -206,17 +206,17 @@ function negBiImp!(tableau::Tableau, idx::Int64)
     # rule for ¬↔
     addFormula!(tableau, formula.left, t.world)
     
+    f1 = Tree('¬')
+    addrightchild!(f1, formula.left)
+    tuple1 = (formula = f1, world = t.world, line = length(tableau.list))
+    push!(tableau.branches, tuple1)   
+
+    tuple2 = (formula = formula.right, world = t.world, line = length(tableau.list))
+    push!(tableau.branches, tuple2)
+
     f3 = Tree('¬')
-    addrightchild!(f2, formula.left)
-    tuple3 = (formula = f3, world = t.world, line = length(tableau.list))
-    push!(tableau.branches, tuple3)   
-
-    tuple4 = (formula = formula.right, world = t.world, line = length(tableau.list))
-    push!(tableau.branches, tuple4)
-
-    f2 = Tree('¬')
-    addrightchild!(f1, formula.right)
-    addFormula!(tableau, f1, t.world)
+    addrightchild!(f3, formula.right)
+    addFormula!(tableau, f3, t.world)
 
     tableau.applied[idx] = true
 end

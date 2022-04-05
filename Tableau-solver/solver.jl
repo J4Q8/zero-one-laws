@@ -132,12 +132,13 @@ function applyBranching!(tableau::Tableau)
 end
 
 function isClosed(list::Vector{NamedTuple{(:formula, :world), Tuple{Tree, Int64}}})
-    for (idx, i) in enumerate(list[1:end-1])
-        # early stopping criterion in case explicit contradiction is ancountered
-        if i.formula.connective == "⊥" || (i.formula.connective == '¬' && i.formula.right.connective == '⊤') 
+    for i in list
+        # stopping criterion in case explicit contradiction is ancountered
+        if i.formula.connective == '⊥' || (i.formula.connective == '¬' && i.formula.right.connective == '⊤') 
             return true
-        end
-
+        end 
+    end
+    for (idx, i) in enumerate(list[1:end-1])
         for j in list[idx+1:end]
             if isOpposite(i.formula, j.formula) && i.world == j.world
                 return true

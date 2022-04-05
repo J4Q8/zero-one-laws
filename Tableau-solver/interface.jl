@@ -92,8 +92,9 @@ function runSolver!()
 
     tableau = loadPremisesConsequent()
 
+    @time @allocated begin
     solve!(tableau, constraints)
-
+    end
 end
 
 end

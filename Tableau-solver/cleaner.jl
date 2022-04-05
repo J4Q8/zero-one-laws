@@ -14,7 +14,7 @@ function cleanChar(c::Char)
     if c == '^' || c == '∧' || c == '&'
         #takes care of conjunction
         return '∧'
-    elseif c == 'v' || c == 'V' || c == '|'
+    elseif c == 'v' || c == 'V' || c == '|' || c == '∨'
         #takes care of disjunction
         return '∨'
     elseif c == '-' || c == '→'
