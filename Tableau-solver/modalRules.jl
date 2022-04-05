@@ -1,6 +1,6 @@
 module ModalRules
 
-export dia!, box!, negDia!, negBox!, diaGL!, boxGL!, transitivity!, reflexivity!, symmetry!
+export dia!, box!, negDia!, negBox!, diaGL!, boxGL!, transitivity!, reflexivity!, symmetry!, isOnList
 
 using ..Trees
 using ..Tableaux

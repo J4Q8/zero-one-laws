@@ -174,18 +174,20 @@ function isInfinite(tableau::Tableau)
         for w in worlds
             check = 0
             for f in f2check
-                for l in tableau.list
-                    if isEqual(f.formula, l.formula) && w == l.world
-                        check = 1 + check
-                    end
+                if isOnList(tableau, f)
+                    check = 1 + check
                 end
             end
             if check == length(f2check)
                 counter = 1 + counter
             end
         end
-    
-        return counter > THRESHOLD ? true : false
+        if counter > THRESHOLD 
+            println("Infinite branch!")
+            return true
+        else
+            return false 
+        end
     else
         return false
     end
@@ -199,9 +201,11 @@ function solveBranch!(tableau::Tableau, constraints::Vector{Char})
     # this loop makes sure that the rules are applied in a correct order as long as there any rules left to be applied
     while true
         if isInfinite(tableau)
-            break
+            return false
         end
-        if !applyNonBranching!(tableau) && !applyModal!(tableau, constraints) && !applyBranching!(tableau)
+        # printBranch(tableau)
+        # println("-----------------------------------------")
+        if (!applyNonBranching!(tableau) && !applyModal!(tableau, constraints) && !applyBranching!(tableau)) || isClosed(tableau.list) 
             break
         end
     end
@@ -209,7 +213,9 @@ function solveBranch!(tableau::Tableau, constraints::Vector{Char})
     return isClosed(tableau.list) 
 end
 
-function solve!(tableau::Tableau, constraints::Vector{Char})
+function solve!(tableau::Tableau, constraints::Vector{Char}, mode::Int64 = 1)
+    #mode == 1 : print, no return
+    #mode == 2 : no print, return
 
     while true
         if solveBranch!(tableau, constraints)
@@ -242,13 +248,25 @@ function solve!(tableau::Tableau, constraints::Vector{Char})
                     end
                 end
             else
-                print("Tableau is closed and complete!")
-                break
+                if mode == 1
+                    print("Tableau is closed and complete!")
+                    break
+                else
+                    return true
+                end
             end
         else
-            print("Tableau has at least one open and complete branch:\n")
-            printBranch(tableau)
-            break
+            if mode == 1
+                print("Tableau has at least one open and complete branch:\n")
+                printBranch(tableau)
+                println()
+                println(tableau.applied)
+                println(length(tableau.applied))
+                println(tableau.relations)
+                break
+            else
+                return false
+            end
         end
     end
 end
