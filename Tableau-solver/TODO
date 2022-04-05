@@ -1,0 +1,5 @@
+1. replace applied bool with numbers where 0 = "not applied" and int indicates the first line resulting from a rule application
+
+2. check why relations include lines which are not on the list
+
+3. make sure that is infinite is checked only when the constraints include transitive, but don't have converse-wellfoundedness

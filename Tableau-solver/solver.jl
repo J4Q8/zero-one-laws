@@ -229,6 +229,13 @@ function solve!(tableau::Tableau, constraints::Vector{Char}, mode::Int64 = 1)
                     _ = pop!(tableau.list)
                     _ = pop!(tableau.applied)
                 end
+
+                # remove relations introduced on the other branch, leave ones on the common part of that branch
+                for r in tableau.relations
+                    if r.line >= branch.line
+                        _ = pop!(tableau.relations)
+                    end
+                end
                 
                 # while-loop used to accomodate the multiple formulas on a new branch produced by negImp! and imp!
                 # we will add all formulas in a new branch to the current branch (list)
@@ -240,13 +247,7 @@ function solve!(tableau::Tableau, constraints::Vector{Char}, mode::Int64 = 1)
                         break
                     end
                 end
-                
-                # remove relations introduced on the other branch, leave ones on the common part of that branch
-                for r in tableau.relations
-                    if r.line >= branch.line
-                        _ = pop!(tableau.relations)
-                    end
-                end
+
             else
                 if mode == 1
                     print("Tableau is closed and complete!")
@@ -259,10 +260,10 @@ function solve!(tableau::Tableau, constraints::Vector{Char}, mode::Int64 = 1)
             if mode == 1
                 print("Tableau has at least one open and complete branch:\n")
                 printBranch(tableau)
-                println()
-                println(tableau.applied)
-                println(length(tableau.applied))
-                println(tableau.relations)
+                # println()
+                # println(tableau.applied)
+                # println(length(tableau.applied))
+                # println(tableau.relations)
                 break
             else
                 return false
