@@ -32,7 +32,7 @@ function welcomeGetConstraints()
             push!(restrictions, 't')
             push!(restrictions, 'r')
         elseif language == "k4"
-            push!(restrictions, 's')
+            push!(restrictions, 't')
         elseif language == "custom"
             println("Which constraints would you like to impose on the language? (You can choose multiple ones, provide a string)")
             println("transitivity : t, reflexivity : r, symmetry : s, converse well-foundedness : c")

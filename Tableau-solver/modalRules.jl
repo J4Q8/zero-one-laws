@@ -191,7 +191,7 @@ end
 function symmetry!(tableau::Tableau)
     flag = false
     for r in tableau.relations
-        relation = (i = r.j, j = r.l, line = r.line)
+        relation = (i = r.j, j = r.i, line = r.line)
         if !(relation in tableau.relations)
             push!(tableau.relations, relation)
             flag = true
