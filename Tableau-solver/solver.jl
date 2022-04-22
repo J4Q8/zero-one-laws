@@ -14,7 +14,7 @@ function applyNonBranching!(tableau::Tableau)
     flag = false
     for (idx, i) in enumerate(tableau.list)
 
-        if tableau.applied[idx]
+        if tableau.applied[idx] != 0
             continue
         end
 
@@ -55,7 +55,7 @@ function applyModal!(tableau::Tableau, constraints::Vector{Char})
     flag = false
     for (idx, i) in enumerate(tableau.list)
 
-        if tableau.applied[idx]
+        if tableau.applied[idx] != 0
             continue
         end
 
@@ -103,7 +103,7 @@ function applyBranching!(tableau::Tableau)
     flag = false
     for (idx, i) in enumerate(tableau.list)
 
-        if tableau.applied[idx]
+        if tableau.applied[idx] != 0
             continue
         end
 
@@ -165,16 +165,16 @@ function isInfinite(tableau::Tableau)
     if length(worlds) > THRESHOLD
         counter = 0
         lastworld = maximum(worlds)
-        f2check = NamedTuple{(:formula, :world), Tuple{Tree, Int64}}[]
+        f2check = Tree[]
         for l in tableau.list
             if l.world == lastworld
-                push!(f2check, l)
+                push!(f2check, l.formula)
             end
         end
         for w in worlds
             check = 0
             for f in f2check
-                if isOnList(tableau, f)
+                if isOnList(tableau, (formula = f, world = w))
                     check = 1 + check
                 end
             end
@@ -225,12 +225,19 @@ function solve!(tableau::Tableau, constraints::Vector{Char}, mode::Int64 = 1)
                 while length(tableau.list) >= branch.line
                     _ = pop!(tableau.list)
                     _ = pop!(tableau.applied)
-                end                
+                end
+                
+                # make sure that all rules that have been applied after branching are applied again on a new branch
+                for (i,f) in enumerate(tableau.applied)
+                    if f > branch.line
+                        tableau.applied[i] = 0
+                    end
+                end
 
                 # remove relations introduced on the other branch, leave ones on the common part of that branch
-                for r in tableau.relations
+                for (i,r) in enumerate(tableau.relations)
                     if r.line >= branch.line
-                        _ = pop!(tableau.relations)
+                        deleteat!(tableau.relations, i)
                     end
                 end
 

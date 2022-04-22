@@ -7,8 +7,8 @@ using ..Trees
 mutable struct Tableau
     #keeps track of the current branch
     list::Vector{NamedTuple{(:formula, :world), Tuple{Tree, Int64}}}
-    #keeps track of whick rules have been applied
-    applied::Vector{Bool}
+    #keeps track of whick rules have been applied (0 - not applied; any other number indicates the last line on which the resulting formula is located) 
+    applied::Vector{Int64}
     #this will keep track of branches to be explored
     branches::Vector{NamedTuple{(:formula, :world, :line), Tuple{Tree, Int64, Int64}}}
     #keeps track of relations
@@ -21,7 +21,7 @@ end
 function addFormula!(tableau::Tableau, formula::Tree, world::Int64)
     tuple1 = (formula = formula, world = world)
     push!(tableau.list, tuple1)
-    push!(tableau.applied, false)
+    push!(tableau.applied, 0)
 end
 
 function printBranch(tableau::Tableau)

@@ -10,3 +10,5 @@ bp <> dq
  ◇ ◻ ◇ p |/- ◇ p #no constraints
 
  b(A ↔ (b(A ∨ b⊥) → b(A → b⊥))) → b(A ↔ (bbb⊥ → bb⊥))
+
+ ( p ↔ q ) ↔ ( ¬ p ↔ ¬ q )

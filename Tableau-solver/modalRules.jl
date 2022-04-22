@@ -19,7 +19,7 @@ end
 function refreshBox!(tableau::Tableau)
     for (idx, i) in enumerate(tableau.list)
         if i.formula.connective == '◻'
-            tableau.applied[idx] = false
+            tableau.applied[idx] = 0
         end
     end
 end
@@ -53,23 +53,27 @@ function dia!(tableau::Tableau, idx::Int64)
     push!(tableau.relations, relation)
 
     addFormula!(tableau, formula.right, j)
+    appliedwhere = length(tableau.list)
 
     #mark this rule as applied and make sure all boxes are checked for the new relations
-    tableau.applied[idx] = true
+    tableau.applied[idx] = appliedwhere
     refreshBox!(tableau)
 end
 
 function box!(tableau::Tableau, idx::Int64)
+    #here applied indicates the last application
     t = tableau.list[idx]
     formula = t.formula
-    
+    appliedwhere = idx
+
     # rule for '◻'
     for i in tableau.relations
         if t.world == i.i
             tuple1 = (formula = formula.right, world = i.j)
             if !isOnList(tableau, tuple1)
                 push!(tableau.list, tuple1)
-                push!(tableau.applied, false)
+                push!(tableau.applied, 0)
+                appliedwhere = length(tableau.list)
             end
         end
     end
@@ -86,8 +90,9 @@ function negDia!(tableau::Tableau, idx::Int64)
     addrightchild!(f2, formula)
     addrightchild!(f1,f2)
     addFormula!(tableau, f1, t.world)
+    appliedwhere = length(tableau.list)
 
-    tableau.applied[idx] = true
+    tableau.applied[idx] = appliedwhere
 end
 
 function negBox!(tableau::Tableau, idx::Int64)
@@ -99,8 +104,9 @@ function negBox!(tableau::Tableau, idx::Int64)
     addrightchild!(f2, formula)
     addrightchild!(f1,f2)
     addFormula!(tableau, f1, t.world)
+    appliedwhere = length(tableau.list)
 
-    tableau.applied[idx] = true
+    tableau.applied[idx] = appliedwhere
 end
 
 function diaGL!(tableau::Tableau, idx::Int64)
@@ -117,17 +123,22 @@ function diaGL!(tableau::Tableau, idx::Int64)
     addrightchild!(f2, formula.right)
     addrightchild!(f1,f2)
     addFormula!(tableau, f1, j)
+    appliedwhere = length(tableau.list)
     addFormula!(tableau, formula.right, j)
 
     #mark this rule as applied and make sure all boxes are checked for the new relations
-    tableau.applied[idx] = true
+    tableau.applied[idx] = appliedwhere
     refreshBox!(tableau)
 end
 
 function boxGL!(tableau::Tableau, idx::Int64)
 
+    #here the applied indicates the last application of the rule
+
     t = tableau.list[idx]
     formula = t.formula
+
+    appliedwhere = idx
     
     # rule for '◻' for GL
     for i in tableau.relations
@@ -140,14 +151,16 @@ function boxGL!(tableau::Tableau, idx::Int64)
 
             if !isOnList(tableau, tuple1) && !isOnList(tableau, tuple2)
                 push!(tableau.list, tuple1)
-                push!(tableau.applied, false)
+                push!(tableau.applied, 0)
                 push!(tableau.list, tuple2)
-                push!(tableau.applied, false)
+                push!(tableau.applied, 0)
+                appliedwhere = length(tableau.list)
+
             end
         end
     end
 
-    tableau.applied[idx] = true
+    tableau.applied[idx] = appliedwhere
 end
 
 function transitivity!(tableau::Tableau)
