@@ -33,6 +33,16 @@ function isOnList(tableau::Tableau, t::NamedTuple{(:formula, :world), Tuple{Tree
     return false
 end
 
+
+function isInRelations(tableau::Tableau, relation::NamedTuple{(:i, :j, :line), Tuple{Int64, Int64, Int64}})
+    for r in tableau.relations
+        if r.i == relation.i && r.j == relation.j
+            return true
+        end
+    end
+    return false
+end
+
 function dia!(tableau::Tableau, idx::Int64)
     t = tableau.list[idx]
     formula = t.formula
@@ -156,7 +166,8 @@ function transitivity!(tableau::Tableau)
 
             if l.j == k.i
                 relation = (i = l.i, j = k.j, line = maximum([l.line, k.line]))
-                if !(relation in tableau.relations)
+                #if !(relation in tableau.relations)
+                if !isInRelations(tableau, relation)
                     push!(tableau.relations, relation)
                     flag = true
                 end
@@ -176,7 +187,8 @@ function reflexivity!(tableau::Tableau)
         if !(l.world in worlds)
             push!(worlds, l.world)
             relation = (i = l.world, j = l.world, line = idx)
-            if !(relation in tableau.relations)
+            #if !(relation in tableau.relations)
+            if !isInRelations(tableau, relation)
                 push!(tableau.relations, relation)
                 flag = true
             end
@@ -192,7 +204,8 @@ function symmetry!(tableau::Tableau)
     flag = false
     for r in tableau.relations
         relation = (i = r.j, j = r.i, line = r.line)
-        if !(relation in tableau.relations)
+        #if !(relation in tableau.relations)
+        if !isInRelations(tableau, relation)
             push!(tableau.relations, relation)
             flag = true
         end

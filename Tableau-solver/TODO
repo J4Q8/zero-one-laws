@@ -1,5 +1,8 @@
 1. replace applied bool with numbers where 0 = "not applied" and int indicates the first line resulting from a rule application
+    then when we move to the next branch we change all line numbers higher than the branching line (hence they were applied later on that branch and need to be applied again)
 
 2. check why relations include lines which are not on the list
 
 3. make sure that is infinite is checked only when the constraints include transitive, but don't have converse-wellfoundedness
+
+4. Visualize graphs: https://medium.com/coffee-in-a-klein-bottle/analyzing-graphs-with-julia-38e26d1d2f62

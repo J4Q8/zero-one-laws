@@ -164,10 +164,10 @@ function isInfinite(tableau::Tableau)
 
     if length(worlds) > THRESHOLD
         counter = 0
-        last = tableau.list[end]
+        lastworld = maximum(worlds)
         f2check = NamedTuple{(:formula, :world), Tuple{Tree, Int64}}[]
         for l in tableau.list
-            if l.world == last.world
+            if l.world == lastworld
                 push!(f2check, l)
             end
         end
@@ -185,12 +185,9 @@ function isInfinite(tableau::Tableau)
         if counter > THRESHOLD 
             println("Infinite branch!")
             return true
-        else
-            return false 
         end
-    else
-        return false
     end
+    return false
 end
 
 function solveBranch!(tableau::Tableau, constraints::Vector{Char})
@@ -228,7 +225,7 @@ function solve!(tableau::Tableau, constraints::Vector{Char}, mode::Int64 = 1)
                 while length(tableau.list) >= branch.line
                     _ = pop!(tableau.list)
                     _ = pop!(tableau.applied)
-                end
+                end                
 
                 # remove relations introduced on the other branch, leave ones on the common part of that branch
                 for r in tableau.relations
@@ -236,6 +233,10 @@ function solve!(tableau::Tableau, constraints::Vector{Char}, mode::Int64 = 1)
                         _ = pop!(tableau.relations)
                     end
                 end
+
+                println("-----------------------------------------")
+                println("Branch line: ", branch.line)
+                println(tableau.relations)
                 
                 # while-loop used to accomodate the multiple formulas on a new branch produced by negImp! and imp!
                 # we will add all formulas in a new branch to the current branch (list)
@@ -260,10 +261,10 @@ function solve!(tableau::Tableau, constraints::Vector{Char}, mode::Int64 = 1)
             if mode == 1
                 print("Tableau has at least one open and complete branch:\n")
                 printBranch(tableau)
-                # println()
-                # println(tableau.applied)
-                # println(length(tableau.applied))
-                # println(tableau.relations)
+                println()
+                println(tableau.applied)
+                println(length(tableau.applied))
+                println(tableau.relations)
                 break
             else
                 return false
