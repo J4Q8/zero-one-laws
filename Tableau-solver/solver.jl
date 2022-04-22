@@ -235,15 +235,13 @@ function solve!(tableau::Tableau, constraints::Vector{Char}, mode::Int64 = 1)
                 end
 
                 # remove relations introduced on the other branch, leave ones on the common part of that branch
+                idx2remove = Int64[]
                 for (i,r) in enumerate(tableau.relations)
                     if r.line >= branch.line
-                        deleteat!(tableau.relations, i)
+                        push!(idx2remove,i)
                     end
                 end
-
-                println("-----------------------------------------")
-                println("Branch line: ", branch.line)
-                println(tableau.relations)
+                deleteat!(tableau.relations, idx2remove)
                 
                 # while-loop used to accomodate the multiple formulas on a new branch produced by negImp! and imp!
                 # we will add all formulas in a new branch to the current branch (list)
