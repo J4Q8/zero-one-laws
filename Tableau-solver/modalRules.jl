@@ -34,9 +34,15 @@ function isOnList(tableau::Tableau, t::NamedTuple{(:formula, :world), Tuple{Tree
 end
 
 
-function isInRelations(tableau::Tableau, relation::NamedTuple{(:i, :j, :line), Tuple{Int64, Int64, Int64}})
+function isInRelations!(tableau::Tableau, relation::NamedTuple{(:i, :j, :line), Tuple{Int64, Int64, Int64}})
     for r in tableau.relations
         if r.i == relation.i && r.j == relation.j
+
+            # check if the line of the new relation is smaller than the one that is currently on relation list, 
+            # if that is the case replace
+            if r.line > relation.line
+                replace!(tableau.relations, r => relation)
+            end
             return true
         end
     end
@@ -78,7 +84,7 @@ function box!(tableau::Tableau, idx::Int64)
         end
     end
 
-    tableau.applied[idx] = true
+    tableau.applied[idx] = appliedwhere
 end
 
 function negDia!(tableau::Tableau, idx::Int64)
@@ -179,8 +185,19 @@ function transitivity!(tableau::Tableau)
 
             if l.j == k.i
                 relation = (i = l.i, j = k.j, line = maximum([l.line, k.line]))
-                #if !(relation in tableau.relations)
-                if !isInRelations(tableau, relation)
+                
+                if !isInRelations!(tableau, relation)
+                    push!(tableau.relations, relation)
+                    flag = true
+                end
+            end
+
+            #in cases such as 1r0, 0r1
+            if l.i == k.j
+                relation = (i = l.j, j = k.i, line = maximum([l.line, k.line]))
+                
+                
+                if !isInRelations!(tableau, relation)
                     push!(tableau.relations, relation)
                     flag = true
                 end
@@ -201,7 +218,7 @@ function reflexivity!(tableau::Tableau)
             push!(worlds, l.world)
             relation = (i = l.world, j = l.world, line = idx)
             #if !(relation in tableau.relations)
-            if !isInRelations(tableau, relation)
+            if !isInRelations!(tableau, relation)
                 push!(tableau.relations, relation)
                 flag = true
             end
@@ -218,7 +235,7 @@ function symmetry!(tableau::Tableau)
     for r in tableau.relations
         relation = (i = r.j, j = r.i, line = r.line)
         #if !(relation in tableau.relations)
-        if !isInRelations(tableau, relation)
+        if !isInRelations!(tableau, relation)
             push!(tableau.relations, relation)
             flag = true
         end

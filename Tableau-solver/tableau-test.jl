@@ -55,7 +55,7 @@ using Test
         @test validate("", "( ⊥ ∧ ⊥ ) ∨ ( ( p ∨ p ) ↔ ( q ∨ q ) )", "gl") == false
         @test validate("", "◇ p → ¬ q", "gl") == false
         @test validate("", "◻ ◻ ◇ ( p ↔ p ) ∧ ◻ ◻ ◇ ◻ ( p ∧ ¬ p )", "gl") == false
-        @test validate("", "◻ ( ◻ p → p ) → ◻p", "gl") == true
+        @test validate("", "◻ ( ◻ p → p ) → ◻ p", "gl") == true
     end 
 
 end

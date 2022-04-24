@@ -93,9 +93,9 @@ function isEqual(t1::Tree, t2::Tree)
     end
 
 
-    if !isdefined(t1, :left) && !isdefined(t2, :left) && !isdefined(t1, :right) && !isdefined(t2, :right)
-        return true
-    end
+    # if !isdefined(t1, :left) && !isdefined(t2, :left) && !isdefined(t1, :right) && !isdefined(t2, :right)
+    #     return true
+    # end
 
     if t1.connective == t2.connective
         if !isdefined(t1, :left)

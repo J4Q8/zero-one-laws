@@ -83,12 +83,27 @@ function applyModal!(tableau::Tableau, constraints::Vector{Char})
     if 'r' in constraints
         flag = reflexivity!(tableau) || flag
     end
-    if flag
+
+    
+    while true
+        flag1 = false
+        flag2 = false
+        
         if 't' in constraints
-            flag = transitivity!(tableau) || flag
+            flag1 = transitivity!(tableau)
+            if flag1
+                flag = true
+            end
         end
+        
         if 's' in constraints
-            flag = symmetry!(tableau) || flag
+            flag2 = symmetry!(tableau)
+            if flag2
+                flag = true
+            end
+        end
+        if !flag1 && !flag2
+            break
         end
     end
 
@@ -150,7 +165,7 @@ end
 
 function isInfinite(tableau::Tableau)
     #after this many worlds are introduced the infinite check will be called
-    THRESHOLD = 10
+    THRESHOLD = 15
 
     worlds = Int64[]
     for r in tableau.relations
@@ -200,7 +215,7 @@ function solveBranch!(tableau::Tableau, constraints::Vector{Char}, mode::Int64 =
             if mode == 1
                 println("Infinite branch!")
             end
-            return false
+            break
         end
         # printBranch(tableau)
         # println("-----------------------------------------")
@@ -215,7 +230,7 @@ end
 function solve!(tableau::Tableau, constraints::Vector{Char}, mode::Int64 = 1)
     #mode == 1 : print, no return
     #mode == 2 : no print, return
-
+    
     while true
         if solveBranch!(tableau, constraints, mode)
             if length(tableau.branches) != 0
@@ -268,10 +283,8 @@ function solve!(tableau::Tableau, constraints::Vector{Char}, mode::Int64 = 1)
             if mode == 1
                 print("Tableau has at least one open and complete branch:\n")
                 printBranch(tableau)
-                println()
-                println(tableau.applied)
-                println(length(tableau.applied))
-                println(tableau.relations)
+                print(tableau.relations)
+                print(tableau.applied)
                 break
             else
                 return false
