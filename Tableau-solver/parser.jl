@@ -201,9 +201,6 @@ function parseFormula(formula::String)
     formulatree = acceptFormula!(formula, wrapper)
     if formulatree == undef || wrapper[1] <= lastindex(formula)
         error("Not able to parse the formula")
-    else 
-        printFormula(formulatree)
-        print("\n")
     end
     return formulatree
 end

@@ -1,1 +1,1 @@
-(((((b(bA ∨ bd¬A) ∨ db⊥) ∨ d(bA ∧ dd¬A)) ∨ d(♦bdA ∧ ddb¬A)) ∨ d(bA ∧ b¬A)) ∨ ♦(b(b¬A ∨ A)∧dd(dA ∧ ¬A))) ∨ d(b(d¬A ∨ A) ∧ dd(bA ∧ ¬A))
+◇ p → ◻ ◇ p

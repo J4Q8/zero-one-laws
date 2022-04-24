@@ -13,7 +13,7 @@ using .Parser
 using .Tableaux
 using .Solver
 
-export runSolver!
+export runSolver, validate
 
 function welcomeGetConstraints()
     println("Welcome to Jakub's modal tableaux solver!")
@@ -54,6 +54,59 @@ function welcomeGetConstraints()
     return restrictions
 end
 
+function parseConstraints(constraint::String)
+    restrictions = Char[]
+    if constraint == "gl"
+        push!(restrictions, 'c')
+        push!(restrictions, 't')
+    elseif constraint == "s4"
+        push!(restrictions, 't')
+        push!(restrictions, 'r')
+    elseif constraint == "k4"
+        push!(restrictions, 't')
+    else
+        possible = ['t', 'r', 's', 'c']
+        for l in constraint
+            if l in possible
+                push!(restrictions, l)
+            end
+        end
+    end
+    return restrictions
+end
+
+function addPremise!(tableau::Tableau, formula::String, mode::Int64 = 1)
+    if !isempty(formula)
+        try
+            formula = parseFormula(formula)
+            addFormula!(tableau, formula, 0)
+            if mode == 1
+                printFormula(formula)
+                print("\n")
+            end
+        catch
+            error(formula, " :cannot be parsed")
+        end
+    end
+end
+
+function addConsequent!(tableau::Tableau, formula::String, mode::Int64 = 1)
+    if !isempty(formula)
+        try
+            formula = parseFormula(formula)
+            negformula = Tree('¬')
+            addrightchild!(negformula, formula)
+            addFormula!(tableau, negformula, 0)
+            if mode == 1
+                printFormula(formula)
+                print("\n")
+            end
+        catch
+            error(formula, " :cannot be parsed")
+        end
+    end
+end
+
 function loadPremisesConsequent()
 
     tableau = Tableau()
@@ -61,32 +114,20 @@ function loadPremisesConsequent()
     println("Loading premises from 'IN_premises.txt'")
 
     for line in eachline("IN_premises.txt")
-        formula = parseFormula(line)
-        addFormula!(tableau, formula, 0)
-        try
-        catch
-            error(line, " :cannot be parsed")
-        end
+        addPremise!(tableau, line)
     end
     
     println("Loading consequent from 'IN_consequent.txt'")
+
     io = open("IN_consequent.txt", "r");
     consequent = read(io, String)
-
-    try
-        formula = parseFormula(consequent)
-        negformula = Tree('¬')
-        addrightchild!(negformula, formula)
-        addFormula!(tableau, negformula, 0)
-    catch
-        error(consequent, " :cannot be parsed")
-    end
+    addConsequent!(tableau, consequent)
     close(io)
     
     return tableau
 end
 
-function runSolver!()
+function runSolver()
 
     constraints = welcomeGetConstraints()
 
@@ -97,4 +138,12 @@ function runSolver!()
     end
 end
 
+function validate(premise::String, consequent::String, constraints::String = "")
+    constraintsCharVec = parseConstraints(constraints)
+    tableau = Tableau()
+    addPremise!(tableau, premise, 2)
+    addConsequent!(tableau, consequent, 2)
+    return solve!(tableau, constraintsCharVec, 2)
 end
+
+end #module

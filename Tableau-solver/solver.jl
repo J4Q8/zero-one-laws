@@ -183,14 +183,13 @@ function isInfinite(tableau::Tableau)
             end
         end
         if counter > THRESHOLD 
-            println("Infinite branch!")
             return true
         end
     end
     return false
 end
 
-function solveBranch!(tableau::Tableau, constraints::Vector{Char})
+function solveBranch!(tableau::Tableau, constraints::Vector{Char}, mode::Int64 = 1)
     #=
         returns true when the branch is closed and complete, false when the branch is open and complete
     =#
@@ -198,6 +197,9 @@ function solveBranch!(tableau::Tableau, constraints::Vector{Char})
     # this loop makes sure that the rules are applied in a correct order as long as there any rules left to be applied
     while true
         if isInfinite(tableau)
+            if mode == 1
+                println("Infinite branch!")
+            end
             return false
         end
         # printBranch(tableau)
@@ -215,7 +217,7 @@ function solve!(tableau::Tableau, constraints::Vector{Char}, mode::Int64 = 1)
     #mode == 2 : no print, return
 
     while true
-        if solveBranch!(tableau, constraints)
+        if solveBranch!(tableau, constraints, mode)
             if length(tableau.branches) != 0
 
                 branch = pop!(tableau.branches)

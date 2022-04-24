@@ -11,37 +11,37 @@ function cleanFormula(formula::String)
 end
 
 function cleanChar(c::Char)
-    if c == '^' || c == '∧' || c == '&'
+    if c in ['^', '∧', '&']
         #takes care of conjunction
         return '∧'
-    elseif c == 'v' || c == 'V' || c == '|' || c == '∨'
+    elseif c in ['v', 'V', '|', '∨']
         #takes care of disjunction
         return '∨'
-    elseif c == '-' || c == '→'
+    elseif c in ['⊃', '-', '→']
         #takes care of implication "->"
         return '→'
-    elseif c == '<' || c == '↔'
+    elseif c in ['<', '↔', '≡']
         #takes care of bimplication"<>"
         return '↔'
-    elseif c == 'b' || c == '◻'
+    elseif c in ['b', '◻']
         # takes care of box
         return '◻'
-    elseif c == 'd' || c == '◇'
+    elseif c in ['d','◇']
         # takes care of diamond
         return '◇'
-    elseif c == '~' || c == '¬'
+    elseif c in ['~','¬']
         # takes care of negation
         return '¬'
-    elseif c == 'F' || c == '⊥'
+    elseif c in ['F', '⊥']
         #takes care of contradiction
         return '⊥'
-    elseif c == 'T' || c == '⊤'
+    elseif c in ['T', '⊤']
         #takes care of truth
         return '⊤'
-    elseif c == '(' || c == ')'
+    elseif c in ['(',')']
         # leaves brackets as they were
         return c
-    elseif !isletter(c) || c == '>'
+    elseif !isletter(c) || c in ['>']
         #removes all characters which cannot be atoms nor they complete "->" or "<>"
         return ""
     else
