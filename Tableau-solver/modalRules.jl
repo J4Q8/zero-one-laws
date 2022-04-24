@@ -83,7 +83,8 @@ function box!(tableau::Tableau, idx::Int64)
             end
         end
     end
-
+    #not applied to anything, -1 to indicate that it has been checked
+    appliedwhere = appliedwhere == idx ? -1 : appliedwhere
     tableau.applied[idx] = appliedwhere
 end
 
@@ -97,7 +98,7 @@ function negDia!(tableau::Tableau, idx::Int64)
     addrightchild!(f1,f2)
     addFormula!(tableau, f1, t.world)
     appliedwhere = length(tableau.list)
-
+    
     tableau.applied[idx] = appliedwhere
 end
 
@@ -165,7 +166,8 @@ function boxGL!(tableau::Tableau, idx::Int64)
             end
         end
     end
-
+    #not applied to anything, -1 to indicate that it has been checked
+    appliedwhere = appliedwhere == idx ? -1 : appliedwhere
     tableau.applied[idx] = appliedwhere
 end
 
@@ -194,7 +196,7 @@ function transitivity!(tableau::Tableau)
 
             #in cases such as 1r0, 0r1
             if l.i == k.j
-                relation = (i = l.j, j = k.i, line = maximum([l.line, k.line]))
+                relation = (i = k.i, j = l.j, line = maximum([l.line, k.line]))
                 
                 
                 if !isInRelations!(tableau, relation)

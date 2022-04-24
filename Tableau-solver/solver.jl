@@ -63,7 +63,7 @@ function applyModal!(tableau::Tableau, constraints::Vector{Char})
         if c == '◇'
             d!(tableau, idx)
             flag = true
-        elseif c == '◻' && length(tableau.relations) != 0
+        elseif c == '◻'
             b!(tableau, idx)
             flag = true
         elseif c == '¬'
@@ -71,7 +71,7 @@ function applyModal!(tableau::Tableau, constraints::Vector{Char})
             if f.connective == '◻'
                 nb!(tableau, idx)
                 flag = true
-            elseif f.connective == '◇' && length(tableau.relations) != 0
+            elseif f.connective == '◇'
                 nd!(tableau, idx)
                 flag = true
             end
@@ -84,27 +84,12 @@ function applyModal!(tableau::Tableau, constraints::Vector{Char})
         flag = reflexivity!(tableau) || flag
     end
 
-    
-    while true
-        flag1 = false
-        flag2 = false
-        
-        if 't' in constraints
-            flag1 = transitivity!(tableau)
-            if flag1
-                flag = true
-            end
-        end
-        
-        if 's' in constraints
-            flag2 = symmetry!(tableau)
-            if flag2
-                flag = true
-            end
-        end
-        if !flag1 && !flag2
-            break
-        end
+    if 't' in constraints
+        flag = transitivity!(tableau) || flag
+    end
+
+    if 's' in constraints
+        flag = symmetry!(tableau) || flag
     end
 
     return flag
@@ -165,7 +150,7 @@ end
 
 function isInfinite(tableau::Tableau)
     #after this many worlds are introduced the infinite check will be called
-    THRESHOLD = 15
+    THRESHOLD = 40
 
     worlds = Int64[]
     for r in tableau.relations
@@ -186,18 +171,20 @@ function isInfinite(tableau::Tableau)
                 push!(f2check, l.formula)
             end
         end
-        for w in worlds
+        for w in worlds[end-THRESHOLD + 1:end]
             check = 0
             for f in f2check
                 if isOnList(tableau, (formula = f, world = w))
                     check = 1 + check
+                else
+                    break
                 end
             end
             if check == length(f2check)
                 counter = 1 + counter
             end
         end
-        if counter > THRESHOLD 
+        if counter == THRESHOLD 
             return true
         end
     end
@@ -283,8 +270,6 @@ function solve!(tableau::Tableau, constraints::Vector{Char}, mode::Int64 = 1)
             if mode == 1
                 print("Tableau has at least one open and complete branch:\n")
                 printBranch(tableau)
-                print(tableau.relations)
-                print(tableau.applied)
                 break
             else
                 return false
