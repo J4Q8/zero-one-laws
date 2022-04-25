@@ -1,8 +1,8 @@
 module Interface
 
-include("cleaner.jl")
-include("trees.jl")
-include("parser.jl")
+include("../Formulas/cleaner.jl")
+include("../Formulas/trees.jl")
+include("../Formulas/parser.jl")
 include("tableaux.jl")
 include("propositionalRules.jl")
 include("modalRules.jl")
@@ -107,19 +107,19 @@ function addConsequent!(tableau::Tableau, formula::String, mode::Int64 = 1)
     end
 end
 
-function loadPremisesConsequent()
+function loadPremisesConsequent(premisesPATH::String, consequentPATH::String)
 
     tableau = Tableau()
 
-    println("Loading premises from 'IN_premises.txt'")
+    println("Loading premises from ", premisesPATH)
 
-    for line in eachline("IN_premises.txt")
+    for line in eachline(premisesPATH)
         addPremise!(tableau, line)
     end
     
-    println("Loading consequent from 'IN_consequent.txt'")
+    println("Loading consequent from ", consequentPATH)
 
-    io = open("IN_consequent.txt", "r");
+    io = open(consequentPATH, "r");
     consequent = read(io, String)
     addConsequent!(tableau, consequent)
     close(io)
@@ -127,11 +127,11 @@ function loadPremisesConsequent()
     return tableau
 end
 
-function runSolver()
+function runSolver(premisesPATH::String = "Src/Tableau-solver/IN_premises.txt", consequentPATH::String = "Src/Tableau-solver/IN_consequent.txt")
 
     constraints = welcomeGetConstraints()
 
-    tableau = loadPremisesConsequent()
+    tableau = loadPremisesConsequent(premisesPATH, consequentPATH)
 
     @time @allocated begin
     solve!(tableau, constraints)

@@ -58,9 +58,9 @@ function printFormula(formulatree::Tree)
 end
 
 function height(tree::Tree)
-    # don't count the root node
-    lh = -1
-    rh = -1
+    # we count the root node.
+    lh = 0
+    rh = 0
 
     if isdefined(tree, :left)
         lh = height(tree.left)
