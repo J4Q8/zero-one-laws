@@ -63,7 +63,7 @@ function applyModal!(tableau::Tableau, constraints::Vector{Char})
         if c == '◇'
             d!(tableau, idx)
             flag = true
-        elseif c == '◻' && length(tableau.relations) != 0
+        elseif c == '◻'
             b!(tableau, idx)
             flag = true
         elseif c == '¬'
@@ -71,7 +71,7 @@ function applyModal!(tableau::Tableau, constraints::Vector{Char})
             if f.connective == '◻'
                 nb!(tableau, idx)
                 flag = true
-            elseif f.connective == '◇' && length(tableau.relations) != 0
+            elseif f.connective == '◇'
                 nd!(tableau, idx)
                 flag = true
             end
