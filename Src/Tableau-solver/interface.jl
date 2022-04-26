@@ -1,8 +1,8 @@
 module Interface
 
-include("../Formulas/cleaner.jl")
-include("../Formulas/trees.jl")
-include("../Formulas/parser.jl")
+include("../FormulaUtils/cleaner.jl")
+include("../FormulaUtils/trees.jl")
+include("../FormulaUtils/parser.jl")
 include("tableaux.jl")
 include("propositionalRules.jl")
 include("modalRules.jl")
@@ -75,11 +75,15 @@ function parseConstraints(constraint::String)
     return restrictions
 end
 
-function addPremise!(tableau::Tableau, formula::String, mode::Int64 = 1)
+function addPremise!(tableau::Tableau, formula::Tree)
+    addFormula!(tableau, formula, 0)
+end
+
+function parseAndAddPremise!(tableau::Tableau, formula::String, mode::Int64 = 1)
     if !isempty(formula)
         try
             formula = parseFormula(formula)
-            addFormula!(tableau, formula, 0)
+            addPremise!(tableau, formula)
             if mode == 1
                 printFormula(formula)
                 print("\n")
@@ -90,13 +94,17 @@ function addPremise!(tableau::Tableau, formula::String, mode::Int64 = 1)
     end
 end
 
-function addConsequent!(tableau::Tableau, formula::String, mode::Int64 = 1)
+function addConsequent!(tableau::Tableau, formula::Tree)
+    negformula = Tree('¬')
+    addrightchild!(negformula, formula)
+    addFormula!(tableau, negformula, 0)
+end
+
+function parseAndAddConsequent!(tableau::Tableau, formula::String, mode::Int64 = 1)
     if !isempty(formula)
         try
             formula = parseFormula(formula)
-            negformula = Tree('¬')
-            addrightchild!(negformula, formula)
-            addFormula!(tableau, negformula, 0)
+            addConsequent!(tableau, formula)
             if mode == 1
                 printFormula(formula)
                 print("\n")
@@ -114,14 +122,14 @@ function loadPremisesConsequent(premisesPATH::String, consequentPATH::String)
     println("Loading premises from ", premisesPATH)
 
     for line in eachline(premisesPATH)
-        addPremise!(tableau, line)
+        parseAndAddPremise!(tableau, line)
     end
     
     println("Loading consequent from ", consequentPATH)
 
     io = open(consequentPATH, "r");
     consequent = read(io, String)
-    addConsequent!(tableau, consequent)
+    parseAndAddConsequent!(tableau, consequent)
     close(io)
     
     return tableau
@@ -138,11 +146,22 @@ function runSolver(premisesPATH::String = "Src/Tableau-solver/IN_premises.txt", 
     end
 end
 
-function validate(premise::String, consequent::String, constraints::String = "")
+function validate(premise::Union{String, Tree} = "", consequent::Union{String, Tree} = "", constraints::String = "")
     constraintsCharVec = parseConstraints(constraints)
     tableau = Tableau()
-    addPremise!(tableau, premise, 2)
-    addConsequent!(tableau, consequent, 2)
+    if typeof(premise) == String && typeof(consequent) == String
+        parseAndAddPremise!(tableau, premise, 2)
+        parseAndAddConsequent!(tableau, consequent, 2)
+    elseif typeof(premise) == Int64 && typeof(consequent) == Int64 
+        if premise != ""
+            addPremise!(tableau, premise)
+        end
+        if consequent != ""
+            addConsequent!(tableau, consequent)
+        end
+    else
+        error("Uncompatible type of formula: ", typeof(premise), " and ", typeof(consequent))
+    end
     return solve!(tableau, constraintsCharVec, 2)
 end
 

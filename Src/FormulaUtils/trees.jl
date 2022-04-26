@@ -2,7 +2,7 @@ module Trees
 
 #Maybe a good idea to change pointers to arrays
 
-export Tree, addleftchild!, addrightchild!, height, isEqual, isOpposite, printFormula
+export Tree, addleftchild!, addrightchild!, height, isEqual, isOpposite, printFormula, formula2String
 
 """
 Inspiration from https://github.com/JuliaCollections/AbstractTrees.jl/blob/master/examples/binarytree_core.jl
@@ -55,6 +55,34 @@ function printFormula(formulatree::Tree)
             print(" )")
         end
     end
+end
+
+function formula2String(formulatree::Tree)
+    if formulatree == undef
+        error("you shouldn't end up here")
+        return
+    end
+
+    left = ""
+    if isdefined(formulatree, :left)
+        if !isdefined(formulatree.left, :left) || !isdefined(formulatree.left, :right)
+            left = formula2String(formulatree.left)
+        else
+            left = " (" * formula2String(formulatree.left) * " )"
+        end
+    end
+
+    middle = " "*formulatree.connective
+
+    right = ""
+    if isdefined(formulatree, :right)
+        if !isdefined(formulatree.right, :left) || !isdefined(formulatree.right, :right)
+            right = formula2String(formulatree.right)
+        else
+            right = " (" * formula2String(formulatree.right) * " )"
+        end
+    end
+    return left*middle*right
 end
 
 function height(tree::Tree)
