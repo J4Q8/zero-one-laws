@@ -146,21 +146,23 @@ function runSolver(premisesPATH::String = "Src/Tableau-solver/IN_premises.txt", 
     end
 end
 
-function validate(premise::Union{String, Tree} = "", consequent::Union{String, Tree} = "", constraints::String = "")
+function validate(;premise::String = "", consequent::String = "", constraints::String = "")
     constraintsCharVec = parseConstraints(constraints)
     tableau = Tableau()
-    if typeof(premise) == String && typeof(consequent) == String
-        parseAndAddPremise!(tableau, premise, 2)
-        parseAndAddConsequent!(tableau, consequent, 2)
-    elseif typeof(premise) == Int64 && typeof(consequent) == Int64 
-        if premise != ""
-            addPremise!(tableau, premise)
-        end
-        if consequent != ""
-            addConsequent!(tableau, consequent)
-        end
-    else
-        error("Uncompatible type of formula: ", typeof(premise), " and ", typeof(consequent))
+    parseAndAddPremise!(tableau, premise, 2)
+    parseAndAddConsequent!(tableau, consequent, 2)
+    
+    return solve!(tableau, constraintsCharVec, 2)
+end
+
+function validate(;premise::Tree = Tree('~'), consequent::Tree = Tree('~'), constraints::String = "")
+    constraintsCharVec = parseConstraints(constraints)
+    tableau = Tableau()
+    if premise.connective != '~'
+        addPremise!(tableau, premise)
+    end
+    if consequent.connective != '~'
+        addConsequent!(tableau, consequent)
     end
     return solve!(tableau, constraintsCharVec, 2)
 end
