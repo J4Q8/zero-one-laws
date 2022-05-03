@@ -2,4 +2,4 @@ include("formulaGenerator.jl")
 
 using .FormulaGenerator
 
-runGenerator(5,6,6)
+runGenerator(10,6,13)

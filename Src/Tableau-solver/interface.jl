@@ -13,7 +13,7 @@ using .Parser
 using .Tableaux
 using .Solver
 
-export runSolver, validate
+export runSolver, validate, isTautology, isContradiction, isTautOrCont, isTautOrContInAnyLanguage
 
 function welcomeGetConstraints()
     println("Welcome to Jakub's modal tableaux solver!")
@@ -146,7 +146,7 @@ function runSolver(premisesPATH::String = "Src/Tableau-solver/IN_premises.txt", 
     end
 end
 
-function validate(;premise::String = "", consequent::String = "", constraints::String = "")
+function validate(premise::String = "", consequent::String = "", constraints::String = "")
     constraintsCharVec = parseConstraints(constraints)
     tableau = Tableau()
     parseAndAddPremise!(tableau, premise, 2)
@@ -165,6 +165,28 @@ function validate(;premise::Tree = Tree('~'), consequent::Tree = Tree('~'), cons
         addConsequent!(tableau, consequent)
     end
     return solve!(tableau, constraintsCharVec, 2)
+end
+
+function isTautology(formula::Tree, constrains::String)
+    return Interface.validate(consequent=formula, constraints=constrains)
+end
+
+function isContradiction(formula::Tree, constrains::String)
+    return Interface.validate(premise=formula,constraints = constrains)
+end
+
+function isTautOrCont(formula::Tree, constrains::String)
+    return isTautology(formula, constrains) || isContradiction(formula, constrains)
+end
+
+function isTautOrContInAnyLanguage(formula::Tree)
+    languages = ["gl","s4","k4"]
+    for l in languages
+        if isTautOrCont(formula, l)
+            return true
+        end
+    end
+    return false
 end
 
 end #module

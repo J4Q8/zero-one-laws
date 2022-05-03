@@ -2,7 +2,7 @@ module Trees
 
 #Maybe a good idea to change pointers to arrays
 
-export Tree, addleftchild!, addrightchild!, height, isEqual, isOpposite, printFormula, formula2String
+export Tree, addleftchild!, addrightchild!, height, isEqual, isEquivalent, isOpposite, printFormula, formula2String
 
 """
 Inspiration from https://github.com/JuliaCollections/AbstractTrees.jl/blob/master/examples/binarytree_core.jl
@@ -97,6 +97,54 @@ function height(tree::Tree)
         rh = height(tree.right)
     end
     return max(lh, rh) + 1
+end
+
+function isEquivalent(t1::Tree, t2::Tree)
+    #check if formulas are equivalent e.g. A^B and B^A are    
+    if !isdefined(t1, :left) && isdefined(t2, :left)
+        return false
+    end
+
+    if !isdefined(t1, :right) && isdefined(t2, :right)
+        return false
+    end
+
+    if !isdefined(t2, :left) && isdefined(t1, :left)
+        return false
+    end
+
+    if !isdefined(t2, :right) && isdefined(t1, :right)
+        return false
+    end
+
+
+    # if !isdefined(t1, :left) && !isdefined(t2, :left) && !isdefined(t1, :right) && !isdefined(t2, :right)
+    #     return true
+    # end
+
+    if t1.connective == t2.connective
+        if !isdefined(t1, :left)
+            if !isdefined(t1, :right)
+                return true
+            else
+                return isEquivalent(t1.right, t2.right)
+            end
+        elseif !isdefined(t1, :right)
+            # this should never be the case, because either the treenode has two children 
+            #   or one child on the right
+            return isEquivalent(t1.left, t2.lfet)
+        else
+            equal = isEquivalent(t1.left, t2.left) && isEquivalent(t1.right, t2.right)
+            if !equal && t1.connective in ['∧', '↔', '∧'] # symmetrical connectives
+                symmetrical = isEquivalent(t1.left, t2.right) && isEquivalent(t1.right, t2.left)
+                return equal || symmetrical
+            else
+                return equal
+            end
+        end
+    else
+        return false
+    end
 end
 
 function isEqual(t1::Tree, t2::Tree)
