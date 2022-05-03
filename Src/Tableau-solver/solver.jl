@@ -148,7 +148,7 @@ function isClosed(list::Vector{NamedTuple{(:formula, :world), Tuple{Tree, Int64}
     return false
 end
 
-function isInfinite(tableau::Tableau)
+function isInfiniteAlpha(tableau::Tableau)
     #after this many worlds are introduced the infinite check will be called
     THRESHOLD = 40
 
@@ -171,7 +171,7 @@ function isInfinite(tableau::Tableau)
                 push!(f2check, l.formula)
             end
         end
-        for w in worlds[end-THRESHOLD + 1:end]
+        for w in worlds
             check = 0
             for f in f2check
                 if isOnList(tableau, (formula = f, world = w))
@@ -186,6 +186,67 @@ function isInfinite(tableau::Tableau)
         end
         if counter == THRESHOLD 
             return true
+        end
+    end
+    return false
+end
+
+function isSubset(list::Set{Tree}, biggerlist::Set{Tree})
+    for t in list
+        flag = false
+        for t2 in biggerlist
+            if isEqual(t, t2)
+                flag = true
+            end
+        end
+        if !flag
+            return false
+        end
+    end
+    return true
+end
+
+function isInfinite(tableau::Tableau)
+    #after this many worlds are introduced the infinite check will be called
+
+    #make a set of formulas going from the highest number to lowest and when the formulas in a world are already in a set or extend 
+    THRESHOLD = 40
+
+    worlds = Int64[]
+    for r in tableau.relations
+        if !(r.i in worlds)
+            push!(worlds, r.i)
+        end
+        if !(r.j in worlds)
+            push!(worlds, r.j)
+        end
+    end
+
+    if length(worlds) > THRESHOLD
+        counter = 0
+        lastworld = maximum(worlds)
+        lastset = Set{Tree}([])
+        for l in tableau.list
+            if l.world == lastworld
+                push!(lastset, l.formula)
+            end
+        end
+        counter = 1
+        for w in sort(worlds, rev=true)
+            currentset = Set{Tree}([])
+            for t in tableau.list
+                if t.world == w
+                    push!(currentset, t.formula)
+                end
+            end
+            if isSubset(lastset, currentset)
+                lastset = currentset
+                counter = counter + 1
+            elseif counter >= THRESHOLD 
+                return true
+            else
+                return false
+            end
         end
     end
     return false
@@ -255,6 +316,19 @@ function solve!(tableau::Tableau, constraints::Vector{Char}, mode::Int64 = 1)
                         branch = pop!(tableau.branches)
                     else
                         break
+                    end
+                end
+
+                # watch out for infipedes
+                # printBranch(tableau)
+                if isInfinite(tableau)
+                    if mode == 1
+                        println("Infinite branch! Infinipede!")
+                        print("Tableau has at least one open and complete branch:\n")
+                        printBranch(tableau)
+                        break
+                    else 
+                        return false
                     end
                 end
 

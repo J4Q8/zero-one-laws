@@ -31,7 +31,7 @@ using Test
         @test validate("", "◇ p → ◻ ◇ p", "st") == true
         @test validate("", "◻ p → ◻ ◻ p", "rs") == false
         @test validate("", "◻ ◻ p → ◻ p", "t") == false
-        @test validate("", "¬ ( ◇ p ∧ ◻ ◇ p )", "") == false
+        @test validate("", "¬ ( ◇ p ∧ ◻ ◇ p )", "t") == false
         @test validate("", "( ◻ ( p → q ) ∧ ◇ ( p ∧ r ) ) → ◇ ( q ∧ r )", "r") == true
         @test validate("", "( ◻ p ∧ ◻ q ) → ( p ↔ q )", "r") == true
         @test validate("", "◇ ( p → q ) ↔ ( ◻ p → ◇ q )", "r") == true
