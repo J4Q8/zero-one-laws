@@ -184,7 +184,7 @@ function isInfiniteAlpha(tableau::Tableau)
                 counter = 1 + counter
             end
         end
-        if counter == THRESHOLD 
+        if counter == THRESHOLD
             return true
         end
     end
@@ -210,7 +210,7 @@ function isInfinite(tableau::Tableau)
     #after this many worlds are introduced the infinite check will be called
 
     #make a set of formulas going from the highest number to lowest and when the formulas in a world are already in a set or extend 
-    THRESHOLD = 40
+    THRESHOLD = 20
 
     worlds = Int64[]
     for r in tableau.relations
@@ -222,32 +222,56 @@ function isInfinite(tableau::Tableau)
         end
     end
 
+    counter = 0
+    period = 0
     if length(worlds) > THRESHOLD
-        counter = 0
-        lastworld = maximum(worlds)
-        lastset = Set{Tree}([])
-        for l in tableau.list
-            if l.world == lastworld
-                push!(lastset, l.formula)
+        sets = sets = [Set{Tree}([]) for _ in 1:length(worlds)]
+        for t in tableau.list
+            #worlds start at 0, arrays at 1
+            push!(sets[t.world+1], t.formula)
+        end
+
+        # detect period of repetitions
+        step = 0
+        reverse!(sets)
+        last = sets[1]
+        for s in sets[2:end]
+            current = s
+            step = step + 1
+            if isSubset(last, current)
+                period = period + step
+                break
             end
         end
-        counter = 1
-        for w in sort(worlds, rev=true)
-            currentset = Set{Tree}([])
-            for t in tableau.list
-                if t.world == w
-                    push!(currentset, t.formula)
-                end
-            end
-            if isSubset(lastset, currentset)
-                lastset = currentset
+
+        # no repeating elements or the period is equal or larger than half the threshold
+        if period < 1 || period >= THRESHOLD/2
+            return false
+        end
+
+        #check if pattern repeats taking into account the possibily alternating pattern
+        for (idx, s) in enumerate(sets[1:end-period])
+            if isSubset(s, sets[idx+period])
                 counter = counter + 1
-            elseif counter >= THRESHOLD 
-                return true
             else
-                return false
+                break
             end
         end
+    end
+
+    if counter >= THRESHOLD - period
+        return true
+    else
+        return false
+    end
+end
+
+function isInfPossible(constraints::Vector{Char})
+    if 'c' in constraints
+        return false
+    end
+    if 't' in constraints
+        return true
     end
     return false
 end
@@ -259,7 +283,7 @@ function solveBranch!(tableau::Tableau, constraints::Vector{Char}, mode::Int64 =
     
     # this loop makes sure that the rules are applied in a correct order as long as there any rules left to be applied
     while true
-        if isInfinite(tableau)
+        if isInfPossible(constraints) && isInfinite(tableau)
             if mode == 1
                 println("Infinite branch!")
             end
@@ -321,7 +345,7 @@ function solve!(tableau::Tableau, constraints::Vector{Char}, mode::Int64 = 1)
 
                 # watch out for infipedes
                 # printBranch(tableau)
-                if isInfinite(tableau) && !isClosed(tableau.list) 
+                if isInfPossible(constraints) && isInfinite(tableau) && !isClosed(tableau.list) 
                     if mode == 1
                         println("Infinite branch! Infinipede!")
                     end
@@ -341,7 +365,7 @@ function solve!(tableau::Tableau, constraints::Vector{Char}, mode::Int64 = 1)
         end
     end
     if mode == 1
-        print("Tableau has at least one open and complete branch:\n")
+        print("Tableau has at least one open and (complete or infinite) branch:\n")
         printBranch(tableau)
     else
         return false
