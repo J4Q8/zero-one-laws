@@ -321,15 +321,11 @@ function solve!(tableau::Tableau, constraints::Vector{Char}, mode::Int64 = 1)
 
                 # watch out for infipedes
                 # printBranch(tableau)
-                if isInfinite(tableau)
+                if isInfinite(tableau) && !isClosed(tableau.list) 
                     if mode == 1
                         println("Infinite branch! Infinipede!")
-                        print("Tableau has at least one open and complete branch:\n")
-                        printBranch(tableau)
-                        break
-                    else 
-                        return false
                     end
+                    break
                 end
 
             else
@@ -341,14 +337,14 @@ function solve!(tableau::Tableau, constraints::Vector{Char}, mode::Int64 = 1)
                 end
             end
         else
-            if mode == 1
-                print("Tableau has at least one open and complete branch:\n")
-                printBranch(tableau)
-                break
-            else
-                return false
-            end
+            break
         end
+    end
+    if mode == 1
+        print("Tableau has at least one open and complete branch:\n")
+        printBranch(tableau)
+    else
+        return false
     end
 end
 
