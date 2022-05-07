@@ -151,12 +151,9 @@ end
 
 function getAllWorlds(tableau::Tableau)
     worlds = Int64[]
-    for r in tableau.relations
-        if !(r.i in worlds)
-            push!(worlds, r.i)
-        end
-        if !(r.j in worlds)
-            push!(worlds, r.j)
+    for f in tableau.list 
+        if !(f.world in worlds)
+            push!(worlds, f.world)
         end
     end
     return worlds
@@ -312,7 +309,7 @@ function getOrders(tableau::Tableau)
 end
 
 
-function isInfinite(tableau::Tableau)
+function isInfiniteGamma(tableau::Tableau)
     #after this many worlds are introduced the infinite check will be called
 
     #make a set of formulas going from the highest number to lowest and when the formulas in a world are already in a set or extend 
@@ -326,12 +323,12 @@ function isInfinite(tableau::Tableau)
 
         orders = getOrders(tableau)
         lengths = [length(order) for order in orders]
-        max = maximum(lengths)
+        mean = sum(lengths)/(length(lengths))
 
         for order in orders
             
             #filter out ones that have probably stopped already
-            if length(order) < max - THRESHOLD
+            if length(order) < mean - THRESHOLD
                 continue
             end
 
@@ -346,39 +343,73 @@ function isInfinite(tableau::Tableau)
                 end
             end
 
-            # this is probably not neeeded but it will definitely not harm, I don't know if formulas can be alternating on one order
-            # detect period of repetitions
-            period = 0
-            step = 0
-            last = sets[1]
-            for s in sets[2:end]
-                current = s
-                step = step + 1
-                if isSubset(last, current)
-                    period = period + step
-                    break
+            lastOriginal = length(order) # fake infinity
+            for (idx, s) in enumerate(sets[1:end-1])
+                lastOriginalMainLoop = lastOriginal
+                for f in s
+                    original = true
+                    for s2 in sets[idx+1:end]
+                        if isSubset(Set{Tree}([f]), s2)
+                            original = false
+                            break
+                        end
+                    end
+                    if original
+                        lastOriginalMainLoop = minimum([lastOriginalMainLoop, idx])
+                    end
                 end
+                lastOriginal = minimum([lastOriginal, lastOriginalMainLoop])
             end
-
-            # no repeating elements or the period is equal or larger than half the threshold
-            if period < 1 || period >= THRESHOLD/2
-                return false
-            end
-
-            #check if pattern repeats taking into account the possibily alternating pattern
-            counter = period
-            for (idx, s) in enumerate(sets[1:end-period])
-                if isSubset(s, sets[idx+period])
-                    counter = counter + 1
-                else
-                    break
-                end
-            end
-            push!(repeating, counter)
+            push!(repeating, lastOriginal)
         end
     end
 
     if length(repeating) != 0 && minimum(repeating) >= THRESHOLD/2
+        return true
+    else
+        return false
+    end
+end
+
+function isInfinite(tableau::Tableau)
+    #after this many worlds are introduced the infinite check will be called
+
+    #make a set of formulas going from the highest number to lowest and when the formulas in a world are already in a set or extend 
+    THRESHOLD = 60
+
+    worlds = getAllWorlds(tableau)
+
+    lastOriginal = length(worlds)
+    if length(worlds) > THRESHOLD
+
+        sets = [Set{Tree}([]) for _ in 1:maximum(worlds)+1]
+        for t in tableau.list
+            #worlds start at 0 arrays in Julia at 1, hence +1
+            push!(sets[t.world+1], t.formula)
+        end
+
+        reverse!(sets)
+
+        for (idx, s) in enumerate(sets[1:end-1])
+            lastOriginalMainLoop = lastOriginal
+            for f in s
+                original = true
+                for s2 in sets[idx+1:end]
+                    if isSubset(Set{Tree}([f]), s2)
+                        original = false
+                        break
+                    end
+                end
+                if original
+                    lastOriginalMainLoop = minimum([lastOriginalMainLoop, idx])
+                end
+            end
+            lastOriginal = minimum([lastOriginal, lastOriginalMainLoop])
+        end
+    end
+    
+    #if the last original formula was introduced THRESHOLD worlds ago or more than its repeating
+    if lastOriginal >= THRESHOLD
         return true
     else
         return false
