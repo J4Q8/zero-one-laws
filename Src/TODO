@@ -9,3 +9,5 @@
 3. make sure that is infinite is checked only when the constraints include transitive, but don't have converse-wellfoundedness
 
 4. Visualize graphs: https://medium.com/coffee-in-a-klein-bottle/analyzing-graphs-with-julia-38e26d1d2f62
+
+5. After applyModal! has been applied we need to run it again something might have changed before branching

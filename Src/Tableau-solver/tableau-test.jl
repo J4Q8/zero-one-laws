@@ -31,7 +31,6 @@ using Test
         @test validate("", "◇ p → ◻ ◇ p", "st") == true
         @test validate("", "◻ p → ◻ ◻ p", "rs") == false
         @test validate("", "◻ ◻ p → ◻ p", "t") == false
-        @test validate("", "¬ ( ◇ p ∧ ◻ ◇ p )", "t") == false
         @test validate("", "( ◻ ( p → q ) ∧ ◇ ( p ∧ r ) ) → ◇ ( q ∧ r )", "r") == true
         @test validate("", "( ◻ p ∧ ◻ q ) → ( p ↔ q )", "r") == true
         @test validate("", "◇ ( p → q ) ↔ ( ◻ p → ◇ q )", "r") == true
@@ -56,6 +55,18 @@ using Test
         @test validate("", "◇ p → ¬ q", "gl") == false
         @test validate("", "◻ ◻ ◇ ( p ↔ p ) ∧ ◻ ◻ ◇ ◻ ( p ∧ ¬ p )", "gl") == false
         @test validate("", "◻ ( ◻ p → p ) → ◻ p", "gl") == true
+        @test validate("", "( ( ( ( ( ◻ ( ◻ a ∨ ◻ ◇ ¬ a ) ∨ ◇ ◻ ⊥ ) ∨ ◇ ( ◻ a ∧ ◇ ◇ ¬ a ) ) ∨ ◇ ( ◻ ◇ a ∧ ◇ ◇ ◻ ¬ a ) ) ∨ ◇ ( ◻ a ∧ ◻ ¬ a ) ) ∨ ◇ ( ◻ ( ◻ ¬ a ∨ a ) ∧ ◇ ◇ ( ◇ a ∧ ¬ a ) ) ) ∨ ◇ ( ◻ ( ◇ ¬ a ∨ a ) ∧ ◇ ◇ ( ◻ a ∧ ¬ a ) )", "gl") == true
     end 
+
+    @testset "modal formulas with infinite branches" begin
+        @test validate("◻ ( ◻ ⊤ ∧ ◻ ( ◻ ( q → p ) ↔ ( ◻ ⊥ ∧ ( ⊥ ∧ ⊤ ) ) ) )", "", "s4") == false
+        @test validate("◻ ( ◻ p ↔ ◻ ⊥ )", "", "s4") == false
+        @test validate("◻ ( p ↔ ◻ ⊥ )", "", "s4") == false
+        @test validate("", "¬ ( ◇ p ∧ ◻ ◇ p )", "t") == false
+        @test validate("( ( ◻ ◻ ¬ p → ( ( ¬ p ∧ ( p ↔ q ) ) ∧ p ) ) ∧ ◇ ¬ ◇ ( p ∧ ⊤ ) ) ↔ ◻ ( ◻ ◇ ( q ↔ ⊥ ) ∧ ◻ ( p ↔ ( ⊤ ∧ p ) ) )", "", "s4") == false
+        @test validate("◇ ( ◇ ( ◇ ( p ∧ q ) ↔ ( ( ( p ∧ ⊥ ) → ( ⊥ → p ) ) ↔ q ) ) ↔ ¬ ( ( ⊤ ↔ ◻ p ) ∧ ¬ ◻ p ) ) ∧ ◻ ◻ ( ◇ ⊤ ∧ ¬ ( ¬ ( p ∧ ⊥ ) ∧ ( ( ⊤ ∧ p ) ∧ ⊥ ) ) )", "", "s4") == false
+        @test validate("◇ ◻ ¬ ◻ p ↔ ( ⊥ ↔ ◻ ( ◻ ( ◇ ◻ p ↔ p ) ∧ ◻ ( ( ◇ q ∧ ( ⊤ ∧ ⊥ ) ) ↔ q ) ) )", "", "s4") == false
+        
+    end
 
 end

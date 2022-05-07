@@ -2,6 +2,7 @@ module Solver
 
 export solve!
 
+using Statistics
 using ..Trees
 using ..Tableaux
 using ..ModalRules
@@ -148,10 +149,7 @@ function isClosed(list::Vector{NamedTuple{(:formula, :world), Tuple{Tree, Int64}
     return false
 end
 
-function isInfiniteAlpha(tableau::Tableau)
-    #after this many worlds are introduced the infinite check will be called
-    THRESHOLD = 40
-
+function getAllWorlds(tableau::Tableau)
     worlds = Int64[]
     for r in tableau.relations
         if !(r.i in worlds)
@@ -161,6 +159,14 @@ function isInfiniteAlpha(tableau::Tableau)
             push!(worlds, r.j)
         end
     end
+    return worlds
+end
+
+function isInfiniteAlpha(tableau::Tableau)
+    #after this many worlds are introduced the infinite check will be called
+    THRESHOLD = 40
+
+    worlds = getAllWorlds(tableau)
 
     if length(worlds) > THRESHOLD
         counter = 0
@@ -206,26 +212,18 @@ function isSubset(list::Set{Tree}, biggerlist::Set{Tree})
     return true
 end
 
-function isInfinite(tableau::Tableau)
+function isInfiniteBeta(tableau::Tableau)
     #after this many worlds are introduced the infinite check will be called
 
     #make a set of formulas going from the highest number to lowest and when the formulas in a world are already in a set or extend 
-    THRESHOLD = 20
+    THRESHOLD = 40
 
-    worlds = Int64[]
-    for r in tableau.relations
-        if !(r.i in worlds)
-            push!(worlds, r.i)
-        end
-        if !(r.j in worlds)
-            push!(worlds, r.j)
-        end
-    end
+    worlds = getAllWorlds(tableau)
 
     counter = 0
     period = 0
     if length(worlds) > THRESHOLD
-        sets = sets = [Set{Tree}([]) for _ in 1:length(worlds)]
+        sets = [Set{Tree}([]) for _ in 1:length(worlds)]
         for t in tableau.list
             #worlds start at 0, arrays at 1
             push!(sets[t.world+1], t.formula)
@@ -266,6 +264,127 @@ function isInfinite(tableau::Tableau)
     end
 end
 
+function isEndWorld(tableau::Tableau, endWorld::Int64)
+    for r in tableau.relations
+        if r.i == endWorld && r.i != r.j
+            return false
+        end
+    end
+    return true
+end
+
+function traceBack(tableau::Tableau, endWorld::Int64)
+    order = Int64[]
+    for r in tableau.relations
+        if r.j == endWorld && r.i != r.j && r.i ∉ order
+            push!(order, r.i)
+        end
+    end
+
+    ordercopy = copy(order)
+    for w in ordercopy
+        order = union(order, traceBack(tableau, w))
+    end
+    #add the endworld
+    push!(order, endWorld)
+
+    return order
+end
+
+function getOrders(tableau::Tableau)
+
+    orders = Vector{Int64}[]
+    worlds = sort(getAllWorlds(tableau), rev=true)
+    endWorlds = Int64[]
+
+    for w in worlds
+        if isEndWorld(tableau, w)
+            push!(endWorlds, w)
+        end
+    end
+
+    for e in endWorlds
+        order = sort(traceBack(tableau, e), rev=true)
+        push!(orders, order)
+    end
+
+    return orders
+end
+
+
+function isInfinite(tableau::Tableau)
+    #after this many worlds are introduced the infinite check will be called
+
+    #make a set of formulas going from the highest number to lowest and when the formulas in a world are already in a set or extend 
+    THRESHOLD = 10
+
+    worlds = getAllWorlds(tableau)
+
+    repeating = Int64[]
+
+    if length(worlds) > THRESHOLD
+
+        orders = getOrders(tableau)
+        lengths = [length(order) for order in orders]
+        max = maximum(lengths)
+
+        for order in orders
+            
+            #filter out ones that have probably stopped already
+            if length(order) < max - THRESHOLD
+                continue
+            end
+
+            sets = [Set{Tree}([]) for _ in 1:length(order)]
+            for t in tableau.list
+                positionArray = indexin(t.world, order)
+                if !(positionArray .== nothing)
+                    #worlds start at 0, arrays at 1
+                    if t.formula.connective == '◇'
+                        push!(sets[positionArray[1]], t.formula)
+                    end
+                end
+            end
+
+            # this is probably not neeeded but it will definitely not harm, I don't know if formulas can be alternating on one order
+            # detect period of repetitions
+            period = 0
+            step = 0
+            last = sets[1]
+            for s in sets[2:end]
+                current = s
+                step = step + 1
+                if isSubset(last, current)
+                    period = period + step
+                    break
+                end
+            end
+
+            # no repeating elements or the period is equal or larger than half the threshold
+            if period < 1 || period >= THRESHOLD/2
+                return false
+            end
+
+            #check if pattern repeats taking into account the possibily alternating pattern
+            counter = period
+            for (idx, s) in enumerate(sets[1:end-period])
+                if isSubset(s, sets[idx+period])
+                    counter = counter + 1
+                else
+                    break
+                end
+            end
+            push!(repeating, counter)
+        end
+    end
+
+    if length(repeating) != 0 && minimum(repeating) >= THRESHOLD/2
+        return true
+    else
+        return false
+    end
+end
+
 function isInfPossible(constraints::Vector{Char})
     if 'c' in constraints
         return false
@@ -280,19 +399,23 @@ function solveBranch!(tableau::Tableau, constraints::Vector{Char}, mode::Int64 =
     #=
         returns true when the branch is closed and complete, false when the branch is open and complete
     =#
-    
+    infPos = isInfPossible(constraints)
     # this loop makes sure that the rules are applied in a correct order as long as there any rules left to be applied
     while true
-        if isInfPossible(constraints) && isInfinite(tableau)
-            if mode == 1
-                println("Infinite branch!")
+        if infPos
+            if isInfinite(tableau)
+                if mode == 1
+                    println("Infinite branch!")
+                end
+                break
             end
-            break
-        end
-        # printBranch(tableau)
-        # println("-----------------------------------------")
-        if (!applyNonBranching!(tableau) && !applyModal!(tableau, constraints) && !applyBranching!(tableau)) || isClosed(tableau.list) 
-            break
+            if isClosed(tableau.list) || (!applyNonBranching!(tableau) && (!applyModal!(tableau, constraints) & !applyBranching!(tableau)))
+                break
+            end
+        else
+            if isClosed(tableau.list) || (!applyNonBranching!(tableau) && !applyModal!(tableau, constraints) && !applyBranching!(tableau))
+                break
+            end
         end
     end
     
@@ -343,6 +466,9 @@ function solve!(tableau::Tableau, constraints::Vector{Char}, mode::Int64 = 1)
                     end
                 end
 
+                # refresh boxes, because some of the rules might have not been applied because of already exisiting formulas on pther branches
+                refreshBox!(tableau)
+
                 # watch out for infipedes
                 # printBranch(tableau)
                 if isInfPossible(constraints) && isInfinite(tableau) && !isClosed(tableau.list) 
@@ -355,7 +481,7 @@ function solve!(tableau::Tableau, constraints::Vector{Char}, mode::Int64 = 1)
             else
                 if mode == 1
                     print("Tableau is closed and complete!")
-                    break
+                    return
                 else
                     return true
                 end
