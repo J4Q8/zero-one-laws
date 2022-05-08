@@ -1,10 +1,12 @@
 module FormulaGenerator
 
-
-include("../Tableau-solver/interface.jl")
-
 using StatsBase
 using Distributed
+
+addprocs(1)
+const result = RemoteChannel(()->Channel{Tuple}(1));
+
+include("../Tableau-solver/interface.jl")
 using .Interface
 
 export runGenerator
@@ -89,30 +91,64 @@ function equivalentOnList(formulas::Vector{String}, formula::Interface.Tree)
 end
 
 
+function checkTC(result, formula::Interface.Tree, language::String)
+    # eval(Expr(:using,:Interface))
+    println("yay-1")
+    isTaut = Interface.isTautology(formula, language)
+    if isTaut
+        put!(result, (isTaut, false))
+    else
+        isCont = Interface.isContradiction(formula, language)
+        put!(result, (isTaut, isCont))
+    end
+end
 
-# Distributed.addprocs(1)  #we add one worker process that will be the 
-#                          #long-running background computation
-# wid = workers()[end]     #take last worker (there is just one anyway)
-# const result = RemoteChannel(()->Channel{Bool}(1));
-# @everywhere function longrun(result,c=3,time=0)
-#     #write whatever code you need here
-#     for i in 1:c
-#         sleep(time)
-#         println("Working $i at $(myid())")
-#     end
-#     #we use the RemoteChannel to collect the result
-#     put!(result, (c,time,999999, myid()))
-# end
+function timeLimitedTautOrCont(formula::Interface.Tree, language::String)
+    TIMELIMIT = 40
 
-# function ready_or_not(result,wid)
-#     if !isready(result)
-#         println("Computation at $wid will be terminated")
-#         rmprocs(wid)
-#         return nothing
-#     else
-#         return take!(result)
-#     end
-# end
+    wid = workers()[end]
+
+    startTime = time_ns()
+    println("yay")
+    remote_do(checkTC, wid, result, formula, language)
+    println("yay2")
+    while true
+        #check if ready
+        if isready(result)
+            return take!(result)
+        else
+            # check if running for more than given time limit
+            endTime = time_ns()
+            # println("yay_",(endTime - startTime)*1e-9)
+            if (endTime - startTime)*1e-9 > TIMELIMIT
+                interrupt(wid)
+                println("time limit exceeded --- killing the proccess")
+                return nothing
+            end
+        end
+    end
+end
+
+function timeLimitedTautOrContALL(formula::Interface.Tree)
+    languages = ["gl","s4","k4"]
+
+    results = Bool[]
+    for l in languages
+        res = timeLimitedTautOrCont(formula, l)
+        if isnothing(res)
+            return nothing
+        else
+            put!(results, res[1])
+            put!(results, res[2])
+        end
+    end
+    # return nothing if a formula is Taut or Cont in all three languages
+    if count(results) == 3
+        return nothing
+    else
+        return results
+    end
+end
 
 function runGenerator(amountPerDepth::Int64=1000, minDepth::Int64 = 6, maxDepth::Int64=13, maxConseqModal::Int64=5, path::String = "generatedFormulas")
     #=
@@ -132,14 +168,14 @@ function runGenerator(amountPerDepth::Int64=1000, minDepth::Int64 = 6, maxDepth:
                 try1 = try1 + 1
                 formula = generateFormulaOfDepth(d, maxConseqModal)
                 formulaString = Interface.formula2String(formula)*"\n"
-                println(try1, formulaString)
-                step1 = !Interface.isTautOrContInAnyLanguage(formula)
-                println(step1)
-                step2 = formulaString ∉ formulas
-                println(step2)
-                step3 = !equivalentOnList(formulas, formula)
-                println(step3)
-                if !Interface.isTautOrContInAnyLanguage(formula) && formulaString ∉ formulas && !equivalentOnList(formulas, formula)
+
+                res = timeLimitedTautOrContALL(formula)
+
+                if isnothing(res)
+                    continue
+                end
+
+                if !equivalentOnList(formulas, formula)
                     println(formulaString)
                     push!(formulas, formulaString)
                     write(file, formulaString)
@@ -148,7 +184,5 @@ function runGenerator(amountPerDepth::Int64=1000, minDepth::Int64 = 6, maxDepth:
         end
     end
 end
-
-
 
 end #module

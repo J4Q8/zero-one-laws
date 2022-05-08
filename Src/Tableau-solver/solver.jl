@@ -375,7 +375,7 @@ function isInfinite(tableau::Tableau)
     #after this many worlds are introduced the infinite check will be called
 
     #make a set of formulas going from the highest number to lowest and when the formulas in a world are already in a set or extend 
-    THRESHOLD = 60
+    THRESHOLD = 100
 
     worlds = getAllWorlds(tableau)
 

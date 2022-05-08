@@ -11,3 +11,7 @@
 4. Visualize graphs: https://medium.com/coffee-in-a-klein-bottle/analyzing-graphs-with-julia-38e26d1d2f62
 
 5. After applyModal! has been applied we need to run it again something might have changed before branching
+
+6. limit running time of one tableaux solver
+
+7. already save the other file where we save wheather something is a tautology/contradiction for each of the 3 languages
