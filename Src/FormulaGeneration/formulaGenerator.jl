@@ -6,7 +6,7 @@ using StatsBase
 
 export runGenerator
 
-CONNECTIVES = ['∧', '→', '↔', '∧']
+CONNECTIVES = ['∧', '→', '↔', '∨']
 MODALS = ['◇', '◻']
 NEG = ['¬']
 ATOMS = ['p','q', '⊥','⊤']
@@ -122,7 +122,7 @@ function simplify(formula::Interface.Tree)
     elseif formula.connective == '↔'
         return simplifyBiImp(formula)
     elseif formula.connective == '∨'
-        return simlifyDisj(formula)
+        return simplifyDisj(formula)
     elseif formula.connective == '¬'
         return simplifyNeg(formula)
     elseif formula.connective == '◇'

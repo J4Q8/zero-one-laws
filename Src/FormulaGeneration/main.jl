@@ -1,4 +1,4 @@
 include("formulaGenerator.jl")
 using .FormulaGenerator
 
-runGenerator(10,6,13)
+@time @allocated runGenerator(10,6,13)
