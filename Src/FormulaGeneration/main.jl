@@ -1,4 +1,3 @@
-
 include("formulaGenerator.jl")
 using .FormulaGenerator
 

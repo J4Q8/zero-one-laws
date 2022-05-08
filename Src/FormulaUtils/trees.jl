@@ -2,7 +2,7 @@ module Trees
 
 #Maybe a good idea to change pointers to arrays
 
-export Tree, addleftchild!, addrightchild!, height, isEqual, isEquivalent, isOpposite, printFormula, formula2String
+export Tree, addleftchild!, addrightchild!, replaceleftchild!, replacerightchild!, height, isEqual, isEquivalent, isOpposite, printFormula, formula2String
 
 """
 Inspiration from https://github.com/JuliaCollections/AbstractTrees.jl/blob/master/examples/binarytree_core.jl
@@ -25,6 +25,14 @@ end
 
 function addrightchild!(parent::Tree, symbol)
     !isdefined(parent, :right) || error("right child is already assigned")
+    parent.right = deepcopy(symbol)
+end
+
+function replaceleftchild!(parent::Tree, symbol)
+    parent.left = deepcopy(symbol)
+end
+
+function replacerightchild!(parent::Tree, symbol)
     parent.right = deepcopy(symbol)
 end
 

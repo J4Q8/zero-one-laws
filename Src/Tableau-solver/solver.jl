@@ -426,13 +426,24 @@ function isInfPossible(constraints::Vector{Char})
     return false
 end
 
-function solveBranch!(tableau::Tableau, constraints::Vector{Char}, mode::Int64 = 1)
+function timeLimitExceeded(startTime::UInt64, timeLimit::Int64 = 30)
+    endTime = time_ns()
+    if (endTime - startTime)*1e-9 > timeLimit
+        return true
+    end
+    return false
+end
+
+function solveBranch!(tableau::Tableau, constraints::Vector{Char}, startTime::UInt64, mode::Int64 = 1)
     #=
         returns true when the branch is closed and complete, false when the branch is open and complete
     =#
     infPos = isInfPossible(constraints)
     # this loop makes sure that the rules are applied in a correct order as long as there any rules left to be applied
     while true
+        if timeLimitExceeded(startTime)
+            return false
+        end
         if infPos
             if isInfinite(tableau)
                 if mode == 1
@@ -457,8 +468,9 @@ function solve!(tableau::Tableau, constraints::Vector{Char}, mode::Int64 = 1)
     #mode == 1 : print, no return
     #mode == 2 : no print, return
     
+    startTime = time_ns()
     while true
-        if solveBranch!(tableau, constraints, mode)
+        if solveBranch!(tableau, constraints, startTime, mode)
             if length(tableau.branches) != 0
 
                 branch = pop!(tableau.branches)
@@ -511,13 +523,19 @@ function solve!(tableau::Tableau, constraints::Vector{Char}, mode::Int64 = 1)
 
             else
                 if mode == 1
-                    print("Tableau is closed and complete!")
+                    println("Tableau is closed and complete!")
                     return
                 else
                     return true
                 end
             end
         else
+            if timeLimitExceeded(startTime)
+                if mode == 1
+                    println("Time limit has been exceeded")
+                end
+                return nothing
+            end
             break
         end
     end
