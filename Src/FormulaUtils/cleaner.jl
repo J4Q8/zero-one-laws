@@ -20,7 +20,7 @@ function cleanChar(c::Char)
     elseif c in ['⊃', '-', '→']
         #takes care of implication "->"
         return '→'
-    elseif c in ['<', '↔', '≡']
+    elseif c in ['<', '↔', '≡', '=']
         #takes care of bimplication"<>"
         return '↔'
     elseif c in ['b', '◻']

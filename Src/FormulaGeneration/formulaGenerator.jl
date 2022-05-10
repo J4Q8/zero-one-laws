@@ -58,11 +58,11 @@ function generateFormula(depth::Int64, modal::Int64, prevNeg::Bool, banned::Vect
             # neg does not reset the modal depth, neg T and neg F do not make sense
             child1 = generateFormula(depth-1, modal, true, ['⊥','⊤'])
             Interface.addrightchild!(root, child1)
-            return Interface.simplifyLoop(root)
+            return Interface.simplify(root)
         elseif choice in MODALS
             child1 = generateFormula(depth-1, modal-1, false, Char[])
             Interface.addrightchild!(root, child1)
-            return Interface.simplifyLoop(root)
+            return Interface.simplify(root)
         elseif choice in CONNECTIVES
             leftban, rightban = getBanned(choice)
             child1 = generateFormula(depth-1, modal, false, leftban)
@@ -72,7 +72,7 @@ function generateFormula(depth::Int64, modal::Int64, prevNeg::Bool, banned::Vect
             end
             Interface.addleftchild!(root, child1)
             Interface.addrightchild!(root, child2)
-            return Interface.simplifyLoop(root)
+            return Interface.simplify(root)
         else
             leaf = Interface.Tree(choice)
             return leaf
