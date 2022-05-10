@@ -23,127 +23,6 @@ function makeFileIfNotExists(path::String)
     end
 end
 
-function simplifyChildren(formula::Interface.Tree)
-    connective = Interface.Tree(formula.connective)
-    if isdefined(formula, :left)
-        Interface.addleftchild!(connective, simplify(formula.left))
-    end
-    if isdefined(formula, :right)
-        Interface.addrightchild!(connective, simplify(formula.right))
-    end
-    return connective
-end
-
-function simplifyConj(formula::Interface.Tree)
-    if formula.left.connective == '⊥' || formula.right.connective == '⊥' || Interface.isOpposite(formula.left, formula.right)
-        return Interface.Tree('⊥')
-    elseif formula.left.connective == '⊤'
-        return simplify(formula.right)
-    elseif formula.right.connective == '⊤'
-        return simplify(formula.left)
-    else
-        return simplifyChildren(formula)
-    end
-end
-
-function simplifyImp(formula::Interface.Tree)
-    if formula.left.connective == '⊥'
-        return Interface.Tree('⊤') 
-    elseif formula.right.connective == '⊤'
-        return Interface.Tree('⊤')
-    elseif formula.left.connective == '⊤' && formula.right.connective == '⊥'
-        return Interface.Tree('⊥') 
-    else
-        return simplifyChildren(formula)
-    end
-end
-
-function simplifyBiImp(formula::Interface.Tree)
-    if Interface.isEquivalent(formula.left, formula.right)
-        return Interface.Tree('⊤')
-    elseif formula.left.connective == '¬' && Interface.isEquivalent(formula.left.right, formula.right)
-        return Interface.Tree('⊥')
-    elseif formula.right.connective == '¬' && Interface.isEquivalent(formula.right.right, formula.left)
-        return Interface.Tree('⊥')
-    elseif formula.left.connective == '⊥' && formula.right.connective == '⊤'
-        return Interface.Tree('⊥')
-    elseif formula.right.connective == '⊥' && formula.left.connective == '⊤'
-        return Interface.Tree('⊥')
-    else
-        return simplifyChildren(formula)
-    end
-end
-
-function simplifyDisj(formula::Interface.Tree)
-    if formula.left.connective == '⊤' || formula.right.connective == '⊤' || Interface.isOpposite(formula.left, formula.right)
-        return Interface.Tree('⊤')
-    elseif formula.left.connective == '⊥'
-        return simplify(formula.right)
-    elseif formula.right.connective == '⊥'
-        return simplify(formula.left)
-    else
-        return simplifyChildren(formula)
-    end
-end
-
-function simplifyNeg(formula::Interface.Tree)
-    if formula.right.connective == '¬'
-        return simplify(formula.right.right)
-    elseif formula.right.connective == '⊥'
-        Interface.Tree('⊤')
-    elseif formula.right.connective == '⊤'
-        Interface.Tree('⊥')
-    else
-        return simplifyChildren(formula)
-    end
-end
-
-function simplifyDia(formula::Interface.Tree)
-    if formula.right.connective == '⊥'
-        return Interface.Tree('⊥')
-    else
-        return simplifyChildren(formula)
-    end
-end
-
-function simplifyBox(formula::Interface.Tree)
-    if formula.right.connective == '⊤'
-        return Interface.Tree('⊤')
-    else
-        return simplifyChildren(formula)
-    end
-end
-
-function simplify(formula::Interface.Tree)
-    if formula.connective == '∧'
-        return simplifyConj(formula)
-    elseif formula.connective == '→'
-        return simplifyImp(formula)
-    elseif formula.connective == '↔'
-        return simplifyBiImp(formula)
-    elseif formula.connective == '∨'
-        return simplifyDisj(formula)
-    elseif formula.connective == '¬'
-        return simplifyNeg(formula)
-    elseif formula.connective == '◇'
-        return simplifyDia(formula)
-    elseif formula.connective == '◻'
-        return simplifyBox(formula)
-    else
-        return formula
-    end
-end
-
-function simplifyLoop(formula::Interface.Tree)
-    steadystate = deepcopy(formula)
-    simplified = simplify(formula)
-    while !Interface.isEqual(steadystate, simplified)
-        steadystate = deepcopy(simplified)
-        simplified = simplify(simplified)
-    end
-    return simplified
-end
-
 function getBanned(connective::Char)
     if connective == '∧'
         return ['⊥','⊤'], ['⊥','⊤']
@@ -176,14 +55,14 @@ function generateFormula(depth::Int64, modal::Int64, prevNeg::Bool, banned::Vect
         choice = sample(possible)
         root = Interface.Tree(choice)
         if choice in NEG
-            # neg does not reset the modal depth
-            child1 = generateFormula(depth-1, modal, true, Char[])
+            # neg does not reset the modal depth, neg T and neg F do not make sense
+            child1 = generateFormula(depth-1, modal, true, ['⊥','⊤'])
             Interface.addrightchild!(root, child1)
-            return simplifyLoop(root)
+            return Interface.simplifyLoop(root)
         elseif choice in MODALS
             child1 = generateFormula(depth-1, modal-1, false, Char[])
             Interface.addrightchild!(root, child1)
-            return simplifyLoop(root)
+            return Interface.simplifyLoop(root)
         elseif choice in CONNECTIVES
             leftban, rightban = getBanned(choice)
             child1 = generateFormula(depth-1, modal, false, leftban)
@@ -193,7 +72,7 @@ function generateFormula(depth::Int64, modal::Int64, prevNeg::Bool, banned::Vect
             end
             Interface.addleftchild!(root, child1)
             Interface.addrightchild!(root, child2)
-            return simplifyLoop(root)
+            return Interface.simplifyLoop(root)
         else
             leaf = Interface.Tree(choice)
             return leaf

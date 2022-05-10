@@ -1,17 +1,18 @@
 1. replace applied bool with numbers where 0 = "not applied" and int indicates the first line resulting from a rule application
     then when we move to the next branch we change all line numbers higher than the branching line (hence they were applied later on that branch and need to be applied again)
 
-
 1.b  check all arrays from which I pop! cause they may be problematic
 
 2. check why relations include lines which are not on the list
 
 3. make sure that is infinite is checked only when the constraints include transitive, but don't have converse-wellfoundedness
 
-4. Visualize graphs: https://medium.com/coffee-in-a-klein-bottle/analyzing-graphs-with-julia-38e26d1d2f62
+4. Visualize graphs: <https://medium.com/coffee-in-a-klein-bottle/analyzing-graphs-with-julia-38e26d1d2f62>
 
 5. After applyModal! has been applied we need to run it again something might have changed before branching
 
 6. limit running time of one tableaux solver
 
 7. already save the other file where we save wheather something is a tautology/contradiction for each of the 3 languages
+
+8. AND OR BICONDITIONAL are all both associative and commutative so i need to check for that in simplificartion

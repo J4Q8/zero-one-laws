@@ -3,6 +3,7 @@ module Interface
 include("../FormulaUtils/cleaner.jl")
 include("../FormulaUtils/trees.jl")
 include("../FormulaUtils/parser.jl")
+include("../FormulaUtils/simplifier.jl")
 include("tableaux.jl")
 include("propositionalRules.jl")
 include("modalRules.jl")
@@ -12,6 +13,7 @@ using .Trees
 using .Parser
 using .Tableaux
 using .Solver
+using .Simplifier
 
 export runSolver, validate, isTautology, isContradiction, isTautOrCont, isTautOrContInAnyLanguage
 
