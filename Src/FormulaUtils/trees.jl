@@ -2,7 +2,7 @@ module Trees
 
 #Maybe a good idea to change pointers to arrays
 
-export Tree, addleftchild!, addrightchild!, replaceleftchild!, replacerightchild!, height, isEqual, isOpposite, isEquivalent, isOppositeEqui, printFormula, formula2String
+export Tree, addleftchild!, addrightchild!, replaceleftchild!, replacerightchild!, height, isEqual, isOpposite, getJuncts, isEquivalent, isOppositeEqui, printFormula, formula2String
 
 """
 Inspiration from https://github.com/JuliaCollections/AbstractTrees.jl/blob/master/examples/binarytree_core.jl
@@ -168,6 +168,36 @@ function isOpposite(t1::Tree, t2::Tree)
     end
 end
 
+function getJuncts(formula::Tree, connective::Char)
+    # get conjuncts and disjuncts and biconditionals
+    if formula.connective == connective
+        return [getJuncts(formula.left, connective); getJuncts(formula.right, connective)]
+    else
+        return [formula]
+    end
+
+end
+
+function compareJuncts(j1::Vector{Tree}, j2::Vector{Tree})
+    v1 = fill(0, length(j1))
+    v2 = fill(0, length(j2))
+    for (idx1, junct1) in enumerate(j1)
+        for (idx2, junct2) in enumerate(j2)
+            t = isEquivalent(junct1, junct2)
+            v1[idx1] = t ? 1 : v1[idx1]
+            v2[idx2] = t ? 1 : v2[idx2]
+            if minimum(v1) == 1 && minimum(v2) == 1
+                return true
+            end
+        end
+    end
+    if minimum(v1) == 0 || minimum(v2) == 0
+        return false
+    else
+        return true
+    end
+end
+
 function isEquivalent(t1::Tree, t2::Tree)
     #check if formulas are equivalent e.g. A^B and B^A are    
     if !isdefined(t1, :left) && isdefined(t2, :left)
@@ -175,7 +205,13 @@ function isEquivalent(t1::Tree, t2::Tree)
     end
 
     if !isdefined(t1, :right) && isdefined(t2, :right)
-        return false
+        if t2.connective == '¬' && t1.connective == '⊤' && t2.right.connective == '⊥'
+            return true
+        elseif t2.connective == '¬' && t1.connective == '⊥' && t2.right.connective == '⊤'
+            return true
+        else
+            return false
+        end
     end
 
     if !isdefined(t2, :left) && isdefined(t1, :left)
@@ -183,13 +219,15 @@ function isEquivalent(t1::Tree, t2::Tree)
     end
 
     if !isdefined(t2, :right) && isdefined(t1, :right)
-        return false
+        if t1.connective == '¬' && t1.right.connective == '⊥' && t2.connective == '⊤'
+            return true
+            #hard coded fact that neg F equals to T
+        elseif t1.connective == '¬' && t1.right.connective == '⊤' && t2.connective == '⊥'
+            return true
+        else
+            return false
+        end
     end
-
-
-    # if !isdefined(t1, :left) && !isdefined(t2, :left) && !isdefined(t1, :right) && !isdefined(t2, :right)
-    #     return true
-    # end
 
     if t1.connective == t2.connective
         if !isdefined(t1, :left)
@@ -204,19 +242,15 @@ function isEquivalent(t1::Tree, t2::Tree)
             return isEquivalent(t1.left, t2.lfet)
         else
             equal = isEquivalent(t1.left, t2.left) && isEquivalent(t1.right, t2.right)
-            if !equal && t1.connective in ['∧', '↔', '∧'] # symmetrical connectives
-                symmetrical = isEquivalent(t1.left, t2.right) && isEquivalent(t1.right, t2.left)
-                return equal || symmetrical
+            if !equal && t1.connective in ['∧', '↔', '∨'] # commutative and associative connectives
+                j1 = getJuncts(t1, t1.connective)
+                j2 = getJuncts(t2, t2.connective)
+                symmetrical_associative_commutative = compareJuncts(j1, j2)
+                return equal || symmetrical_associative_commutative
             else
                 return equal
             end
         end
-        #hard coded fact that neg T equals to F
-    elseif t1.connective == '¬' && t1.right.connective == '⊥' && t2.connective == '⊤'
-        return true
-        #hard coded fact that neg F equals to T
-    elseif t1.connective == '¬' && t1.right.connective == '⊤' && t2.connective == '⊥'
-        return true
     else
         return false
     end

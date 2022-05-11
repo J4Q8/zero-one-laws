@@ -4,6 +4,15 @@ using ..Trees
 
 export simplify, rebuildTreeFromJuncts
 
+function isIn(formula::Tree, list::Vector{Tree})
+    for l in list
+        if isEquivalent(formula, l)
+            return true
+        end
+    end
+    return false
+end
+
 function simplifyChildren(formula::Tree)
     connective = Tree(formula.connective)
     if isdefined(formula, :left)
@@ -15,19 +24,9 @@ function simplifyChildren(formula::Tree)
     return connective
 end
 
-function getJuncts(formula::Tree, connective::Char)
-    # get conjuncts and disjuncts
-    if formula.connective == connective
-        return [getJuncts(formula.left, connective); getJuncts(formula.right, connective)]
-    else
-        return formula
-    end
-
-end
-
 function anyOppositeFormulas(juncts::Vector{Tree})
-    for (idx, junct1) in enumerate(juncts[2:end-1])
-        for junct2 in juncts[idx:end]
+    for (idx, junct1) in enumerate(juncts[1:end-1])
+        for junct2 in juncts[idx+1:end]
             if isOppositeEqui(junct1, junct2)
                 return true
             end
@@ -51,19 +50,21 @@ end
 
 function getRepeatingJuncts(juncts::Vector{Tree})
     repeating = Vector{Int64}[]
-    for (idx1, junct1) in enumerate(juncts[2:end-1])
-        for (idx2, junct2) in enumerate(juncts[idx1:end])
+    for (idx1, junct1) in enumerate(juncts[1:end-1])
+        for (idx2, junct2) in enumerate(juncts[idx1+1:end])
             if isEquivalent(junct1, junct2)
                 #add to list of repeating formulas
                 added = false
                 for r in repeating
-                    if idx1 ∈ r
-                        push!(r, idx2)
+                    if idx1 ∈ r 
                         added = true
+                        if idx1+idx2 ∉ r
+                            push!(r, idx1+idx2)
+                        end
                     end
                 end
                 if !added
-                    push!(repeating, [idx1, idx2])  
+                    push!(repeating, [idx1, idx1+idx2])  
                 end              
             end
         end
@@ -88,24 +89,35 @@ function reduceRepeatingJuncts(connective::Char, juncts::Vector{Tree})
     end
     deleteat!(juncts, idx2Remove)
 
+    if length(juncts) == 0
+        if connective == '∧'
+            push!(juncts, Tree('⊤'))
+        elseif connective == '∨'
+            push!(juncts, Tree('⊥'))
+        end
+    end
     # recreate tree structure using juncts
     return rebuildTreeFromJuncts(connective, juncts)
 end
 
-function replaceRepeatingJunctsWithT(connective::Char, juncts::Vector{Tree})
+function replaceRepeatingJunctsWithT(juncts::Vector{Tree})
     repeating = getRepeatingJuncts(juncts)
-
-    flag = false
+    
+    vcat(repeating...)
+    idx2Remove = Int64[]
     for r in repeating
-        deleteat!(juncts, r)
-        flag = true
+        if iseven(length(r))
+            idx2Remove = [idx2Remove; r]
+        else
+            idx2Remove = [idx2Remove; r[2:end]]
+        end    
     end
-
+    deleteat!(juncts, sort(idx2Remove))
     # for biconditional we can rearrange juncts in a way that all repeating elements will be next to each other
     # then all repeating formulas of the same time can be replaced with 'T'
     # if there is more than 1 repeating formula then we can still replace it with just one 'T', 
     # because we can rearrange them into (T <-> T) <-> T, which is T
-    if flag
+    if !isIn(Tree('⊤'), juncts)  && length(idx2Remove) != 0
         push!(juncts, Tree('⊤'))
     end
 
@@ -114,40 +126,41 @@ end
 
 function getOppositeJuncts(juncts::Vector{Tree})
     opposite = Vector{Int64}[]
-    for (idx1, junct1) in enumerate(juncts[2:end-1])
-        for (idx2, junct2) in enumerate(juncts[idx1:end])
+    for (idx1, junct1) in enumerate(juncts[1:end-1])
+        for (idx2, junct2) in enumerate(juncts[idx1+1:end])
             if isOppositeEqui(junct1, junct2)
                 #add to list of repeating formulas
-                if !added
-                    push!(opposite, [idx1, idx2])  
-                end              
+                push!(opposite, [idx1, idx1+idx2])        
             end
         end
     end
     return opposite
 end
 
-function replaceOppositeJunctsWithF(connective::Char, juncts::Vector{Tree})
+function replaceOppositeJunctsWithF(juncts::Vector{Tree})
     opposite = getOppositeJuncts(juncts)
 
-    unzipped = sort!([i for o in opposite for i in o])
+    #flatten array
+    flatten = vcat(opposite...)
 
-    for (idx, val) in unzipped[1:end-1]
-        if val == unzipped[idx+1]
-            throw(ErrorException("This should never happen, call replace repeating juncts with T before"))
-        end
+    if flatten != unique(flatten)
+        throw(ErrorException("This should never happen, call replace repeating juncts with T before"))
     end
 
-    falseCount = 0
-    for o in opposite
-        deleteat!(juncts, o)
-        falseCount = falseCount + 1
-    end
+    falseCount = length(flatten)
+    deleteat!(juncts, sort(flatten))
     
-    if isodd(falseCount)
-        push!(juncts, Tree('⊥'))
+    if iseven(falseCount) && falseCount != 0
+        if !isIn(Tree('⊥'), juncts)
+            push!(juncts, Tree('⊥'))
+        else
+            push!(juncts, Tree('⊤'))
+        end
     else
-        push!(juncts, Tree('⊤'))
+        # add T if it already isn't in the juncts
+        if !isIn(Tree('⊤'), juncts)
+            push!(juncts, Tree('⊤'))
+        end
     end
     return juncts
 end
@@ -191,8 +204,8 @@ end
 function simplifyBiImp(formula::Tree)
     # first reduce repeating then opposite
     juncts = getJuncts(formula, formula.connective)
-    juncts = replaceRepeatingJunctsWithT(formula.connective, juncts)
-    juncts = replaceOppositeJunctsWithF(formula.connective, juncts)
+    juncts = replaceRepeatingJunctsWithT(juncts)
+    juncts = replaceOppositeJunctsWithF(juncts)
     reducedFormula = rebuildTreeFromJuncts(formula.connective, juncts)
     return simplifyChildren(reducedFormula)
 end
@@ -200,6 +213,18 @@ end
 function simplifyNeg(formula::Tree)
     if formula.right.connective == '¬'
         return simplify(formula.right.right)
+    elseif formula.right.connective == '◻'
+        root = Tree('◇')
+        neg = Tree('¬')
+        addrightchild!(neg, simplify(formula.right.right))
+        addrightchild!(root, neg)
+        return root
+    elseif formula.right.connective == '◇'
+        root = Tree('◻')
+        neg = Tree('¬')
+        addrightchild!(neg, simplify(formula.right.right))
+        addrightchild!(root, neg)
+        return root
     elseif formula.right.connective == '⊥'
         Tree('⊤')
     elseif formula.right.connective == '⊤'
