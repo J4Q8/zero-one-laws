@@ -196,6 +196,12 @@ function simplifyImp(formula::Tree)
         return Tree('⊤')
     elseif formula.left.connective == '⊤' && formula.right.connective == '⊥'
         return Tree('⊥') 
+    elseif formula.left.connective == '⊤'
+        return formula.right
+    elseif formula.right.connective == '⊥'
+        root = Tree('¬')
+        addrightchild!(root, formula.left)
+        return root
     else
         return simplifyChildren(formula)
     end
@@ -203,11 +209,25 @@ end
 
 function simplifyBiImp(formula::Tree)
     # first reduce repeating then opposite
-    juncts = getJuncts(formula, formula.connective)
-    juncts = replaceRepeatingJunctsWithT(juncts)
-    juncts = replaceOppositeJunctsWithF(juncts)
-    reducedFormula = rebuildTreeFromJuncts(formula.connective, juncts)
-    return simplifyChildren(reducedFormula)
+    if formula.left.connective == '⊥'
+        root = Tree('¬')
+        addrightchild!(root, formula.right)
+        return root
+    elseif formula.right.connective == '⊥'
+        root = Tree('¬')
+        addrightchild!(root, formula.left)
+        return root
+    elseif formula.left.connective == '⊤'
+        return formula.right
+    elseif formula.right.connective == '⊤'
+        return formula.left
+    else
+        juncts = getJuncts(formula, formula.connective)
+        juncts = replaceRepeatingJunctsWithT(juncts)
+        juncts = replaceOppositeJunctsWithF(juncts)
+        reducedFormula = rebuildTreeFromJuncts(formula.connective, juncts)
+        return simplifyChildren(reducedFormula)
+    end
 end
 
 function simplifyNeg(formula::Tree)
