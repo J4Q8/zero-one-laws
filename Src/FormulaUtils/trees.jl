@@ -2,10 +2,13 @@ module Trees
 
 #Maybe a good idea to change pointers to arrays
 
-export Tree, addleftchild!, addrightchild!, replaceleftchild!, replacerightchild!, height, isEqual, isOpposite, getJuncts, isEquivalent, isOppositeEqui, printFormula, formula2String
+using AutoHashEquals
+
+export Tree, addleftchild!, addrightchild!, replaceleftchild!, replacerightchild!, height, isequal, isOpposite, getJuncts, isEquivalent, isOppositeEqui, printFormula, formula2String
 
 """
 Inspiration from https://github.com/JuliaCollections/AbstractTrees.jl/blob/master/examples/binarytree_core.jl
+        and from https://github.com/andrewcooke/AutoHashEquals.jl
 """
 
 mutable struct Tree
@@ -17,6 +20,9 @@ mutable struct Tree
     Tree(symbol) = new(symbol)
     Tree(symbol, l, r) = new(symbol, l, r)
 end
+
+Base.hash(a::Tree, h::UInt) = hash(myHash(a), hash(:Tree, h)) #hash(a.b, hash(a.a, hash(:Foo, h)))
+#Base.(:(==))(a::Tree, b::Tree) = isequal(a, b)
 
 function addleftchild!(parent::Tree, symbol)
     !isdefined(parent, :left) || error("left child is already assigned")
@@ -107,7 +113,26 @@ function height(tree::Tree)
     return max(lh, rh) + 1
 end
 
-function isEqual(t1::Tree, t2::Tree)
+function myHash(t::Tree)
+    lh = hash(0)
+    rh = hash(0)
+
+    if isdefined(t, :left)
+        lh = myHash(t.left)
+    end
+
+    if isdefined(t, :rigth)
+        rh = myHash(t.right)
+    end
+
+    return hash(t.connective, hash(lh, rh))
+end
+
+function Base.:(==)(t1::Tree, t2::Tree)
+    return isequal(t1,t2)
+end
+
+function Base.:isequal(t1::Tree, t2::Tree)
     # this function checks if 2 trees are exactly the same
 
     # I am pretty sure this can be simplified but I have no idea how, since you cannot access undefined 
@@ -140,12 +165,12 @@ function isEqual(t1::Tree, t2::Tree)
             if !isdefined(t1, :right)
                 return true
             else
-                return isEqual(t1.right, t2.right)
+                return isequal(t1.right, t2.right)
             end
         elseif !isdefined(t1, :right)
-            return isEqual(t1.left, t2.lfet)
+            return isequal(t1.left, t2.lfet)
         else
-            return isEqual(t1.left, t2.left) && isEqual(t1.right, t2.right)
+            return isequal(t1.left, t2.left) && isequal(t1.right, t2.right)
         end
     else
         return false
@@ -159,10 +184,10 @@ function isOpposite(t1::Tree, t2::Tree)
             #make sure that multiple repeating negations are removed
             return isOpposite(t1.right, t2.right)
         else
-            return isEqual(t1.right, t2)
+            return isequal(t1.right, t2)
         end
     elseif t2.connective == '¬'
-        return isEqual(t1, t2.right)
+        return isequal(t1, t2.right)
     else
         return false
     end

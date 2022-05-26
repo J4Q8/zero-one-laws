@@ -26,7 +26,7 @@ end
 
 function isOnList(tableau::Tableau, t::NamedTuple{(:formula, :world), Tuple{Tree, Int64}})
     for i in tableau.list
-        if isEqual(t.formula,i.formula) && t.world == i.world
+        if isequal(t.formula,i.formula) && t.world == i.world
             return true
         end
     end

@@ -198,7 +198,7 @@ function isSubset(list::Set{Tree}, biggerlist::Set{Tree})
     for t in list
         flag = false
         for t2 in biggerlist
-            if isEqual(t, t2)
+            if isequal(t, t2)
                 flag = true
             end
         end

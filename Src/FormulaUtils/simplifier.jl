@@ -293,7 +293,7 @@ end
 function simplify(formula::Tree)
     steadystate = deepcopy(formula)
     simplified = simplifySwitch(formula)
-    while !isEqual(steadystate, simplified)
+    while !isequal(steadystate, simplified)
         steadystate = deepcopy(simplified)
         simplified = simplify(simplified)
     end
