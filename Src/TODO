@@ -1,3 +1,19 @@
+Options for improvement:
+
+1. make general model checker and compare to my specialized one on KR frames (+ tryout cache)
+2. check every formula on asymptotic model
+3. check every formula on bbbF tableau - for frame validity
+4. get frequency analysis on tautologies and contradictions among the three languages (possibly generate more data for that)
+5. make everthing nice as a Julia package
+
+
+
+
+
+
+
+
+
 1. replace applied bool with numbers where 0 = "not applied" and int indicates the first line resulting from a rule application
     then when we move to the next branch we change all line numbers higher than the branching line (hence they were applied later on that branch and need to be applied again)
 

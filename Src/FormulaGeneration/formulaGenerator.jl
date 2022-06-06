@@ -1,6 +1,7 @@
 module FormulaGenerator
 
-include("../Tableau-solver/interface.jl")
+include(joinpath("..", joinpath("Tableau-solver","interface.jl")))
+
 using .Interface
 using StatsBase
 

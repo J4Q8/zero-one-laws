@@ -1,33 +1,25 @@
+
 include(joinpath("..", joinpath("FormulaUtils","trees.jl")))
 include(joinpath("..", joinpath("FormulaUtils","cleaner.jl")))
 include(joinpath("..", joinpath("FormulaUtils","parser.jl")))
 include(joinpath("..", joinpath("FormulaUtils","simplifier.jl")))
+include("structures.jl")
 
+using Test
 using .Trees
 using .Parser
 using .Simplifier
-using Test
+using .Structures
 
-function testE(f1::String, f2::String)
-    f1 = parseFormula(f1)
-    f2 = parseFormula(f2)
-    return isEquivalent(f1, f2)
-end
 
-function testS(f1::String, f2::String)
-    f1 = parseFormula(f1)
-    f2 = parseFormula(f2)
-    f1 = simplify(f1)
-    # printFormula(f1)
-    # println()
-    return isEquivalent(f1, f2)
+function isvalid(formula::String)
+    
 end
 
 
+@testset verbose = true "ModelCheckerTest" begin
 
-@testset verbose = true "isEquivalent" begin
-
-    @testset "multiple conjuncts" begin
+    @testset "Propositional tautologies" begin
         @test testE("p ∧ ( q ∧ r )", "(p ∧ q) ∧ r")
         @test testE("p ∧ ( q ∧ r )", "(p ∧ r) ∧ q")
         @test testE("(p^r)^(q^r)", "((p^p)^q)^r")

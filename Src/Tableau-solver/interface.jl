@@ -1,9 +1,9 @@
 module Interface
 
-include("../FormulaUtils/cleaner.jl")
-include("../FormulaUtils/trees.jl")
-include("../FormulaUtils/parser.jl")
-include("../FormulaUtils/simplifier.jl")
+include(joinpath("..", joinpath("FormulaUtils","trees.jl")))
+include(joinpath("..", joinpath("FormulaUtils","cleaner.jl")))
+include(joinpath("..", joinpath("FormulaUtils","parser.jl")))
+include(joinpath("..", joinpath("FormulaUtils","simplifier.jl")))
 include("tableaux.jl")
 include("propositionalRules.jl")
 include("modalRules.jl")

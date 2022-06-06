@@ -2,8 +2,6 @@ module Trees
 
 #Maybe a good idea to change pointers to arrays
 
-using AutoHashEquals
-
 export Tree, addleftchild!, addrightchild!, replaceleftchild!, replacerightchild!, height, isequal, isOpposite, getJuncts, isEquivalent, isOppositeEqui, printFormula, formula2String
 
 """
@@ -24,17 +22,27 @@ end
 Base.hash(a::Tree, h::UInt) = hash(myHash(a), hash(:Tree, h)) #hash(a.b, hash(a.a, hash(:Foo, h)))
 #Base.(:(==))(a::Tree, b::Tree) = isequal(a, b)
 
-function addleftchild!(parent::Tree, symbol)
+function addleftchild!(parent::Tree, symbol::Tree)
     !isdefined(parent, :left) || error("left child is already assigned")
     parent.left = deepcopy(symbol)
 end
 
-function addrightchild!(parent::Tree, symbol)
+function addleftchild!(parent::Tree, symbol::Char)
+    !isdefined(parent, :left) || error("left child is already assigned")
+    parent.left = Tree(symbol)
+end
+
+function addrightchild!(parent::Tree, symbol::Tree)
     !isdefined(parent, :right) || error("right child is already assigned")
     parent.right = deepcopy(symbol)
 end
 
-function replaceleftchild!(parent::Tree, symbol)
+function addrightchild!(parent::Tree, symbol::Char)
+    !isdefined(parent, :right) || error("right child is already assigned")
+    parent.right = Tree(symbol)
+end
+
+function replaceleftchild!(parent::Tree, symbol::Tree)
     parent.left = deepcopy(symbol)
 end
 
