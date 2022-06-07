@@ -275,7 +275,8 @@ function checkFormula!(model::KRStructure, formula::Tree, layer::Int64, world::I
 end
 
 function checkModelValidity!(model::KRStructure, formula::Tree)
-    for (lidx, layer) in enumerate(model.worlds)
+    # design choice evaluate from the upper layer as it will faster rule out formulas starting with box
+    for (lidx, layer) in enumerate(model.worlds[end:-1:1])
         for (widx, _) in enumerate(layer)
             if !checkFormula!(model, formula, lidx, widx)
                 return false
@@ -285,60 +286,37 @@ function checkModelValidity!(model::KRStructure, formula::Tree)
     return true
 end
 
-function checkFrameValidity(model::KRStructure, formula::Tree, nValuations::Int64, returnCounts::Bool = false)
-    for n in 1:nValuations
+function checkFrameValidity(model::KRStructure, formula::Tree, nValuations::Int64)
+    for _ in 1:nValuations
         model_copy = deepcopy(model)
         addValuations!(model_copy)
         if !checkModelValidity!(model_copy, formula)
-            if returnCounts
-                return [false, n]
-            else
-                return false
-            end
+            return false
         end
     end
-    if returnCounts
-        return [true, nValuations]
-    else
-        return true
-    end
+    return true
 end
 
-function serialCheckModelValidity(formula::Tree, language::String, nodes::Int64, nModels::Int64, returnCounts::Bool = false)
-    for n in nModels
+function serialCheckModelValidity(formula::Tree, language::String, nodes::Int64, nModels::Int64)
+    validCount = 0
+    for n in 1:nModels
         model = generateModel(nodes, language)
         if checkModelValidity!(model, formula)
-            if returnCounts
-                return [false, n]
-            else
-                return false
-            end
+            validCount = validCount + 1
         end
     end
-    if returnCounts
-        return [true, nModels]
-    else
-        return true
-    end
+    return validCount
 end
 
 function serialCheckFrameValidity(formula::Tree, language::String, nodes::Int64, nModels::Int64, nFrames::Int64, returnCounts::Bool = false)
-    for nFrame in nFrames
+    validCount = 0
+    for nFrame in 1:nFrames
         frame = generateFrame(nodes, language)
-        result, counts = checkFrameValidity!(frame, formula, nModels, true)
-        if !result
-            if returnCounts
-                return [false, nFrame, counts]
-            else
-                return false
-            end
+        if checkFrameValidity(frame, formula, nModels)
+            validCount = validCount + 1
         end
     end
-    if returnCounts
-        return [true, nFrames, nModels]
-    else
-        return true
-    end
+    return validCount
 end
 
 # @time begin

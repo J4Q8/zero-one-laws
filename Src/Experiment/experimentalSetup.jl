@@ -13,30 +13,56 @@ using .Simplifier
 using .Structures
 using .SpecializedModelChecker
 
-function runExperiment(language::String, n::Int64, nModels::Int64, nFrames::Int64, nValuations::Int64)
+export runExperiment
+
+function writeResultsData(rFile::IOStream, results::Vector{Float64})
+    rData = string(results[1])
+    for r in results[2:end]
+        rData = rData*", "*string(r)
+    end
+
+    write(rFile, rData*"\n")
+end
+
+function runExperiment(language::String, n::Int64, nModels::Int64 = 5000, nFrames::Int64 = 500, nValuations::Int64 = 50)
 
     formulaRange = 6:13
     formulaPath = joinpath("..", joinpath("..", joinpath("generated", "formulas")))
+    # VScode path
+    # formulaPath = joinpath("generated", "formulas")
     resultsPath = joinpath("..", joinpath("..", joinpath("validated-Peregrine", joinpath(language, string(n)))))
-
+    # VScode path
+    # resultsPath = joinpath("validated-Peregrine", joinpath(language, string(n)))
 
     if !isdir(resultsPath)
         mkpath(resultsPath)
     end
 
     for r in formulaRange
-        formulaFile = joinpath(formulaPath, "depth "*string(d)*".txt")
-        resultsFile = joinpath(resultsPath, "depth "*string(d)*".txt")
+        formulaFile = joinpath(formulaPath, "depth "*string(r)*".txt")
+        resultsFile = joinpath(resultsPath, "depth "*string(r)*".txt")
 
         open(formulaFile, "r") do fFile
             for formula in eachline(fFile)
 
+                #convert formula to tree
+                formula = parseFormula(formula)
 
                 #check formula in models and frames
-                serialCheckModelValidity()
+                st_time_model = time_ns()
+                modelCount = serialCheckModelValidity(formula, language, n, nModels)
+                elapsed_time_model = (time_ns() - st_time_model)/1e9
+
+                st_time_frame = time_ns()
+                frameCount = serialCheckFrameValidity(formula, language, n, nValuations, nFrames)
+                elapsed_time_frame = (time_ns() - st_time_frame)/1e9
+
+                results = [modelCount, elapsed_time_model, frameCount, elapsed_time_frame]
+
                 open(resultsFile, "a") do rFile
-                    #save the results
+                    writeResultsData(rFile, results)
                 end
+
             end
         end
     end
@@ -44,5 +70,25 @@ function runExperiment(language::String, n::Int64, nModels::Int64, nFrames::Int6
 
 
 end
+
+function prepareJobArrayScripts(languages::Vector{String} = ["gl", "k4", "s4"], nodes::Vector{Int64} = collect(40:8:80))
+    path = joinpath("Src", "Experiment")
+
+    count = 0
+    for l in languages, n in nodes
+
+        count = count+1
+        file = joinpath(path, "experiment"*string(count)*".jl")
+
+        open(file, "w") do io
+            incl = """include("experimentalSetup.jl")\n\n"""
+            use = """using .ExperimentalSetup\n\n"""
+            command = """runExperiment(\"""" * l *"""\", """*string(n)*""")\n"""
+            write(io, incl*use*command)
+        end
+    end
+end
+
+prepareJobArrayScripts()
 
 end #module
