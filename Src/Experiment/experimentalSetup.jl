@@ -1,3 +1,5 @@
+module ExperimentalSetup
+
 include(joinpath("..", joinpath("FormulaUtils","trees.jl")))
 include(joinpath("..", joinpath("FormulaUtils","cleaner.jl")))
 include(joinpath("..", joinpath("FormulaUtils","parser.jl")))
@@ -11,7 +13,7 @@ using .Simplifier
 using .Structures
 using .SpecializedModelChecker
 
-function runExperiment(language::String, n::Int64)
+function runExperiment(language::String, n::Int64, nModels::Int64, nFrames::Int64, nValuations::Int64)
 
     formulaRange = 6:13
     formulaPath = joinpath("..", joinpath("..", joinpath("generated", "formulas")))
@@ -28,6 +30,8 @@ function runExperiment(language::String, n::Int64)
 
         open(formulaFile, "r") do fFile
             for formula in eachline(fFile)
+
+
                 #check formula in models and frames
                 serialCheckModelValidity()
                 open(resultsFile, "a") do rFile
@@ -40,3 +44,5 @@ function runExperiment(language::String, n::Int64)
 
 
 end
+
+end #module
