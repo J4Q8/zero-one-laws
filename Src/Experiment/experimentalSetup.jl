@@ -29,6 +29,7 @@ function runExperiment(language::String, n::Int64)
         open(formulaFile, "r") do fFile
             for formula in eachline(fFile)
                 #check formula in models and frames
+                serialCheckModelValidity()
                 open(resultsFile, "a") do rFile
                     #save the results
                 end

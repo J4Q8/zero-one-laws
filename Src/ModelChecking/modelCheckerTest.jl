@@ -28,7 +28,7 @@ end
 function isValidFrame(formula::String, language::String = "gl")
     formula = parseFormula(formula)
     for _ in 1:100
-        model = generateModel(80, language)
+        model = generateFrame(80, language)
         if !checkFrameValidity(model, formula, 50)
             return false
         end
@@ -113,6 +113,83 @@ end
             @test isValidFrame("¬(◻ ( ◻ p → p ) → ◻ p)") == false
             @test isValidModel("¬(( ( ( ( ( ◻ ( ◻ p ∨ ◻ ◇ ¬ p ) ∨ ◇ ◻ ⊥ ) ∨ ◇ ( ◻ p ∧ ◇ ◇ ¬ p ) ) ∨ ◇ ( ◻ ◇ p ∧ ◇ ◇ ◻ ¬ p ) ) ∨ ◇ ( ◻ p ∧ ◻ ¬ p ) ) ∨ ◇ ( ◻ ( ◻ ¬ p ∨ p ) ∧ ◇ ◇ ( ◇ p ∧ ¬ p ) ) ) ∨ ◇ ( ◻ ( ◇ ¬ p ∨ p ) ∧ ◇ ◇ ( ◻ p ∧ ¬ p ) ))") == false
             @test isValidFrame("¬(( ( ( ( ( ◻ ( ◻ p ∨ ◻ ◇ ¬ p ) ∨ ◇ ◻ ⊥ ) ∨ ◇ ( ◻ p ∧ ◇ ◇ ¬ p ) ) ∨ ◇ ( ◻ ◇ p ∧ ◇ ◇ ◻ ¬ p ) ) ∨ ◇ ( ◻ p ∧ ◻ ¬ p ) ) ∨ ◇ ( ◻ ( ◻ ¬ p ∨ p ) ∧ ◇ ◇ ( ◇ p ∧ ¬ p ) ) ) ∨ ◇ ( ◻ ( ◇ ¬ p ∨ p ) ∧ ◇ ◇ ( ◻ p ∧ ¬ p ) ))") == false
+        end
+
+        @testset "Randomly generated modal tautologies" begin
+            # line 26 in tripleTC.txt
+            @test isValidModel(" ¬ ( ( ◇ ⊤ ↔ q ) ∨ ◇ p ) ∨ ( ( ( p ∨ q ) ↔ ¬ p ) → q )") == true
+            @test isValidFrame(" ¬ ( ( ◇ ⊤ ↔ q ) ∨ ◇ p ) ∨ ( ( ( p ∨ q ) ↔ ¬ p ) → q )") == true
+            @test isValidModel(" ¬ ( ( ◇ ⊤ ↔ q ) ∨ ◇ p ) ∨ ( ( ( p ∨ q ) ↔ ¬ p ) → q )", "k4") == true
+            @test isValidFrame(" ¬ ( ( ◇ ⊤ ↔ q ) ∨ ◇ p ) ∨ ( ( ( p ∨ q ) ↔ ¬ p ) → q )", "k4") == true
+            @test isValidModel(" ¬ ( ( ◇ ⊤ ↔ q ) ∨ ◇ p ) ∨ ( ( ( p ∨ q ) ↔ ¬ p ) → q )", "s4") == true
+            @test isValidFrame(" ¬ ( ( ◇ ⊤ ↔ q ) ∨ ◇ p ) ∨ ( ( ( p ∨ q ) ↔ ¬ p ) → q )", "s4") == true
+            # line 39 in tripleTC.txt
+            @test isValidModel("◻ ⊥ → ◻ ( ( ◻ ◻ q ∨ p ) ∧ q )") == true
+            @test isValidFrame("◻ ⊥ → ◻ ( ( ◻ ◻ q ∨ p ) ∧ q )") == true
+            @test isValidModel("◻ ⊥ → ◻ ( ( ◻ ◻ q ∨ p ) ∧ q )", "k4") == true
+            @test isValidFrame("◻ ⊥ → ◻ ( ( ◻ ◻ q ∨ p ) ∧ q )", "k4") == true
+            @test isValidModel("◻ ⊥ → ◻ ( ( ◻ ◻ q ∨ p ) ∧ q )", "s4") == true
+            @test isValidFrame("◻ ⊥ → ◻ ( ( ◻ ◻ q ∨ p ) ∧ q )", "s4") == true
+            # line 43 in tripleTC.txt
+            @test isValidModel("( ◇ p → ◻ q ) ∨ ( p → ( ( ¬ p ∨ ◻ ⊥ ) → ( ¬ ( q ∧ ◻ ⊥ ) ∨ ( p ∧ ( ◻ q → q ) ) ) ) )") == true
+            @test isValidFrame("( ◇ p → ◻ q ) ∨ ( p → ( ( ¬ p ∨ ◻ ⊥ ) → ( ¬ ( q ∧ ◻ ⊥ ) ∨ ( p ∧ ( ◻ q → q ) ) ) ) )") == true
+            @test isValidModel("( ◇ p → ◻ q ) ∨ ( p → ( ( ¬ p ∨ ◻ ⊥ ) → ( ¬ ( q ∧ ◻ ⊥ ) ∨ ( p ∧ ( ◻ q → q ) ) ) ) )", "k4") == true
+            @test isValidFrame("( ◇ p → ◻ q ) ∨ ( p → ( ( ¬ p ∨ ◻ ⊥ ) → ( ¬ ( q ∧ ◻ ⊥ ) ∨ ( p ∧ ( ◻ q → q ) ) ) ) )", "k4") == true
+            @test isValidModel("( ◇ p → ◻ q ) ∨ ( p → ( ( ¬ p ∨ ◻ ⊥ ) → ( ¬ ( q ∧ ◻ ⊥ ) ∨ ( p ∧ ( ◻ q → q ) ) ) ) )", "s4") == true
+            @test isValidFrame("( ◇ p → ◻ q ) ∨ ( p → ( ( ¬ p ∨ ◻ ⊥ ) → ( ¬ ( q ∧ ◻ ⊥ ) ∨ ( p ∧ ( ◻ q → q ) ) ) ) )", "s4") == true
+            # line 72 in tripleTC.txt
+            @test isValidModel("p → ( ◻ ( ( ¬ q ∧ ¬ ( p ∧ q ) ) ↔ ( ◻ ( p ∧ q ) → p ) ) ∨ ( ( ◇ ¬ q → ( ¬ ( ( p ↔ q ) ∨ ◻ p ) ∧ ( q → ◻ ◇ ◇ p ) ) ) ∨ ( ( ◻ ◻ ⊥ → ( ◻ ⊥ → ( ( ¬ p → ( ◇ ¬ q ∧ ◻ ⊥ ) ) ∨ ( ( ( q → ◇ p ) ∧ ◇ q ) ∨ p ) ) ) ) ∨ ( ( ( ◻ ⊥ ↔ p ) ∧ ◇ q ) ∨ ( p ∧ ( ◻ ⊥ ↔ ( ( q → p ) ∨ ( q ∨ p ) ) ) ) ) ) ) )") == true
+            @test isValidFrame("p → ( ◻ ( ( ¬ q ∧ ¬ ( p ∧ q ) ) ↔ ( ◻ ( p ∧ q ) → p ) ) ∨ ( ( ◇ ¬ q → ( ¬ ( ( p ↔ q ) ∨ ◻ p ) ∧ ( q → ◻ ◇ ◇ p ) ) ) ∨ ( ( ◻ ◻ ⊥ → ( ◻ ⊥ → ( ( ¬ p → ( ◇ ¬ q ∧ ◻ ⊥ ) ) ∨ ( ( ( q → ◇ p ) ∧ ◇ q ) ∨ p ) ) ) ) ∨ ( ( ( ◻ ⊥ ↔ p ) ∧ ◇ q ) ∨ ( p ∧ ( ◻ ⊥ ↔ ( ( q → p ) ∨ ( q ∨ p ) ) ) ) ) ) ) )") == true
+            @test isValidModel("p → ( ◻ ( ( ¬ q ∧ ¬ ( p ∧ q ) ) ↔ ( ◻ ( p ∧ q ) → p ) ) ∨ ( ( ◇ ¬ q → ( ¬ ( ( p ↔ q ) ∨ ◻ p ) ∧ ( q → ◻ ◇ ◇ p ) ) ) ∨ ( ( ◻ ◻ ⊥ → ( ◻ ⊥ → ( ( ¬ p → ( ◇ ¬ q ∧ ◻ ⊥ ) ) ∨ ( ( ( q → ◇ p ) ∧ ◇ q ) ∨ p ) ) ) ) ∨ ( ( ( ◻ ⊥ ↔ p ) ∧ ◇ q ) ∨ ( p ∧ ( ◻ ⊥ ↔ ( ( q → p ) ∨ ( q ∨ p ) ) ) ) ) ) ) )", "k4") == true
+            @test isValidFrame("p → ( ◻ ( ( ¬ q ∧ ¬ ( p ∧ q ) ) ↔ ( ◻ ( p ∧ q ) → p ) ) ∨ ( ( ◇ ¬ q → ( ¬ ( ( p ↔ q ) ∨ ◻ p ) ∧ ( q → ◻ ◇ ◇ p ) ) ) ∨ ( ( ◻ ◻ ⊥ → ( ◻ ⊥ → ( ( ¬ p → ( ◇ ¬ q ∧ ◻ ⊥ ) ) ∨ ( ( ( q → ◇ p ) ∧ ◇ q ) ∨ p ) ) ) ) ∨ ( ( ( ◻ ⊥ ↔ p ) ∧ ◇ q ) ∨ ( p ∧ ( ◻ ⊥ ↔ ( ( q → p ) ∨ ( q ∨ p ) ) ) ) ) ) ) )", "k4") == true
+            @test isValidModel("p → ( ◻ ( ( ¬ q ∧ ¬ ( p ∧ q ) ) ↔ ( ◻ ( p ∧ q ) → p ) ) ∨ ( ( ◇ ¬ q → ( ¬ ( ( p ↔ q ) ∨ ◻ p ) ∧ ( q → ◻ ◇ ◇ p ) ) ) ∨ ( ( ◻ ◻ ⊥ → ( ◻ ⊥ → ( ( ¬ p → ( ◇ ¬ q ∧ ◻ ⊥ ) ) ∨ ( ( ( q → ◇ p ) ∧ ◇ q ) ∨ p ) ) ) ) ∨ ( ( ( ◻ ⊥ ↔ p ) ∧ ◇ q ) ∨ ( p ∧ ( ◻ ⊥ ↔ ( ( q → p ) ∨ ( q ∨ p ) ) ) ) ) ) ) )", "s4") == true
+            @test isValidFrame("p → ( ◻ ( ( ¬ q ∧ ¬ ( p ∧ q ) ) ↔ ( ◻ ( p ∧ q ) → p ) ) ∨ ( ( ◇ ¬ q → ( ¬ ( ( p ↔ q ) ∨ ◻ p ) ∧ ( q → ◻ ◇ ◇ p ) ) ) ∨ ( ( ◻ ◻ ⊥ → ( ◻ ⊥ → ( ( ¬ p → ( ◇ ¬ q ∧ ◻ ⊥ ) ) ∨ ( ( ( q → ◇ p ) ∧ ◇ q ) ∨ p ) ) ) ) ∨ ( ( ( ◻ ⊥ ↔ p ) ∧ ◇ q ) ∨ ( p ∧ ( ◻ ⊥ ↔ ( ( q → p ) ∨ ( q ∨ p ) ) ) ) ) ) ) )", "s4") == true
+            # line 94 in tripleTC.txt
+            @test isValidModel("◇ p → ( ¬ ( p → ( ◇ ⊤ → ( ◇ ( ◇ p ↔ ( ◻ ⊥ ↔ ( ¬ p → ¬ q ) ) ) ↔ p ) ) ) → p )") == true
+            @test isValidFrame("◇ p → ( ¬ ( p → ( ◇ ⊤ → ( ◇ ( ◇ p ↔ ( ◻ ⊥ ↔ ( ¬ p → ¬ q ) ) ) ↔ p ) ) ) → p )") == true
+            @test isValidModel("◇ p → ( ¬ ( p → ( ◇ ⊤ → ( ◇ ( ◇ p ↔ ( ◻ ⊥ ↔ ( ¬ p → ¬ q ) ) ) ↔ p ) ) ) → p )", "k4") == true
+            @test isValidFrame("◇ p → ( ¬ ( p → ( ◇ ⊤ → ( ◇ ( ◇ p ↔ ( ◻ ⊥ ↔ ( ¬ p → ¬ q ) ) ) ↔ p ) ) ) → p )", "k4") == true
+            @test isValidModel("◇ p → ( ¬ ( p → ( ◇ ⊤ → ( ◇ ( ◇ p ↔ ( ◻ ⊥ ↔ ( ¬ p → ¬ q ) ) ) ↔ p ) ) ) → p )", "s4") == true
+            @test isValidFrame("◇ p → ( ¬ ( p → ( ◇ ⊤ → ( ◇ ( ◇ p ↔ ( ◻ ⊥ ↔ ( ¬ p → ¬ q ) ) ) ↔ p ) ) ) → p )", "s4") == true
+        end
+
+        @testset "Randomly generated modal contradictions" begin
+            # line 55 in tripleTC.txt
+            @test isValidModel("q ∧ ◇ ( ◻ q ∧ ◇ ◇ ¬ ( p ∨ q ) )") == false
+            @test isValidFrame("q ∧ ◇ ( ◻ q ∧ ◇ ◇ ¬ ( p ∨ q ) )") == false
+            @test isValidModel("q ∧ ◇ ( ◻ q ∧ ◇ ◇ ¬ ( p ∨ q ) )", "k4") == false
+            @test isValidFrame("q ∧ ◇ ( ◻ q ∧ ◇ ◇ ¬ ( p ∨ q ) )", "k4") == false
+            @test isValidModel("q ∧ ◇ ( ◻ q ∧ ◇ ◇ ¬ ( p ∨ q ) )", "s4") == false
+            @test isValidFrame("q ∧ ◇ ( ◻ q ∧ ◇ ◇ ¬ ( p ∨ q ) )", "s4") == false
+            # line 91 in tripleTC.txt
+            @test isValidModel("q ∧ ( ¬ ( q ∨ ◇ ¬ p ) ∧ ◻ ◻ ¬ ( ( ( ◇ ( q → ◻ q ) ∧ ( q → ◇ ◇ q ) ) → p ) ∧ ◻ p ) )") == false
+            @test isValidFrame("q ∧ ( ¬ ( q ∨ ◇ ¬ p ) ∧ ◻ ◻ ¬ ( ( ( ◇ ( q → ◻ q ) ∧ ( q → ◇ ◇ q ) ) → p ) ∧ ◻ p ) )") == false
+            @test isValidModel("q ∧ ( ¬ ( q ∨ ◇ ¬ p ) ∧ ◻ ◻ ¬ ( ( ( ◇ ( q → ◻ q ) ∧ ( q → ◇ ◇ q ) ) → p ) ∧ ◻ p ) )", "k4") == false
+            @test isValidFrame("q ∧ ( ¬ ( q ∨ ◇ ¬ p ) ∧ ◻ ◻ ¬ ( ( ( ◇ ( q → ◻ q ) ∧ ( q → ◇ ◇ q ) ) → p ) ∧ ◻ p ) )", "k4") == false
+            @test isValidModel("q ∧ ( ¬ ( q ∨ ◇ ¬ p ) ∧ ◻ ◻ ¬ ( ( ( ◇ ( q → ◻ q ) ∧ ( q → ◇ ◇ q ) ) → p ) ∧ ◻ p ) )", "s4") == false
+            @test isValidFrame("q ∧ ( ¬ ( q ∨ ◇ ¬ p ) ∧ ◻ ◻ ¬ ( ( ( ◇ ( q → ◻ q ) ∧ ( q → ◇ ◇ q ) ) → p ) ∧ ◻ p ) )", "s4") == false
+            # line 64 in tripleTC.txt
+            @test isValidModel("¬ ( ( q → ( q ∨ ( ◇ ◻ ¬ ( q ∨ p ) → p ) ) ) ∨ ◻ q )") == false
+            @test isValidFrame("¬ ( ( q → ( q ∨ ( ◇ ◻ ¬ ( q ∨ p ) → p ) ) ) ∨ ◻ q )") == false
+            @test isValidModel("¬ ( ( q → ( q ∨ ( ◇ ◻ ¬ ( q ∨ p ) → p ) ) ) ∨ ◻ q )", "k4") == false
+            @test isValidFrame("¬ ( ( q → ( q ∨ ( ◇ ◻ ¬ ( q ∨ p ) → p ) ) ) ∨ ◻ q )", "k4") == false
+            @test isValidModel("¬ ( ( q → ( q ∨ ( ◇ ◻ ¬ ( q ∨ p ) → p ) ) ) ∨ ◻ q )", "s4") == false
+            @test isValidFrame("¬ ( ( q → ( q ∨ ( ◇ ◻ ¬ ( q ∨ p ) → p ) ) ) ∨ ◻ q )", "s4") == false
+            # line 49 in tripleTC.txt
+            @test isValidModel("◇ ¬ ( ( q ∧ ( ◻ q ∧ ◻ ( q → ¬ q ) ) ) → ( ◇ p → ◇ ¬ p ) )") == false
+            @test isValidFrame("◇ ¬ ( ( q ∧ ( ◻ q ∧ ◻ ( q → ¬ q ) ) ) → ( ◇ p → ◇ ¬ p ) )") == false
+            @test isValidModel("◇ ¬ ( ( q ∧ ( ◻ q ∧ ◻ ( q → ¬ q ) ) ) → ( ◇ p → ◇ ¬ p ) )", "k4") == false
+            @test isValidFrame("◇ ¬ ( ( q ∧ ( ◻ q ∧ ◻ ( q → ¬ q ) ) ) → ( ◇ p → ◇ ¬ p ) )", "k4") == false
+            @test isValidModel("◇ ¬ ( ( q ∧ ( ◻ q ∧ ◻ ( q → ¬ q ) ) ) → ( ◇ p → ◇ ¬ p ) )", "s4") == false
+            @test isValidFrame("◇ ¬ ( ( q ∧ ( ◻ q ∧ ◻ ( q → ¬ q ) ) ) → ( ◇ p → ◇ ¬ p ) )", "s4") == false
+            # line 1 in tripleTC.txt
+            @test isValidModel("◇ ⊤ ↔ ◻ ⊥") == false
+            @test isValidFrame("◇ ⊤ ↔ ◻ ⊥") == false
+            @test isValidModel("◇ ⊤ ↔ ◻ ⊥", "k4") == false
+            @test isValidFrame("◇ ⊤ ↔ ◻ ⊥", "k4") == false
+            @test isValidModel("◇ ⊤ ↔ ◻ ⊥", "s4") == false
+            @test isValidFrame("◇ ⊤ ↔ ◻ ⊥", "s4") == false
+            
         end
     
     end

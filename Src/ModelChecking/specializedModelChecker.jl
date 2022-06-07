@@ -5,7 +5,7 @@ using ..Parser
 using ..Simplifier
 using ..Structures
 
-export checkModelValidity!, checkFrameValidity
+export checkModelValidity!, checkFrameValidity, serialCheckModelValidity, serialCheckFrameValidity
 
 TESTMODE = true
 
@@ -291,14 +291,14 @@ function checkFrameValidity(model::KRStructure, formula::Tree, nValuations::Int6
         addValuations!(model_copy)
         if !checkModelValidity!(model_copy, formula)
             if returnCounts
-                return (false, n)
+                return [false, n]
             else
                 return false
             end
         end
     end
     if returnCounts
-        return (true, nValuations)
+        return [true, nValuations]
     else
         return true
     end
@@ -309,14 +309,14 @@ function serialCheckModelValidity(formula::Tree, language::String, nodes::Int64,
         model = generateModel(nodes, language)
         if checkModelValidity!(model, formula)
             if returnCounts
-                return (false, n)
+                return [false, n]
             else
                 return false
             end
         end
     end
     if returnCounts
-        return (true, nModels)
+        return [true, nModels]
     else
         return true
     end
@@ -325,17 +325,17 @@ end
 function serialCheckFrameValidity(formula::Tree, language::String, nodes::Int64, nModels::Int64, nFrames::Int64, returnCounts::Bool = false)
     for nFrame in nFrames
         frame = generateFrame(nodes, language)
-        result = checkFrameValidity!()
-        if checkModelValidity!(model, formula)
+        result, counts = checkFrameValidity!(frame, formula, nModels, true)
+        if !result
             if returnCounts
-                return (false, n)
+                return [false, nFrame, counts]
             else
                 return false
             end
         end
     end
     if returnCounts
-        return (true, nModels)
+        return [true, nFrames, nModels]
     else
         return true
     end
