@@ -285,17 +285,61 @@ function checkModelValidity!(model::KRStructure, formula::Tree)
     return true
 end
 
-function checkFrameValidity(model::KRStructure, formula::Tree, nValuations::Int64)
-    for _ in 1:nValuations
+function checkFrameValidity(model::KRStructure, formula::Tree, nValuations::Int64, returnCounts::Bool = false)
+    for n in 1:nValuations
         model_copy = deepcopy(model)
         addValuations!(model_copy)
         if !checkModelValidity!(model_copy, formula)
-            return false
+            if returnCounts
+                return (false, n)
+            else
+                return false
+            end
         end
     end
-    return true
+    if returnCounts
+        return (true, nValuations)
+    else
+        return true
+    end
 end
 
+function serialCheckModelValidity(formula::Tree, language::String, nodes::Int64, nModels::Int64, returnCounts::Bool = false)
+    for n in nModels
+        model = generateModel(nodes, language)
+        if checkModelValidity!(model, formula)
+            if returnCounts
+                return (false, n)
+            else
+                return false
+            end
+        end
+    end
+    if returnCounts
+        return (true, nModels)
+    else
+        return true
+    end
+end
+
+function serialCheckFrameValidity(formula::Tree, language::String, nodes::Int64, nModels::Int64, nFrames::Int64, returnCounts::Bool = false)
+    for nFrame in nFrames
+        frame = generateFrame(nodes, language)
+        result = checkFrameValidity!()
+        if checkModelValidity!(model, formula)
+            if returnCounts
+                return (false, n)
+            else
+                return false
+            end
+        end
+    end
+    if returnCounts
+        return (true, nModels)
+    else
+        return true
+    end
+end
 
 # @time begin
 #     for _ in 1:10000

@@ -141,7 +141,7 @@ end
 function equivalentOnList(formulas::Vector{String}, formula::Interface.Tree)
     for f in formulas
         if Interface.isEquivalent(Interface.parseFormula(f), formula)
-            println(f, " == ", Interface.formula2String(formula))
+            # println(f, " == ", Interface.formula2String(formula))
             return true
         end
     end
@@ -193,11 +193,17 @@ function timeLimitedTautOrContALL(formula::Interface.Tree)
     
 end
 
-function writeMetaData(metaFile::IOStream, res::Vector{Bool})
+function writeMetaData(metaFile::IOStream, res::Vector{Bool}, depth::Int64 = -1)
     metaData = string(res[1])
     for r in res[2:end]
         metaData = metaData*", "*string(r)
     end
+
+    #if depth is -1 do not save it, if depth was passed, do save it
+    if depth != -1
+        metaData = metaData*", "*string(depth)
+    end
+
     write(metaFile, metaData*"\n")
 end
 
@@ -231,16 +237,16 @@ function runGenerator(amountPerDepth::Int64=1000, minDepth::Int64 = 6, maxDepth:
                     res = timeLimitedTautOrContALL(formula)
 
                     # return nothing if a formula is Taut or Cont in all three languages
-                    if count(res) == 3
+                    if isnothing(res)
+                        continue
+                    elseif count(res) == 3
                         #write formulas that were all taut or cont
-                        io = open(extraFormulasFile, "a")
-                        write(io, formulaString)
-                        close(io)
-
-                        io = open(extraMetaFile, "a")
-                        writeMetaData(io, res)
-                        close(io)
-                        
+                        open(extraFormulasFile, "a") do io
+                            write(io, formulaString)
+                        end
+                        open(extraMetaFile, "a") do io
+                            writeMetaData(io, res, d)
+                        end
                         continue
                     end
 
