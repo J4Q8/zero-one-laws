@@ -1,8 +1,8 @@
 
-include(joinpath("..", joinpath("FormulaUtils","trees.jl")))
-include(joinpath("..", joinpath("FormulaUtils","cleaner.jl")))
-include(joinpath("..", joinpath("FormulaUtils","parser.jl")))
-include(joinpath("..", joinpath("FormulaUtils","simplifier.jl")))
+include("trees.jl")
+include("cleaner.jl")
+include("parser.jl")
+include("simplifier.jl")
 
 using .Trees
 using .Parser

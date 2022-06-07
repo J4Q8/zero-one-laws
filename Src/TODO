@@ -5,6 +5,9 @@ Options for improvement:
 3. check every formula on bbbF tableau - for frame validity
 4. get frequency analysis on tautologies and contradictions among the three languages (possibly generate more data for that)
 5. make everthing nice as a Julia package
+6. check correlation between depth/modal depth/amount of connectives and validity in frames and models
+7. check for functional dependencies between tautologies
+8. check if for indeed for larger frames all in B are connected to all in U layer, simulate a lot of dot products
 
 
 

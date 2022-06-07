@@ -32,13 +32,13 @@ function generateFrame(n::Int64, language::String)
 
     r12 = bitrand(m, 2m)
     # first layer points cannot be endpoints
-    while !minimum(maximum.(eachrow(r12)))
+    while !minimum(maximum.(eachrow(r12))) || !minimum(maximum.(eachcol(r12)))
         r12 = bitrand(m, 2m)
     end
 
     r23 = bitrand(2m, m)
     # neither can be those in second layer
-    while !minimum(maximum.(eachcol(r23)))
+    while !minimum(maximum.(eachrow(r23))) || !minimum(maximum.(eachcol(r23)))
         r23 = bitrand(2m, m)
     end
 

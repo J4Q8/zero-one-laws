@@ -189,11 +189,16 @@ function timeLimitedTautOrContALL(formula::Interface.Tree)
         end
     end
     # return nothing if a formula is Taut or Cont in all three languages
-    if count(results) == 3
-        return nothing
-    else
-        return results
+    return results
+    
+end
+
+function writeMetaData(metaFile::IOStream, res::Vector{Bool})
+    metaData = string(res[1])
+    for r in res[2:end]
+        metaData = metaData*", "*string(r)
     end
+    write(metaFile, metaData*"\n")
 end
 
 function runGenerator(amountPerDepth::Int64=1000, minDepth::Int64 = 6, maxDepth::Int64=13, maxConseqModal::Int64=5, path::String = "generated")
@@ -207,10 +212,14 @@ function runGenerator(amountPerDepth::Int64=1000, minDepth::Int64 = 6, maxDepth:
     makePathIfNotExists(formulaPath)
     makePathIfNotExists(metaDataPath)
     
+    extraFormulasFile = joinpath(formulaPath, "tripleTC.txt")
+    extraMetaFile = joinpath(metaDataPath, "tripleTC.txt")
 
     for d in minDepth:maxDepth
+
         formulasFile = joinpath(formulaPath, "depth "*string(d)*".txt")
         metaFile = joinpath(metaDataPath, "depth "*string(d)*".txt")
+
         formulas = String[]
         open(formulasFile, "w") do formulasFile
             open(metaFile, "w") do metaFile
@@ -221,7 +230,17 @@ function runGenerator(amountPerDepth::Int64=1000, minDepth::Int64 = 6, maxDepth:
                     formulaString = Interface.formula2String(formula)*"\n"
                     res = timeLimitedTautOrContALL(formula)
 
-                    if isnothing(res) # true if time limit was exceeded
+                    # return nothing if a formula is Taut or Cont in all three languages
+                    if count(res) == 3
+                        #write formulas that were all taut or cont
+                        io = open(extraFormulasFile, "a")
+                        write(io, formulaString)
+                        close(io)
+
+                        io = open(extraMetaFile, "a")
+                        writeMetaData(io, res)
+                        close(io)
+                        
                         continue
                     end
 
@@ -229,12 +248,7 @@ function runGenerator(amountPerDepth::Int64=1000, minDepth::Int64 = 6, maxDepth:
                         println(formulaString)
                         push!(formulas, formulaString)
                         write(formulasFile, formulaString)
-
-                        metaData = string(res[1])
-                        for r in res[2:end]
-                            metaData = metaData*", "*string(r)
-                        end
-                        write(metaFile, metaData*"\n")
+                        writeMetaData(metaFile, res)
                     end
                 end
             end

@@ -1,4 +1,4 @@
-module specializedModelChecker
+module SpecializedModelChecker
 
 using ..Trees
 using ..Parser
@@ -133,15 +133,15 @@ end
 
 function diaHelperReflexivity!(model::KRStructure, formula::Tree)
     if model.class == "k4"
-        mod = 2
+        mode = 2
     elseif model.class == "s4"
-        mod = 1
+        mode = 1
     else
         return false
     end
 
     for (idx, l) in enumerate(model.worlds), idx2 in 1:length(l)
-        if mod(idx2, mod) == 0
+        if mod(idx2, mode) == 0
             if checkFormula!(model, formula.right, idx, idx2)
                 model.worlds[idx][idx2][formula.right] = '⊤'
                 return true
@@ -205,15 +205,15 @@ end
 
 function boxHelperReflexivity!(model::KRStructure, formula::Tree)
     if model.class == "k4"
-        mod = 2
+        mode = 2
     elseif model.class == "s4"
-        mod = 1
+        mode = 1
     else
         return true
     end
 
     for (idx, l) in enumerate(model.worlds), idx2 in 1:length(l)
-        if mod(idx2, mod) == 0
+        if mod(idx2, mode) == 0
             if !checkFormula!(model, formula.right, idx, idx2)
                 model.worlds[idx][idx2][formula.right] = '⊥'
                 return false
@@ -271,7 +271,7 @@ function checkFormula!(model::KRStructure, formula::Tree, layer::Int64, world::I
     elseif formula.connective == '⊥'
         return false
     end
-    error("You shouldn't be here, atoms should have been replaced with their valuations before")
+    error("You shouldn't be here, atoms should have been replaced with their valuations before", formula)
 end
 
 function checkModelValidity!(model::KRStructure, formula::Tree)
