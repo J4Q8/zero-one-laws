@@ -1,0 +1,12 @@
+true, false, true, false, true, false, 6
+true, false, true, false, true, false, 6
+true, false, true, false, true, false, 6
+true, false, true, false, true, false, 6
+true, false, true, false, true, false, 6
+true, false, true, false, true, false, 6
+true, false, true, false, true, false, 6
+true, false, true, false, true, false, 6
+false, true, false, true, false, true, 6
+false, true, false, true, false, true, 6
+true, false, true, false, true, false, 6
+true, false, true, false, true, false, 7
