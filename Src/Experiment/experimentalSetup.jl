@@ -24,15 +24,15 @@ function writeResultsData(rFile::IOStream, results::Vector{Float64})
     write(rFile, rData*"\n")
 end
 
-function runExperiment(language::String, n::Int64, formulaSet::INt64,nModels::Int64 = 5000, nFrames::Int64 = 500, nValuations::Int64 = 50)
+function runExperiment(language::String, n::Int64, formulaSet::Int64,nModels::Int64 = 5000, nFrames::Int64 = 500, nValuations::Int64 = 50)
 
     formulaRange = 6:13
-    formulaPath = joinpath("..", joinpath("..", joinpath("generated", "formulas "*string(formulaSet))))
+    # formulaPath = joinpath("..", joinpath("..", joinpath("generated", "formulas "*string(formulaSet))))
     # VScode path
-    # formulaPath = joinpath("generated", "formulas")
-    resultsPath = joinpath("..", joinpath("..", joinpath("validated-Peregrine", joinpath(language, string(n)))))
+    formulaPath = joinpath("generated", "formulas "*string(formulaSet))
+    # resultsPath = joinpath("..", joinpath("..", joinpath("validated-Peregrine", joinpath(language, string(n)))))
     # VScode path
-    # resultsPath = joinpath("validated-Peregrine", joinpath(language, string(n)))
+    resultsPath = joinpath("validated-Peregrine", joinpath(language, string(n)))
 
     if !isdir(resultsPath)
         mkpath(resultsPath)
@@ -57,7 +57,7 @@ function runExperiment(language::String, n::Int64, formulaSet::INt64,nModels::In
                 frameCount = serialCheckFrameValidity(formula, language, n, nValuations, nFrames)
                 elapsed_time_frame = (time_ns() - st_time_frame)/1e9
 
-                results = [modelCount, elapsed_time_model, frameCount, elapsed_time_frame]
+                results = [modelCount, nModels, elapsed_time_model, frameCount, nFrames, nValuations, elapsed_time_frame]
 
                 open(resultsFile, "a") do rFile
                     writeResultsData(rFile, results)
@@ -75,7 +75,7 @@ function prepareJobArrayScripts(languages::Vector{String} = ["gl", "k4", "s4"], 
     path = joinpath("Src", "Experiment")
 
     count = 0
-    for l in languages, n in nodes, f in formulaSets
+    for f in formulaSets, l in languages, n in nodes
 
         count = count+1
         file = joinpath(path, "experiment"*string(count)*".jl")
@@ -83,12 +83,12 @@ function prepareJobArrayScripts(languages::Vector{String} = ["gl", "k4", "s4"], 
         open(file, "w") do io
             incl = """include("experimentalSetup.jl")\n\n"""
             use = "using .ExperimentalSetup\n\n"
-            command = "runExperiment(\"" * l *"\", "*string(n)*", "*stringa(f)*")\n"
+            command = "runExperiment(\"" * l *"\", "*string(n)*", "*string(f)*")\n"
             write(io, incl*use*command)
         end
     end
 end
 
-prepareJobArrayScripts()
+# prepareJobArrayScripts()
 
 end #module

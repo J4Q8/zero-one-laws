@@ -208,14 +208,15 @@ function writeMetaData(metaFile::IOStream, res::Vector{Bool}, depth::Int64 = -1)
     write(metaFile, metaData*"\n")
 end
 
-function getPrevFormulas(nBatches::Int64, depth::Int64, path::String)
+function getPrevFormulas(curBatch::Int64, depth::Int64, path::String)
     formulas = String[]
-    for b in 1:nBatches
+    for b in 1:curBatch
         formulaPath = joinpath(path, "formulas "*string(b))
-        if isdir(formulaPath)
-            formulaFile = joinpath(formulaPath, "depth "*string(depth)*".txt")
+        formulaFile = joinpath(formulaPath, "depth "*string(depth)*".txt")
+        if isdir(formulaFile)
             open(formulaFile, "r") do io
                 formulas = [formulas; readlines(io, keep=true)]
+                print(formulas)
             end
         else
             return formulas
