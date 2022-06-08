@@ -299,7 +299,7 @@ end
 
 function serialCheckModelValidity(formula::Tree, language::String, nodes::Int64, nModels::Int64)
     validCount = 0
-    for n in 1:nModels
+    for _ in 1:nModels
         model = generateModel(nodes, language)
         if checkModelValidity!(model, formula)
             validCount = validCount + 1
@@ -310,7 +310,7 @@ end
 
 function serialCheckFrameValidity(formula::Tree, language::String, nodes::Int64, nModels::Int64, nFrames::Int64, returnCounts::Bool = false)
     validCount = 0
-    for nFrame in 1:nFrames
+    for _ in 1:nFrames
         frame = generateFrame(nodes, language)
         if checkFrameValidity(frame, formula, nModels)
             validCount = validCount + 1

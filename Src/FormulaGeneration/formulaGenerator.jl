@@ -139,6 +139,7 @@ function generateFormulaOfDepth(depth::Int64, maxConseqModal::Int64)
 end
 
 function equivalentOnList(formulas::Vector{String}, formula::Interface.Tree)
+    #we want to check for equivalences not identities
     for f in formulas
         if Interface.isEquivalent(Interface.parseFormula(f), formula)
             # println(f, " == ", Interface.formula2String(formula))
@@ -207,54 +208,79 @@ function writeMetaData(metaFile::IOStream, res::Vector{Bool}, depth::Int64 = -1)
     write(metaFile, metaData*"\n")
 end
 
-function runGenerator(amountPerDepth::Int64=1000, minDepth::Int64 = 6, maxDepth::Int64=13, maxConseqModal::Int64=5, path::String = "generated")
+function getPrevFormulas(nBatches::Int64, depth::Int64, path::String)
+    formulas = String[]
+    for b in 1:nBatches
+        formulaPath = joinpath(path, "formulas "*string(b))
+        if isdir(formulaPath)
+            formulaFile = joinpath(formulaPath, "depth "*string(depth)*".txt")
+            open(formulaFile, "r") do io
+                formulas = [formulas; readlines(io, keep=true)]
+            end
+        else
+            return formulas
+        end
+    end
+    return formulas
+end
+
+function runGenerator(nBatches::Int64 = 1, amountPerDepth::Int64=1000, minDepth::Int64 = 6, maxDepth::Int64=13, maxConseqModal::Int64=5, path::String = "generated")
     #=
         minDepth indicates the minimum depth of a tree of a formula.
         maxDepth indicates the maximum depth of a tree of a formula. It is important to notice that the root node is already depth 1.
         maxConseqModal indicates how many modal symbols can be next to each other
     =#
-    formulaPath = joinpath(path, "formulas")
-    metaDataPath = joinpath(path, "metaData")
-    makePathIfNotExists(formulaPath)
-    makePathIfNotExists(metaDataPath)
-    
-    extraFormulasFile = joinpath(formulaPath, "tripleTC.txt")
-    extraMetaFile = joinpath(metaDataPath, "tripleTC.txt")
+    for b in 1:nBatches
 
-    for d in minDepth:maxDepth
+        formulaPath = joinpath(path, "formulas "*string(b))
+        metaDataPath = joinpath(path, "metaData "*string(b))
 
-        formulasFile = joinpath(formulaPath, "depth "*string(d)*".txt")
-        metaFile = joinpath(metaDataPath, "depth "*string(d)*".txt")
+        if isdir(formulaPath)
+            continue
+        end
 
-        formulas = String[]
-        open(formulasFile, "w") do formulasFile
-            open(metaFile, "w") do metaFile
+        makePathIfNotExists(formulaPath)
+        makePathIfNotExists(metaDataPath)
 
-                while length(formulas) < amountPerDepth
+        
+        extraFormulasFile = joinpath(formulaPath, "tripleTC.txt")
+        extraMetaFile = joinpath(metaDataPath, "tripleTC.txt")
 
-                    formula = generateFormulaOfDepth(d, maxConseqModal)
-                    formulaString = Interface.formula2String(formula)*"\n"
-                    res = timeLimitedTautOrContALL(formula)
+        for d in minDepth:maxDepth
 
-                    # return nothing if a formula is Taut or Cont in all three languages
-                    if isnothing(res)
-                        continue
-                    elseif count(res) == 3
-                        #write formulas that were all taut or cont
-                        open(extraFormulasFile, "a") do io
-                            write(io, formulaString)
+            formulasFile = joinpath(formulaPath, "depth "*string(d)*".txt")
+            metaFile = joinpath(metaDataPath, "depth "*string(d)*".txt")
+
+            formulas = getPrevFormulas(b, d, path)
+            open(formulasFile, "w") do formulasFile
+                open(metaFile, "w") do metaFile
+
+                    while length(formulas) < amountPerDepth
+
+                        formula = generateFormulaOfDepth(d, maxConseqModal)
+                        formulaString = Interface.formula2String(formula)*"\n"
+                        res = timeLimitedTautOrContALL(formula)
+
+                        # return nothing if a formula is Taut or Cont in all three languages
+                        if isnothing(res)
+                            continue
+                        elseif count(res) == 3
+                            #write formulas that were all taut or cont
+                            open(extraFormulasFile, "a") do io
+                                write(io, formulaString)
+                            end
+                            open(extraMetaFile, "a") do io
+                                writeMetaData(io, res, d)
+                            end
+                            continue
                         end
-                        open(extraMetaFile, "a") do io
-                            writeMetaData(io, res, d)
-                        end
-                        continue
-                    end
 
-                    if !equivalentOnList(formulas, formula)
-                        println(formulaString)
-                        push!(formulas, formulaString)
-                        write(formulasFile, formulaString)
-                        writeMetaData(metaFile, res)
+                        if !equivalentOnList(formulas, formula)
+                            println(formulaString)
+                            push!(formulas, formulaString)
+                            write(formulasFile, formulaString)
+                            writeMetaData(metaFile, res)
+                        end
                     end
                 end
             end

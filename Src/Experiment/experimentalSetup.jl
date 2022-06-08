@@ -24,10 +24,10 @@ function writeResultsData(rFile::IOStream, results::Vector{Float64})
     write(rFile, rData*"\n")
 end
 
-function runExperiment(language::String, n::Int64, nModels::Int64 = 5000, nFrames::Int64 = 500, nValuations::Int64 = 50)
+function runExperiment(language::String, n::Int64, formulaSet::INt64,nModels::Int64 = 5000, nFrames::Int64 = 500, nValuations::Int64 = 50)
 
     formulaRange = 6:13
-    formulaPath = joinpath("..", joinpath("..", joinpath("generated", "formulas")))
+    formulaPath = joinpath("..", joinpath("..", joinpath("generated", "formulas "*string(formulaSet))))
     # VScode path
     # formulaPath = joinpath("generated", "formulas")
     resultsPath = joinpath("..", joinpath("..", joinpath("validated-Peregrine", joinpath(language, string(n)))))
@@ -71,19 +71,19 @@ function runExperiment(language::String, n::Int64, nModels::Int64 = 5000, nFrame
 
 end
 
-function prepareJobArrayScripts(languages::Vector{String} = ["gl", "k4", "s4"], nodes::Vector{Int64} = collect(40:8:80))
+function prepareJobArrayScripts(languages::Vector{String} = ["gl", "k4", "s4"], nodes::Vector{Int64} = collect(40:8:80), formulaSets::Vector{Int64} = collect(1:10))
     path = joinpath("Src", "Experiment")
 
     count = 0
-    for l in languages, n in nodes
+    for l in languages, n in nodes, f in formulaSets
 
         count = count+1
         file = joinpath(path, "experiment"*string(count)*".jl")
 
         open(file, "w") do io
             incl = """include("experimentalSetup.jl")\n\n"""
-            use = """using .ExperimentalSetup\n\n"""
-            command = """runExperiment(\"""" * l *"""\", """*string(n)*""")\n"""
+            use = "using .ExperimentalSetup\n\n"
+            command = "runExperiment(\"" * l *"\", "*string(n)*", "*stringa(f)*")\n"
             write(io, incl*use*command)
         end
     end
