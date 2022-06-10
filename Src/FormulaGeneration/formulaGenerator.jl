@@ -213,10 +213,9 @@ function getPrevFormulas(curBatch::Int64, depth::Int64, path::String)
     for b in 1:curBatch
         formulaPath = joinpath(path, "formulas "*string(b))
         formulaFile = joinpath(formulaPath, "depth "*string(depth)*".txt")
-        if isdir(formulaFile)
+        if isfile(formulaFile)
             open(formulaFile, "r") do io
                 formulas = [formulas; readlines(io, keep=true)]
-                print(formulas)
             end
         else
             return formulas
@@ -256,7 +255,7 @@ function runGenerator(nBatches::Int64 = 1, amountPerDepth::Int64=1000, minDepth:
             open(formulasFile, "w") do formulasFile
                 open(metaFile, "w") do metaFile
 
-                    while length(formulas) < amountPerDepth
+                    while length(formulas) < amountPerDepth*b
 
                         formula = generateFormulaOfDepth(d, maxConseqModal)
                         formulaString = Interface.formula2String(formula)*"\n"

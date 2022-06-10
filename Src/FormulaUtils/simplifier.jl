@@ -75,9 +75,11 @@ end
 function reduceRepeatingJuncts(connective::Char, juncts::Vector{Tree})
     repeating = getRepeatingJuncts(juncts)
     # remove repeating formulas
+    toDelete = Int64[]
     for r in repeating
-        deleteat!(juncts, r[2:end])
+        toDelete = [toDelete; r[2:end]]
     end
+    deleteat!(juncts, sort(toDelete))
 
     idx2Remove = Int64[]
     for (idx, junct) in enumerate(juncts)
