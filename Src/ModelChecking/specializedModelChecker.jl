@@ -18,7 +18,7 @@ end
 function cacheFormula!(model::KRStructure, layer::Int64, world::Int64, formula::Tree, result::Bool)
     # IMPORTANT
     # we cache only the children, because the top most formula is never checked again in the same world
-    model.world[layer][world][formula] = result ? '⊤' : '⊥'
+    model.worlds[layer][world][formula] = result ? '⊤' : '⊥'
 end
 
 function simplifyInWorldRec(world::Dict{Tree, Char}, formula::Tree)
@@ -120,10 +120,10 @@ function diaHelper!(model::KRStructure, formula::Tree, relation::String)
 
     for a in accessibleWorlds
         if checkFormula!(model, formula.right, layer, a)
-            model.worlds[layer][a][formula.right] = '⊤'
+            cacheFormula!(model, layer, a, formula.right, true)
             return true
         else
-            model.worlds[layer][a][formula.right] = '⊥'
+            cacheFormula!(model, layer, a, formula.right, false)
         end
     end 
     return false
@@ -141,10 +141,10 @@ function diaHelperReflexivity!(model::KRStructure, formula::Tree)
     for (idx, l) in enumerate(model.worlds), idx2 in 1:length(l)
         if mod(idx2, mode) == 0
             if checkFormula!(model, formula.right, idx, idx2)
-                model.worlds[idx][idx2][formula.right] = '⊤'
+                cacheFormula!(model, idx, idx2, formula.right, true)
                 return true
             else
-                model.worlds[idx][idx2][formula.right] = '⊥'
+                cacheFormula!(model, idx, idx2, formula.right, false)
             end
         end
     end
@@ -171,7 +171,7 @@ function checkDia!(model::KRStructure, formula::Tree, layer::Int64, world::Int64
         return true
     end
 
-    cacheFormula!(model, layer, world, [formula] = '⊥'
+    cacheFormula!(model, layer, world, formula, false)
     return false
 end
 
@@ -213,10 +213,10 @@ function boxHelperReflexivity!(model::KRStructure, formula::Tree)
     for (idx, l) in enumerate(model.worlds), idx2 in 1:length(l)
         if mod(idx2, mode) == 0
             if !checkFormula!(model, formula.right, idx, idx2)
-                model.worlds[idx][idx2][formula.right] = '⊥'
+                cacheFormula!(model, idx, idx2, formula.right, false)
                 return false
             else
-                model.worlds[idx][idx2][formula.right] = '⊤'
+                cacheFormula!(model, idx, idx2, formula.right, true)
             end
         end
     end
@@ -243,13 +243,13 @@ function checkBox!(model::KRStructure, formula::Tree, layer::Int64, world::Int64
         return false
     end
     
-    cacheFormula!(model, layer, world, [formula] = '⊤'
+    cacheFormula!(model, layer, world, formula, true)
     return true
 end
 
 
 function checkFormula!(model::KRStructure, formula::Tree, layer::Int64, world::Int64)
-    formula = simplifyInWorld(cacheFormula!(model, layer, world, , formula)
+    formula = simplifyInWorld(model.worlds[layer][world], formula)
     if formula.connective == '∨'
         return checkConj!(model, formula, layer, world)
     elseif formula.connective == '∧'
@@ -269,7 +269,7 @@ function checkFormula!(model::KRStructure, formula::Tree, layer::Int64, world::I
     elseif formula.connective == '⊥'
         return false
     end
-    error("You shouldn't be here, atoms should have been replaced with their valuations before", formula)
+    error("You reached the end of the switch statement. You shouldn't be here.\n Atoms should have been replaced with their valuations before, however we got: ", formula)
 end
 
 function checkModelValidity!(model::KRStructure, formula::Tree)

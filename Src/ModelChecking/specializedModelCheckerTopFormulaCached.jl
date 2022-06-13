@@ -16,7 +16,7 @@ function checkTF(t::Tree)
 end
 
 function cacheFormula!(model::KRStructure, layer::Int64, world::Int64, formula::Tree, result::Bool)
-    model.world[layer][world][formula] = result ? '⊤' : '⊥'
+    model.worlds[layer][world][formula] = result ? '⊤' : '⊥'
 end
 
 function simplifyInWorldRec(world::Dict{Tree, Char}, formula::Tree)
