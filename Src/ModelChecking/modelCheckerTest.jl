@@ -10,7 +10,7 @@ using Test
 using .Trees
 using .Parser
 using .Simplifier
-using .Structures
+using .KRStructures
 using .SpecializedModelChecker
 
 

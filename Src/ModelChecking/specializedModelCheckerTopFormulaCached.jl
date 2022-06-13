@@ -46,10 +46,12 @@ function checkConj!(model::KRStructure, formula::Tree, layer::Int64, world::Int6
     lh = checkFormula!(model, formula.left, layer, world)
     model.worlds[layer][world][formula.left] = lh ? '⊤' : '⊥'
     if lh
+        model.worlds[layer][world][formula] = '⊤'
         return true
     else
         rh = checkFormula!(model, formula.right, layer, world)
         model.worlds[layer][world][formula.right] = rh ? '⊤' : '⊥'
+        model.worlds[layer][world][formula] = rh ? '⊤' : '⊥'
         return rh
     end
 end
@@ -58,10 +60,12 @@ function checkDisj!(model::KRStructure, formula::Tree, layer::Int64, world::Int6
     lh = checkFormula!(model, formula.left, layer, world)
     model.worlds[layer][world][formula.left] = lh ? '⊤' : '⊥'
     if !lh
+        model.worlds[layer][world][formula] = '⊥'
         return false
     else
         rh = checkFormula!(model, formula.right, layer, world)
         model.worlds[layer][world][formula.right] = rh ? '⊤' : '⊥'
+        model.worlds[layer][world][formula] = rh ? '⊤' : '⊥'
         return rh
     end
 end
@@ -72,8 +76,10 @@ function checkImp!(model::KRStructure, formula::Tree, layer::Int64, world::Int64
     rh = checkFormula!(model, formula.right, layer, world)
     model.worlds[layer][world][formula.right] = rh ? '⊤' : '⊥'
     if !lh || rh
+        model.worlds[layer][world][formula] = '⊤'
         return true
     else
+        model.worlds[layer][world][formula] = '⊥'
         return false
     end
 end
@@ -84,8 +90,10 @@ function checkBiImp!(model::KRStructure, formula::Tree, layer::Int64, world::Int
     rh = checkFormula!(model, formula.right, layer, world)
     model.worlds[layer][world][formula.right] = rh ? '⊤' : '⊥'
     if lh == rh
+        model.worlds[layer][world][formula] = '⊤'
         return true
     else
+        model.worlds[layer][world][formula] = '⊥'
         return false
     end
 end
@@ -93,6 +101,7 @@ end
 function checkNeg!(model::KRStructure, formula::Tree, layer::Int64, world::Int64)
     rh = checkFormula!(model, formula.right, layer, world)
     model.worlds[layer][world][formula.right] = rh ? '⊤' : '⊥'
+    model.worlds[layer][world][formula] = !rh ? '⊤' : '⊥'
     return !rh
 end
 
@@ -164,6 +173,7 @@ function checkDia!(model::KRStructure, formula::Tree, layer::Int64, world::Int64
         return true
     end
 
+    model.worlds[layer][world][formula] = '⊥'
     return false
 end
 
@@ -235,6 +245,7 @@ function checkBox!(model::KRStructure, formula::Tree, layer::Int64, world::Int64
         return false
     end
     
+    model.worlds[layer][world][formula] = '⊤'
     return true
 end
 
@@ -260,7 +271,7 @@ function checkFormula!(model::KRStructure, formula::Tree, layer::Int64, world::I
     elseif formula.connective == '⊥'
         return false
     end
-    error("You reached the end of the switch statement. You shouldn't be here.\n Atoms should have been replaced with their valuations before, however we got: ", formula)
+    error("You shouldn't be here, atoms should have been replaced with their valuations before", formula)
 end
 
 function checkModelValidity!(model::KRStructure, formula::Tree)
