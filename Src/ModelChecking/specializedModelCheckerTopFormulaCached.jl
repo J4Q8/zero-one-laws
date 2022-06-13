@@ -15,6 +15,10 @@ function checkTF(t::Tree)
     end
 end
 
+function cacheFormula!(model::KRStructure, layer::Int64, world::Int64, formula::Tree, result::Bool)
+    model.world[layer][world][formula] = result ? '⊤' : '⊥'
+end
+
 function simplifyInWorldRec(world::Dict{Tree, Char}, formula::Tree)
     if TESTMODE
         checkTF(formula)
@@ -44,64 +48,64 @@ end
 function checkConj!(model::KRStructure, formula::Tree, layer::Int64, world::Int64)
     # short circuited OR implemented manually (needed to save the formulas)
     lh = checkFormula!(model, formula.left, layer, world)
-    model.worlds[layer][world][formula.left] = lh ? '⊤' : '⊥'
+    cacheFormula!(model, layer, world, formula.left, lh)
     if lh
-        model.worlds[layer][world][formula] = '⊤'
+        cacheFormula!(model, layer, world, formula, true)
         return true
     else
         rh = checkFormula!(model, formula.right, layer, world)
-        model.worlds[layer][world][formula.right] = rh ? '⊤' : '⊥'
-        model.worlds[layer][world][formula] = rh ? '⊤' : '⊥'
+        cacheFormula!(model, layer, world, formula.right, rh)
+        cacheFormula!(model, layer, world, formula, rh)
         return rh
     end
 end
 
 function checkDisj!(model::KRStructure, formula::Tree, layer::Int64, world::Int64)
     lh = checkFormula!(model, formula.left, layer, world)
-    model.worlds[layer][world][formula.left] = lh ? '⊤' : '⊥'
+    cacheFormula!(model, layer, world, formula.left, lh)
     if !lh
-        model.worlds[layer][world][formula] = '⊥'
+        cacheFormula!(model, layer, world, formula, false)
         return false
     else
         rh = checkFormula!(model, formula.right, layer, world)
-        model.worlds[layer][world][formula.right] = rh ? '⊤' : '⊥'
-        model.worlds[layer][world][formula] = rh ? '⊤' : '⊥'
+        cacheFormula!(model, layer, world, formula.right, rh)
+        cacheFormula!(model, layer, world, formula, rh)
         return rh
     end
 end
 
 function checkImp!(model::KRStructure, formula::Tree, layer::Int64, world::Int64)
     lh = checkFormula!(model, formula.left, layer, world)
-    model.worlds[layer][world][formula.left] = lh ? '⊤' : '⊥'
+    cacheFormula!(model, layer, world, formula.left, lh)
     rh = checkFormula!(model, formula.right, layer, world)
-    model.worlds[layer][world][formula.right] = rh ? '⊤' : '⊥'
+    cacheFormula!(model, layer, world, formula.right, rh)
     if !lh || rh
-        model.worlds[layer][world][formula] = '⊤'
+        cacheFormula!(model, layer, world, formula, true)
         return true
     else
-        model.worlds[layer][world][formula] = '⊥'
+        cacheFormula!(model, layer, world, formula, false)
         return false
     end
 end
 
 function checkBiImp!(model::KRStructure, formula::Tree, layer::Int64, world::Int64)
     lh = checkFormula!(model, formula.left, layer, world)
-    model.worlds[layer][world][formula.left] = lh ? '⊤' : '⊥'
+    cacheFormula!(model, layer, world, formula.left, lh)
     rh = checkFormula!(model, formula.right, layer, world)
-    model.worlds[layer][world][formula.right] = rh ? '⊤' : '⊥'
+    cacheFormula!(model, layer, world, formula.right, rh)
     if lh == rh
-        model.worlds[layer][world][formula] = '⊤'
+        cacheFormula!(model, layer, world, formula, true)
         return true
     else
-        model.worlds[layer][world][formula] = '⊥'
+        cacheFormula!(model, layer, world, formula, false)
         return false
     end
 end
 
 function checkNeg!(model::KRStructure, formula::Tree, layer::Int64, world::Int64)
     rh = checkFormula!(model, formula.right, layer, world)
-    model.worlds[layer][world][formula.right] = rh ? '⊤' : '⊥'
-    model.worlds[layer][world][formula] = !rh ? '⊤' : '⊥'
+    cacheFormula!(model, layer, world, formula.right, rh)
+    cacheFormula!(model, layer, world, formula, !rh)
     return !rh
 end
 
@@ -173,7 +177,7 @@ function checkDia!(model::KRStructure, formula::Tree, layer::Int64, world::Int64
         return true
     end
 
-    model.worlds[layer][world][formula] = '⊥'
+    cacheFormula!(model, layer, world, [formula] = '⊥'
     return false
 end
 
@@ -245,13 +249,13 @@ function checkBox!(model::KRStructure, formula::Tree, layer::Int64, world::Int64
         return false
     end
     
-    model.worlds[layer][world][formula] = '⊤'
+    cacheFormula!(model, layer, world, [formula] = '⊤'
     return true
 end
 
 
 function checkFormula!(model::KRStructure, formula::Tree, layer::Int64, world::Int64)
-    formula = simplifyInWorld(model.worlds[layer][world], formula)
+    formula = simplifyInWorld(cacheFormula!(model, layer, world, , formula)
     if formula.connective == '∨'
         return checkConj!(model, formula, layer, world)
     elseif formula.connective == '∧'
