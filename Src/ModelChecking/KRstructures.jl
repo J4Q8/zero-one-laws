@@ -1,10 +1,10 @@
-module Structures
+module KRStructures
 
 using ..Trees
 using LinearAlgebra
 using Random: bitrand
 
-export KRStructure, generateFrame, generateModel, addValuations!
+export KRStructure, generateFrame, generateModel, addRandomValuations!
 
 mutable struct KRStructure
     #initialize worlds
@@ -50,7 +50,7 @@ function generateFrame(n::Int64, language::String)
     return KRStructure(worlds, r12, r23, language)
 end
 
-function addValuations!(frame::KRStructure)
+function addRandomValuations!(frame::KRStructure)
     for (idx, layer) in enumerate(frame.worlds), idx2 in 1:length(layer)
         valuation = bitrand(2)
 
@@ -64,7 +64,7 @@ end
 
 function generateModel(n::Int64, language::String)
     frame = generateFrame(n, language)
-    addValuations!(frame)
+    addRandomValuations!(frame)
     return frame
 end
 

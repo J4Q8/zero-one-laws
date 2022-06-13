@@ -3,7 +3,7 @@ include(joinpath("..", joinpath("FormulaUtils","trees.jl")))
 include(joinpath("..", joinpath("FormulaUtils","cleaner.jl")))
 include(joinpath("..", joinpath("FormulaUtils","parser.jl")))
 include(joinpath("..", joinpath("FormulaUtils","simplifier.jl")))
-include("structures.jl")
+include("KRstructures.jl")
 include("specializedModelChecker.jl")
 
 using Test

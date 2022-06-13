@@ -4,7 +4,7 @@ include(joinpath("..", joinpath("FormulaUtils","trees.jl")))
 include(joinpath("..", joinpath("FormulaUtils","cleaner.jl")))
 include(joinpath("..", joinpath("FormulaUtils","parser.jl")))
 include(joinpath("..", joinpath("FormulaUtils","simplifier.jl")))
-include(joinpath("..", joinpath("ModelChecking","structures.jl")))
+include(joinpath("..", joinpath("ModelChecking","KRstructures.jl")))
 include(joinpath("..", joinpath("ModelChecking","specializedModelChecker.jl")))
 
 using .Trees

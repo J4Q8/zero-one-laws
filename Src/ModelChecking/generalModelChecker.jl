@@ -1,4 +1,4 @@
-module SpecializedModelChecker
+module GeneralModelChecker
 
 using ..Trees
 using ..Parser
@@ -308,7 +308,7 @@ function serialCheckModelValidity(formula::Tree, language::String, nodes::Int64,
     return validCount
 end
 
-function serialCheckFrameValidity(formula::Tree, language::String, nodes::Int64, nModels::Int64, nFrames::Int64)
+function serialCheckFrameValidity(formula::Tree, language::String, nodes::Int64, nModels::Int64, nFrames::Int64, returnCounts::Bool = false)
     validCount = 0
     for _ in 1:nFrames
         frame = generateFrame(nodes, language)
