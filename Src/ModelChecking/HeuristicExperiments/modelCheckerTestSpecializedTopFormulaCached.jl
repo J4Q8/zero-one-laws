@@ -1,10 +1,10 @@
 
-include(joinpath("..", joinpath("FormulaUtils","trees.jl")))
-include(joinpath("..", joinpath("FormulaUtils","cleaner.jl")))
-include(joinpath("..", joinpath("FormulaUtils","parser.jl")))
-include(joinpath("..", joinpath("FormulaUtils","simplifier.jl")))
+include(joinpath("..", joinpath("..", joinpath("FormulaUtils","trees.jl"))))
+include(joinpath("..", joinpath("..", joinpath("FormulaUtils","cleaner.jl"))))
+include(joinpath("..", joinpath("..", joinpath("FormulaUtils","parser.jl"))))
+include(joinpath("..", joinpath("..", joinpath("FormulaUtils","simplifier.jl"))))
 include(joinpath("..", "KRstructures.jl"))
-include(joinpath("..", "specializedModelCheckerTopFormulaCached.jl"))
+include("specializedModelCheckerTopFormulaCached.jl")
 
 using Test
 using .Trees

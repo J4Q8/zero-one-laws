@@ -1,9 +1,0 @@
-#!/bin/bash
-
-
-julia modelCheckerTestGeneralNoCache.jl
-julia modelCheckerTestSpecializedCached.jl
-julia modelCheckerTestSpecializedNoCache.jl
-julia modelCheckerTestSpecializedNoCacheBackwardsIt.jl
-julia modelCheckerTestSpecializedTopFormulaCached.jl
-echo "done"
