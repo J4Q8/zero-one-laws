@@ -11,11 +11,11 @@ using LightGraphs
 # transpose
 #  neighbors(G,5)
 
-export GeneralStructure, generateRandomFrame, generateKRFrameAsGS, addRandomValuations!
+export GeneralStructure, generateRandomFrame, generateFrame, generateModel, addRandomValuations!
 
 mutable struct GeneralStructure
     frame::DiGraph
-    worlds::Vector{Tree, Char}
+    worlds::Vector{Dict{Tree, Char}}
 end
 
 function generateRandomFrame(nStates::Int64, language::String = nothing)
@@ -38,7 +38,9 @@ function generateRandomFrame(nStates::Int64, language::String = nothing)
     return GeneralStructure(G, worlds)
 end
 
-function generateKRFrameAsGS(n::Int64, language::String)
+function generateFrame(n::Int64, language::String)
+    # generates KR frame
+
     # n is a total number of states layers will have n/4, n/2, n/4 elements
     m = floor(Int, n/4)
     G = falses(n, n)
@@ -74,6 +76,13 @@ function generateKRFrameAsGS(n::Int64, language::String)
     G = DiGraph(G)
 
     return GeneralStructure(G, worlds)
+end
+
+function generateModel(n::Int64, language::String)
+    # again KR model
+    frame = generateFrame(n, language)
+    addRandomValuations!(frame)
+    return frame
 end
 
 function applyReflexivity!(mat::BitMatrix, sparse::Bool = false)
@@ -120,10 +129,6 @@ function addRandomValuations!(frame::GeneralStructure, atoms::Vector{Char} = ['p
             frame.worlds[idx][root] = valuation[v] ? '⊤' : '⊥' 
         end
     end
-end
-
-function generateKRModel()
-    
 end
 
 end #module
