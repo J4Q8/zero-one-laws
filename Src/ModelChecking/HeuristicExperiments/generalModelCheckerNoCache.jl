@@ -44,30 +44,30 @@ end
 function cacheFormula!(model::GeneralStructure, formula::Tree, world::Int64, result::Bool)
     # IMPORTANT
     # we cache only the children, because the top most formula is never checked again in the same world
-    # model.world[world][formula] = result ? '⊤' : '⊥'
+    # model.worlds[world][formula] = result ? '⊤' : '⊥'
 end
 
 function checkConj!(model::GeneralStructure, formula::Tree, world::Int64)
     # short circuited OR implemented manually (needed to save the formulas)
     lh = checkFormula!(model, formula.left, world)
-    cacheFormula!(model, formula.left, word, lh)
+    cacheFormula!(model, formula.left, world, lh)
     if lh
         return true
     else
         rh = checkFormula!(model, formula.right, world)
-        cacheFormula!(model, formula.right, word, rh)
+        cacheFormula!(model, formula.right, world, rh)
         return rh
     end
 end
 
 function checkDisj!(model::GeneralStructure, formula::Tree, world::Int64)
     lh = checkFormula!(model, formula.left, world)
-    cacheFormula!(model, formula.left, word, lh)
+    cacheFormula!(model, formula.left, world, lh)
     if !lh
         return false
     else
         rh = checkFormula!(model, formula.right, world)
-        cacheFormula!(model, formula.right, word, rh)
+        cacheFormula!(model, formula.right, world, rh)
         return rh
     end
 end

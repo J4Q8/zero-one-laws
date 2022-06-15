@@ -11,7 +11,7 @@ using LightGraphs
 # transpose
 #  neighbors(G,5)
 
-export GeneralStructure, generateRandomFrame, generateFrame, generateModel, addRandomValuations!
+export GeneralStructure, generateRandomFrame, generateFrame, generateModel, addRandomValuations!, neighbors
 
 mutable struct GeneralStructure
     frame::DiGraph
