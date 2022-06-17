@@ -255,7 +255,7 @@ end
 
 
 function checkFormula!(model::KRStructure, formula::Tree, layer::Int64, world::Int64)
-    formula = simplifyInWorld(world[layer][world], formula)
+    formula = simplifyInWorld(model.worlds[layer][world], formula)
     if formula.connective == '∨'
         return checkConj!(model, formula, layer, world)
     elseif formula.connective == '∧'
