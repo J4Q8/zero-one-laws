@@ -16,7 +16,7 @@ using .SpecializedModelChecker
 
 function isValidModel(formula::String, language::String = "gl")
     formula = parseFormula(formula)
-    for _ in 1:100
+    for _ in 1:5000
         model = generateModel(80, language)
         if !checkModelValidity!(model, formula)
             return false
@@ -27,7 +27,7 @@ end
 
 function isValidFrame(formula::String, language::String = "gl")
     formula = parseFormula(formula)
-    for _ in 1:100
+    for _ in 1:500
         model = generateFrame(80, language)
         if !checkFrameValidity(model, formula, 50)
             return false
