@@ -1,0 +1,43 @@
+slurmstepd: error: *** JOB 24566981 ON pg-node209 CANCELLED AT 2022-06-20T20:27:48 DUE TO TIME LIMIT ***
+
+
+###############################################################################
+Peregrine Cluster
+Job 24566981 for user 's3986209'
+Finished at: Mon Jun 20 20:27:50 CEST 2022
+
+Job details:
+============
+
+Job ID              : 24566958_54
+Name                : zero-one-laws-sim
+User                : s3986209
+Partition           : regular
+Nodes               : pg-node209
+Number of Nodes     : 1
+Cores               : 1
+Number of Tasks     : 1
+State               : TIMEOUT,CANCELLED
+Submit              : 2022-06-10T20:25:23
+Start               : 2022-06-10T20:27:21
+End                 : 2022-06-20T20:27:50
+Reserved walltime   : 10-00:00:00
+Used walltime       : 10-00:00:29
+Used CPU time       : 9-23:59:36 (efficiency: 99.99%)
+% User (Computation): 99.95%
+% System (I/O)      :  0.05%
+Mem reserved        : 4G
+Max Mem (Node/step) : 253.65M (pg-node209, per node)
+Full Max Mem usage  : 253.65M
+Total Disk Read     : 1.59M
+Total Disk Write    : 9.16K
+
+
+Acknowledgements:
+=================
+
+Please see this page for information about acknowledging Peregrine in your publications:
+
+https://wiki.hpc.rug.nl/peregrine/introduction/scientific_output
+
+################################################################################
