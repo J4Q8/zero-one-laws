@@ -84,6 +84,9 @@ function runExperiment(language::String, n::Int64, formulaSet::Int64, nModels::I
 end
 
 function getNumberOfValidatedFormulas(file::String)
+    if !isfile(file)
+        return 0
+    end
     open(file, "r") do io
         lines = readlines(io)
     end
@@ -259,6 +262,6 @@ end
 
 # prepareJobArrayScripts()
 # prepareJobArrayScriptsContinued()
-prepareJobArrayScriptsSelected()
+# prepareJobArrayScriptsSelected()
 
 end #module

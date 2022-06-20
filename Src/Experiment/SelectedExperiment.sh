@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=zero-one-laws-sim
+#SBATCH --job-name=zero-one-laws-sim-selected-formulas
 #SBATCH --time=1-00:00:00
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1
