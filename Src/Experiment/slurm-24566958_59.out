@@ -1,0 +1,42 @@
+
+
+###############################################################################
+Peregrine Cluster
+Job 24566994 for user 's3986209'
+Finished at: Wed Jun 15 03:17:49 CEST 2022
+
+Job details:
+============
+
+Job ID              : 24566958_59
+Name                : zero-one-laws-sim
+User                : s3986209
+Partition           : regular
+Nodes               : pg-node209
+Number of Nodes     : 1
+Cores               : 1
+Number of Tasks     : 1
+State               : COMPLETED
+Submit              : 2022-06-10T20:25:23
+Start               : 2022-06-10T20:57:27
+End                 : 2022-06-15T03:17:49
+Reserved walltime   : 10-00:00:00
+Used walltime       : 4-06:20:22
+Used CPU time       : 4-06:19:28 (efficiency: 99.99%)
+% User (Computation): 99.95%
+% System (I/O)      :  0.05%
+Mem reserved        : 4G
+Max Mem (Node/step) : 278.89M (pg-node209, per node)
+Full Max Mem usage  : 278.89M
+Total Disk Read     : 1.59M
+Total Disk Write    : 9.16K
+
+
+Acknowledgements:
+=================
+
+Please see this page for information about acknowledging Peregrine in your publications:
+
+https://wiki.hpc.rug.nl/peregrine/introduction/scientific_output
+
+################################################################################

@@ -1,0 +1,43 @@
+slurmstepd: error: acct_gather_profile/influxdb _send_data: curl_easy_perform failed to send data (discarded). Reason: Failure when receiving data from the peer
+
+
+###############################################################################
+Peregrine Cluster
+Job 24566971 for user 's3986209'
+Finished at: Sun Jun 19 01:58:40 CEST 2022
+
+Job details:
+============
+
+Job ID              : 24566958_44
+Name                : zero-one-laws-sim
+User                : s3986209
+Partition           : regular
+Nodes               : pg-node182
+Number of Nodes     : 1
+Cores               : 1
+Number of Tasks     : 1
+State               : COMPLETED
+Submit              : 2022-06-10T20:25:23
+Start               : 2022-06-10T20:26:20
+End                 : 2022-06-19T01:58:40
+Reserved walltime   : 10-00:00:00
+Used walltime       : 8-05:32:20
+Used CPU time       : 8-05:31:57 (efficiency: 100.00%)
+% User (Computation): 99.94%
+% System (I/O)      :  0.06%
+Mem reserved        : 4G
+Max Mem (Node/step) : 275.07M (pg-node182, per node)
+Full Max Mem usage  : 275.07M
+Total Disk Read     : 1.59M
+Total Disk Write    : 9.16K
+
+
+Acknowledgements:
+=================
+
+Please see this page for information about acknowledging Peregrine in your publications:
+
+https://wiki.hpc.rug.nl/peregrine/introduction/scientific_output
+
+################################################################################
