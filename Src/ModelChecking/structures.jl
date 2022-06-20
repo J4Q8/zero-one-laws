@@ -47,7 +47,6 @@ function generateFrame(n::Int64, language::String)
 
     r12 = bitrand(m, 2m)
     # first layer points cannot be endpoints
-    println(n)
     while !minimum(maximum.(eachrow(r12))) || !minimum(maximum.(eachcol(r12)))
         r12 = bitrand(m, 2m)
     end

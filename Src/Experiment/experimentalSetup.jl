@@ -98,11 +98,11 @@ function finishExperiment(language::String, nodes::Int64, formulaSet::Int64, nMo
     formulaRange = 6:13
     formulaPath = joinpath("..", joinpath("..", joinpath("generated", "formulas "*string(formulaSet))))
     # VScode path
-    formulaPath = joinpath("generated", "formulas "*string(formulaSet))
+    # formulaPath = joinpath("generated", "formulas "*string(formulaSet))
 
-    resultsPath = joinpath("..", joinpath("..", joinpath("validated-Peregrine", joinpath(language, joinpath(string(n), "formulas "*string(formulaSet))))))
+    resultsPath = joinpath("..", joinpath("..", joinpath("validated-Peregrine", joinpath(language, joinpath(string(nodes), "formulas "*string(formulaSet))))))
     # VScode path
-    resultsPath = joinpath("validated-Peregrine", joinpath(language, joinpath(string(n), "formulas "*string(formulaSet))))
+    # resultsPath = joinpath("validated-Peregrine", joinpath(language, joinpath(string(nodes), "formulas "*string(formulaSet))))
 
     if !isdir(resultsPath)
         mkpath(resultsPath)
@@ -133,11 +133,11 @@ function runSelectedFormulasExperiment(language::String, n::Int64, nModels::Int6
     
     selectedFile = joinpath("..", joinpath("..", "SelectedFormulasRaw.txt"))
     # VScode path
-    selectedFile = "SelectedFormulasRaw.txt"
+    # selectedFile = "SelectedFormulasRaw.txt"
 
     resultsPath = joinpath("..", joinpath("..", joinpath("validated-Peregrine", joinpath(language, joinpath(string(n), "formulas 0")))))
     # VScode path
-    resultsPath = joinpath("validated-Peregrine", joinpath(language, joinpath(string(n), "formulas 0")))
+    # resultsPath = joinpath("validated-Peregrine", joinpath(language, joinpath(string(n), "formulas 0")))
 
     resultsFile = joinpath(resultsPath, "selected.txt")
 
