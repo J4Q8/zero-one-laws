@@ -1,9 +1,9 @@
-module GeneralModelChecker
+module ModelChecker
 
 using ..Trees
 using ..Parser
 using ..Simplifier
-using ..GeneralStructures
+using ..Structures
 
 export checkModelValidity!, checkFrameValidity, serialCheckModelValidity, serialCheckFrameValidity
 
@@ -41,13 +41,13 @@ function simplifyInWorld(world::Dict{Tree, Char}, formula::Tree)
     return simplify(formula)
 end
 
-function cacheFormula!(model::GeneralStructure, formula::Tree, world::Int64, result::Bool)
+function cacheFormula!(model::Structure, formula::Tree, world::Int64, result::Bool)
     # IMPORTANT
     # we cache only the children, because the top most formula is never checked again in the same world
     # model.worlds[world][formula] = result ? '⊤' : '⊥'
 end
 
-function checkConj!(model::GeneralStructure, formula::Tree, world::Int64)
+function checkConj!(model::Structure, formula::Tree, world::Int64)
     # short circuited OR implemented manually (needed to save the formulas)
     lh = checkFormula!(model, formula.left, world)
     cacheFormula!(model, formula.left, world, lh)
@@ -60,7 +60,7 @@ function checkConj!(model::GeneralStructure, formula::Tree, world::Int64)
     end
 end
 
-function checkDisj!(model::GeneralStructure, formula::Tree, world::Int64)
+function checkDisj!(model::Structure, formula::Tree, world::Int64)
     lh = checkFormula!(model, formula.left, world)
     cacheFormula!(model, formula.left, world, lh)
     if !lh
@@ -72,7 +72,7 @@ function checkDisj!(model::GeneralStructure, formula::Tree, world::Int64)
     end
 end
 
-function checkImp!(model::GeneralStructure, formula::Tree, world::Int64)
+function checkImp!(model::Structure, formula::Tree, world::Int64)
     lh = checkFormula!(model, formula.left, world)
     cacheFormula!(model, formula.left, world, lh)
 
@@ -86,7 +86,7 @@ function checkImp!(model::GeneralStructure, formula::Tree, world::Int64)
     end
 end
 
-function checkBiImp!(model::GeneralStructure, formula::Tree, world::Int64)
+function checkBiImp!(model::Structure, formula::Tree, world::Int64)
     lh = checkFormula!(model, formula.left, world)
     cacheFormula!(model, formula.left, world, lh)
     rh = checkFormula!(model, formula.right, world)
@@ -98,14 +98,14 @@ function checkBiImp!(model::GeneralStructure, formula::Tree, world::Int64)
     end
 end
 
-function checkNeg!(model::GeneralStructure, formula::Tree, world::Int64)
+function checkNeg!(model::Structure, formula::Tree, world::Int64)
     rh = checkFormula!(model, formula.right, world)
     cacheFormula!(model, formula.right, world, rh)
     return !rh
 end
 
 
-function checkDia!(model::GeneralStructure, formula::Tree, world::Int64)
+function checkDia!(model::Structure, formula::Tree, world::Int64)
 
     for neighbor in neighbors(model.frame, world)
         if checkFormula!(model, formula.right, neighbor)
@@ -119,7 +119,7 @@ function checkDia!(model::GeneralStructure, formula::Tree, world::Int64)
     return false
 end
 
-function checkBox!(model::GeneralStructure, formula::Tree, world::Int64)
+function checkBox!(model::Structure, formula::Tree, world::Int64)
 
     for neighbor in neighbors(model.frame, world)
         if !checkFormula!(model, formula.right, neighbor)
@@ -134,7 +134,7 @@ function checkBox!(model::GeneralStructure, formula::Tree, world::Int64)
 end
 
 
-function checkFormula!(model::GeneralStructure, formula::Tree, world::Int64)
+function checkFormula!(model::Structure, formula::Tree, world::Int64)
     formula = simplifyInWorld(model.worlds[world], formula)
     if formula.connective == '∨'
         return checkConj!(model, formula, world)
@@ -158,7 +158,7 @@ function checkFormula!(model::GeneralStructure, formula::Tree, world::Int64)
     error("You reached the end of the switch statement. You shouldn't be here.\n Atoms should have been replaced with their valuations before, however we got: ", formula)
 end
 
-function checkModelValidity!(model::GeneralStructure, formula::Tree)
+function checkModelValidity!(model::Structure, formula::Tree)
     # we decided to iterate from the end because especially for KR frames it will find invalid worlds quicker
     for world in 1:length(model.worlds)
         if !checkFormula!(model, formula, world)
@@ -168,7 +168,7 @@ function checkModelValidity!(model::GeneralStructure, formula::Tree)
     return true
 end
 
-function checkFrameValidity(model::GeneralStructure, formula::Tree, nValuations::Int64)
+function checkFrameValidity(model::Structure, formula::Tree, nValuations::Int64)
     for _ in 1:nValuations
         model_copy = deepcopy(model)
         addRandomValuations!(model_copy)

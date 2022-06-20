@@ -106,7 +106,7 @@ end
 function diaHelper!(model::KRStructure, formula::Tree, relation::String)
     #we don't have to save e.g. model.worlds[1][world][formula] = '⊤' because it will be used only in the first
     # I am aware that this could be made more flexible, but I intend to maximize the speed of execution, 
-    # for general model checker look at generalModelChecker
+    # for general model checker look at ModelChecker
     if relation == "r12"
         accessibleWorlds = [w[2] for w in findall(model.r12)]
         layer = 2
@@ -178,7 +178,7 @@ end
 function boxHelper!(model::KRStructure, formula::Tree, relation::String)
     #we don't have to save e.g. model.worlds[1][world][formula] = '⊤' because it will be used only in the first
     # I am aware that this could be made more flexible, but I intend to maximize the speed of execution, 
-    # for general model checker look at generalModelChecker
+    # for general model checker look at ModelChecker
     if relation == "r12"
         accessibleWorlds = [w[2] for w in findall(model.r12)]
         layer = 2
