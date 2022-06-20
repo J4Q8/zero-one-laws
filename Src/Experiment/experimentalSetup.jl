@@ -94,15 +94,15 @@ function getNumberOfValidatedFormulas(file::String)
     return length(lines)
 end
 
-function finishExperiment(language::String, n::Int64, formulaSet::Int64, nModels::Int64 = 5000, nFrames::Int64 = 500, nValuations::Int64 = 50)
+function finishExperiment(language::String, nodes::Int64, formulaSet::Int64, nModels::Int64 = 5000, nFrames::Int64 = 500, nValuations::Int64 = 50)
     formulaRange = 6:13
     formulaPath = joinpath("..", joinpath("..", joinpath("generated", "formulas "*string(formulaSet))))
     # VScode path
-    # formulaPath = joinpath("generated", "formulas "*string(formulaSet))
+    formulaPath = joinpath("generated", "formulas "*string(formulaSet))
 
     resultsPath = joinpath("..", joinpath("..", joinpath("validated-Peregrine", joinpath(language, joinpath(string(n), "formulas "*string(formulaSet))))))
     # VScode path
-    # resultsPath = joinpath("validated-Peregrine", joinpath(language, joinpath(string(n), "formulas "*string(formulaSet))))
+    resultsPath = joinpath("validated-Peregrine", joinpath(language, joinpath(string(n), "formulas "*string(formulaSet))))
 
     if !isdir(resultsPath)
         mkpath(resultsPath)
@@ -123,7 +123,7 @@ function finishExperiment(language::String, n::Int64, formulaSet::Int64, nModels
                     continue
                 end
 
-                processFormula(formula, resultsFile, language, n, nModels, nFrames, nValuations)
+                processFormula(formula, resultsFile, language, nodes, nModels, nFrames, nValuations)
             end
         end
     end
