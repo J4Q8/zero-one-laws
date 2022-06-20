@@ -13,7 +13,7 @@ using .ModelChecker
 
 formulaSetRange = 1:10
 
-formulas = String[]
+formulas = Tree[]
 metadata = String[]
 
 for formulaSer in formulaSetRange
@@ -22,7 +22,11 @@ for formulaSer in formulaSetRange
     formulaFile = joinpath(formulaPath, "tripleTC.txt")
     metaFile = joinpath(formulaPath, "tripleTC.txt")
 
-    open(formulaFile, "r")
-    for line in eachline()
+    open(formulaFile, "r") do io
+        for line in eachline(io)
+            formula = parseFormula(line)
+            if formula
+        end
+    end
 
 end
