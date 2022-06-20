@@ -4,8 +4,8 @@ include(joinpath("..", joinpath("FormulaUtils","trees.jl")))
 include(joinpath("..", joinpath("FormulaUtils","cleaner.jl")))
 include(joinpath("..", joinpath("FormulaUtils","parser.jl")))
 include(joinpath("..", joinpath("FormulaUtils","simplifier.jl")))
-include(joinpath("..", joinpath("ModelChecking","Structures.jl")))
-include(joinpath("..", joinpath("ModelChecking","ModelChecker.jl")))
+include(joinpath("..", joinpath("ModelChecking","structures.jl")))
+include(joinpath("..", joinpath("ModelChecking","modelChecker.jl")))
 
 using .Trees
 using .Parser
@@ -95,10 +95,11 @@ function finishExperiment(language::String, n::Int64, formulaSet::Int64, nModels
     formulaRange = 6:13
     formulaPath = joinpath("..", joinpath("..", joinpath("generated", "formulas "*string(formulaSet))))
     # VScode path
-    formulaPath = joinpath("generated", "formulas "*string(formulaSet))
+    # formulaPath = joinpath("generated", "formulas "*string(formulaSet))
+    
     resultsPath = joinpath("..", joinpath("..", joinpath("validated-Peregrine", joinpath(language, joinpath(string(n), "formulas "*string(formulaSet))))))
     # VScode path
-    resultsPath = joinpath("validated-Peregrine", joinpath(language, joinpath(string(n), "formulas "*string(formulaSet))))
+    # resultsPath = joinpath("validated-Peregrine", joinpath(language, joinpath(string(n), "formulas "*string(formulaSet))))
 
     if !isdir(resultsPath)
         mkpath(resultsPath)
