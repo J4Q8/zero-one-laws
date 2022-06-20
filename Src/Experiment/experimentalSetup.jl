@@ -95,10 +95,10 @@ function finishExperiment(language::String, n::Int64, formulaSet::Int64, nModels
     formulaRange = 6:13
     formulaPath = joinpath("..", joinpath("..", joinpath("generated", "formulas "*string(formulaSet))))
     # VScode path
-    # formulaPath = joinpath("generated", "formulas "*string(formulaSet))
+    formulaPath = joinpath("generated", "formulas "*string(formulaSet))
     resultsPath = joinpath("..", joinpath("..", joinpath("validated-Peregrine", joinpath(language, joinpath(string(n), "formulas "*string(formulaSet))))))
     # VScode path
-    # resultsPath = joinpath("validated-Peregrine", joinpath(language, joinpath(string(n), "formulas "*string(formulaSet))))
+    resultsPath = joinpath("validated-Peregrine", joinpath(language, joinpath(string(n), "formulas "*string(formulaSet))))
 
     if !isdir(resultsPath)
         mkpath(resultsPath)
@@ -115,7 +115,6 @@ function finishExperiment(language::String, n::Int64, formulaSet::Int64, nModels
 
         open(formulaFile, "r") do fFile
             for (i, formula) in enumerate(eachline(fFile))
-                println(n, i)
                 if i <= n
                     continue
                 end
