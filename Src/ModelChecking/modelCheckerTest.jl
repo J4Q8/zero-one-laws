@@ -4,35 +4,39 @@ include(joinpath("..", joinpath("FormulaUtils","cleaner.jl")))
 include(joinpath("..", joinpath("FormulaUtils","parser.jl")))
 include(joinpath("..", joinpath("FormulaUtils","simplifier.jl")))
 include("structures.jl")
-include("specializedModelChecker.jl")
+include("modelChecker.jl")
 
 using Test
 using .Trees
 using .Parser
 using .Simplifier
 using .Structures
-using .SpecializedModelChecker
+using .ModelChecker
 
 
 function isValidModel(formula::String, language::String = "gl")
     formula = parseFormula(formula)
-    for _ in 1:100
+    for _ in 1:5000
         model = generateModel(80, language)
         if !checkModelValidity!(model, formula)
+            println("model done")
             return false
         end
     end
+    println("model done")
     return true
 end
 
 function isValidFrame(formula::String, language::String = "gl")
     formula = parseFormula(formula)
-    for _ in 1:100
+    for _ in 1:500
         model = generateFrame(80, language)
         if !checkFrameValidity(model, formula, 50)
+            println("frame done")
             return false
         end
     end
+    println("frame done")
     return true
 end
 
@@ -123,14 +127,14 @@ end
             @test isValidFrame(" ¬ ( ( ◇ ⊤ ↔ q ) ∨ ◇ p ) ∨ ( ( ( p ∨ q ) ↔ ¬ p ) → q )", "k4") == true
             @test isValidModel(" ¬ ( ( ◇ ⊤ ↔ q ) ∨ ◇ p ) ∨ ( ( ( p ∨ q ) ↔ ¬ p ) → q )", "s4") == true
             @test isValidFrame(" ¬ ( ( ◇ ⊤ ↔ q ) ∨ ◇ p ) ∨ ( ( ( p ∨ q ) ↔ ¬ p ) → q )", "s4") == true
-            # line 39 in tripleTC.txt
+            # # line 39 in tripleTC.txt
             @test isValidModel("◻ ⊥ → ◻ ( ( ◻ ◻ q ∨ p ) ∧ q )") == true
             @test isValidFrame("◻ ⊥ → ◻ ( ( ◻ ◻ q ∨ p ) ∧ q )") == true
             @test isValidModel("◻ ⊥ → ◻ ( ( ◻ ◻ q ∨ p ) ∧ q )", "k4") == true
             @test isValidFrame("◻ ⊥ → ◻ ( ( ◻ ◻ q ∨ p ) ∧ q )", "k4") == true
             @test isValidModel("◻ ⊥ → ◻ ( ( ◻ ◻ q ∨ p ) ∧ q )", "s4") == true
             @test isValidFrame("◻ ⊥ → ◻ ( ( ◻ ◻ q ∨ p ) ∧ q )", "s4") == true
-            # line 43 in tripleTC.txt
+            # # line 43 in tripleTC.txt
             @test isValidModel("( ◇ p → ◻ q ) ∨ ( p → ( ( ¬ p ∨ ◻ ⊥ ) → ( ¬ ( q ∧ ◻ ⊥ ) ∨ ( p ∧ ( ◻ q → q ) ) ) ) )") == true
             @test isValidFrame("( ◇ p → ◻ q ) ∨ ( p → ( ( ¬ p ∨ ◻ ⊥ ) → ( ¬ ( q ∧ ◻ ⊥ ) ∨ ( p ∧ ( ◻ q → q ) ) ) ) )") == true
             @test isValidModel("( ◇ p → ◻ q ) ∨ ( p → ( ( ¬ p ∨ ◻ ⊥ ) → ( ¬ ( q ∧ ◻ ⊥ ) ∨ ( p ∧ ( ◻ q → q ) ) ) ) )", "k4") == true

@@ -1,0 +1,1 @@
+"C:\Users\jakub\Documents\Bachelor AI\Bachelor Thesis\Code\Src\ModelChecking\HeuristicExperiments\heuristicsExeriment.bat"

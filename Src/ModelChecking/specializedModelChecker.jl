@@ -3,7 +3,7 @@ module SpecializedModelChecker
 using ..Trees
 using ..Parser
 using ..Simplifier
-using ..Structures
+using ..KRStructures
 
 export checkModelValidity!, checkFrameValidity, serialCheckModelValidity, serialCheckFrameValidity
 
@@ -13,6 +13,12 @@ function checkTF(t::Tree)
     if t.connective in ['⊤','⊥'] && isdefined(t, :left) && isdefined(t, :right)
         error("This should be a leaf but is:", t)
     end
+end
+
+function cacheFormula!(model::KRStructure, layer::Int64, world::Int64, formula::Tree, result::Bool)
+    # IMPORTANT
+    # we cache only the children, because the top most formula is never checked again in the same world
+    model.worlds[layer][world][formula] = result ? '⊤' : '⊥'
 end
 
 function simplifyInWorldRec(world::Dict{Tree, Char}, formula::Tree)
@@ -44,71 +50,63 @@ end
 function checkConj!(model::KRStructure, formula::Tree, layer::Int64, world::Int64)
     # short circuited OR implemented manually (needed to save the formulas)
     lh = checkFormula!(model, formula.left, layer, world)
-    model.worlds[layer][world][formula.left] = lh ? '⊤' : '⊥'
+    cacheFormula!(model, layer, world, formula.left, lh)
     if lh
-        model.worlds[layer][world][formula] = '⊤'
         return true
     else
         rh = checkFormula!(model, formula.right, layer, world)
-        model.worlds[layer][world][formula.right] = rh ? '⊤' : '⊥'
-        model.worlds[layer][world][formula] = rh ? '⊤' : '⊥'
+        cacheFormula!(model, layer, world, formula.right, rh)
         return rh
     end
 end
 
 function checkDisj!(model::KRStructure, formula::Tree, layer::Int64, world::Int64)
     lh = checkFormula!(model, formula.left, layer, world)
-    model.worlds[layer][world][formula.left] = lh ? '⊤' : '⊥'
+    cacheFormula!(model, layer, world, formula.left, lh)
     if !lh
-        model.worlds[layer][world][formula] = '⊥'
         return false
     else
         rh = checkFormula!(model, formula.right, layer, world)
-        model.worlds[layer][world][formula.right] = rh ? '⊤' : '⊥'
-        model.worlds[layer][world][formula] = rh ? '⊤' : '⊥'
+        cacheFormula!(model, layer, world, formula.right, rh)
         return rh
     end
 end
 
 function checkImp!(model::KRStructure, formula::Tree, layer::Int64, world::Int64)
     lh = checkFormula!(model, formula.left, layer, world)
-    model.worlds[layer][world][formula.left] = lh ? '⊤' : '⊥'
+    cacheFormula!(model, layer, world, formula.left, lh)
+
     rh = checkFormula!(model, formula.right, layer, world)
-    model.worlds[layer][world][formula.right] = rh ? '⊤' : '⊥'
+    cacheFormula!(model, layer, world, formula.right, rh)
     if !lh || rh
-        model.worlds[layer][world][formula] = '⊤'
         return true
     else
-        model.worlds[layer][world][formula] = '⊥'
         return false
     end
 end
 
 function checkBiImp!(model::KRStructure, formula::Tree, layer::Int64, world::Int64)
     lh = checkFormula!(model, formula.left, layer, world)
-    model.worlds[layer][world][formula.left] = lh ? '⊤' : '⊥'
+    cacheFormula!(model, layer, world, formula.left, lh)
     rh = checkFormula!(model, formula.right, layer, world)
-    model.worlds[layer][world][formula.right] = rh ? '⊤' : '⊥'
+    cacheFormula!(model, layer, world, formula.right, rh)
     if lh == rh
-        model.worlds[layer][world][formula] = '⊤'
         return true
     else
-        model.worlds[layer][world][formula] = '⊥'
         return false
     end
 end
 
 function checkNeg!(model::KRStructure, formula::Tree, layer::Int64, world::Int64)
-    lh = checkFormula!(model, formula.right, layer, world)
-    model.worlds[layer][world][formula.right] = lh ? '⊤' : '⊥'
-    model.worlds[layer][world][formula] = !lh ? '⊤' : '⊥'
-    return !lh
+    rh = checkFormula!(model, formula.right, layer, world)
+    cacheFormula!(model, layer, world, formula.right, rh)
+    return !rh
 end
 
 function diaHelper!(model::KRStructure, formula::Tree, relation::String)
     #we don't have to save e.g. model.worlds[1][world][formula] = '⊤' because it will be used only in the first
     # I am aware that this could be made more flexible, but I intend to maximize the speed of execution, 
-    # for general model checker look at generalModelChecker
+    # for general model checker look at ModelChecker
     if relation == "r12"
         accessibleWorlds = [w[2] for w in findall(model.r12)]
         layer = 2
@@ -122,10 +120,10 @@ function diaHelper!(model::KRStructure, formula::Tree, relation::String)
 
     for a in accessibleWorlds
         if checkFormula!(model, formula.right, layer, a)
-            model.worlds[layer][a][formula.right] = '⊤'
+            cacheFormula!(model, layer, a, formula.right, true)
             return true
         else
-            model.worlds[layer][a][formula.right] = '⊥'
+            cacheFormula!(model, layer, a, formula.right, false)
         end
     end 
     return false
@@ -143,10 +141,10 @@ function diaHelperReflexivity!(model::KRStructure, formula::Tree)
     for (idx, l) in enumerate(model.worlds), idx2 in 1:length(l)
         if mod(idx2, mode) == 0
             if checkFormula!(model, formula.right, idx, idx2)
-                model.worlds[idx][idx2][formula.right] = '⊤'
+                cacheFormula!(model, idx, idx2, formula.right, true)
                 return true
             else
-                model.worlds[idx][idx2][formula.right] = '⊥'
+                cacheFormula!(model, idx, idx2, formula.right, false)
             end
         end
     end
@@ -173,14 +171,14 @@ function checkDia!(model::KRStructure, formula::Tree, layer::Int64, world::Int64
         return true
     end
 
-    model.worlds[layer][world][formula] = '⊥'
+    cacheFormula!(model, layer, world, formula, false)
     return false
 end
 
 function boxHelper!(model::KRStructure, formula::Tree, relation::String)
     #we don't have to save e.g. model.worlds[1][world][formula] = '⊤' because it will be used only in the first
     # I am aware that this could be made more flexible, but I intend to maximize the speed of execution, 
-    # for general model checker look at generalModelChecker
+    # for general model checker look at ModelChecker
     if relation == "r12"
         accessibleWorlds = [w[2] for w in findall(model.r12)]
         layer = 2
@@ -215,10 +213,10 @@ function boxHelperReflexivity!(model::KRStructure, formula::Tree)
     for (idx, l) in enumerate(model.worlds), idx2 in 1:length(l)
         if mod(idx2, mode) == 0
             if !checkFormula!(model, formula.right, idx, idx2)
-                model.worlds[idx][idx2][formula.right] = '⊥'
+                cacheFormula!(model, idx, idx2, formula.right, false)
                 return false
             else
-                model.worlds[idx][idx2][formula.right] = '⊤'
+                cacheFormula!(model, idx, idx2, formula.right, true)
             end
         end
     end
@@ -245,7 +243,7 @@ function checkBox!(model::KRStructure, formula::Tree, layer::Int64, world::Int64
         return false
     end
     
-    model.worlds[layer][world][formula] = '⊤'
+    cacheFormula!(model, layer, world, formula, true)
     return true
 end
 
@@ -271,7 +269,7 @@ function checkFormula!(model::KRStructure, formula::Tree, layer::Int64, world::I
     elseif formula.connective == '⊥'
         return false
     end
-    error("You shouldn't be here, atoms should have been replaced with their valuations before", formula)
+    error("You reached the end of the switch statement. You shouldn't be here.\n Atoms should have been replaced with their valuations before, however we got: ", formula)
 end
 
 function checkModelValidity!(model::KRStructure, formula::Tree)
@@ -289,7 +287,7 @@ end
 function checkFrameValidity(model::KRStructure, formula::Tree, nValuations::Int64)
     for _ in 1:nValuations
         model_copy = deepcopy(model)
-        addValuations!(model_copy)
+        addRandomValuations!(model_copy)
         if !checkModelValidity!(model_copy, formula)
             return false
         end
@@ -308,7 +306,7 @@ function serialCheckModelValidity(formula::Tree, language::String, nodes::Int64,
     return validCount
 end
 
-function serialCheckFrameValidity(formula::Tree, language::String, nodes::Int64, nModels::Int64, nFrames::Int64, returnCounts::Bool = false)
+function serialCheckFrameValidity(formula::Tree, language::String, nodes::Int64, nModels::Int64, nFrames::Int64)
     validCount = 0
     for _ in 1:nFrames
         frame = generateFrame(nodes, language)
