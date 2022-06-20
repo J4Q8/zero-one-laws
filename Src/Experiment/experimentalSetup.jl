@@ -84,6 +84,9 @@ function runExperiment(language::String, n::Int64, formulaSet::Int64, nModels::I
 end
 
 function getNumberOfValidatedFormulas(file::String)
+    if !isfile(file)
+        return 0
+    end
     open(file, "r") do io
         lines = readlines(io)
     end
@@ -96,7 +99,7 @@ function finishExperiment(language::String, n::Int64, formulaSet::Int64, nModels
     formulaPath = joinpath("..", joinpath("..", joinpath("generated", "formulas "*string(formulaSet))))
     # VScode path
     # formulaPath = joinpath("generated", "formulas "*string(formulaSet))
-    
+
     resultsPath = joinpath("..", joinpath("..", joinpath("validated-Peregrine", joinpath(language, joinpath(string(n), "formulas "*string(formulaSet))))))
     # VScode path
     # resultsPath = joinpath("validated-Peregrine", joinpath(language, joinpath(string(n), "formulas "*string(formulaSet))))
@@ -128,19 +131,19 @@ end
 
 function runSelectedFormulasExperiment(language::String, n::Int64, nModels::Int64 = 5000, nFrames::Int64 = 500, nValuations::Int64 = 50)
     
-    selectedFile = "SelectedFormulasRaw.txt"
+    selectedFile = joinpath("..", joinpath("..", "SelectedFormulasRaw.txt"))
     # VScode path
-    # selectedFile = joinpath("..", joinpath("..", "SelectedFormulasRaw.txt"))
+    selectedFile = "SelectedFormulasRaw.txt"
+
+    resultsPath = joinpath("..", joinpath("..", joinpath("validated-Peregrine", joinpath(language, joinpath(string(n), "formulas 0")))))
+    # VScode path
+    resultsPath = joinpath("validated-Peregrine", joinpath(language, joinpath(string(n), "formulas 0")))
+
+    resultsFile = joinpath(resultsPath, "selected.txt")
 
     if !isdir(resultsPath)
         mkpath(resultsPath)
     end
-
-    resultsPath = joinpath("..", joinpath("..", joinpath("validated-Peregrine", joinpath(language, joinpath(string(n), "formulas 0")))))
-    # VScode path
-    # resultsPath = joinpath("validated-Peregrine", joinpath(language, joinpath(string(n), "formulas 0")))
-
-    resultsFile = joinpath(resultsPath, "selected.txt")
 
     open(selectedFile, "r") do sFile
         for formula in eachline(sFile)
@@ -259,6 +262,6 @@ end
 
 # prepareJobArrayScripts()
 # prepareJobArrayScriptsContinued()
-prepareJobArrayScriptsSelected()
+# prepareJobArrayScriptsSelected()
 
 end #module
