@@ -1,4 +1,5 @@
 
+from codecs import ignore_errors
 import pandas as pd
 import numpy as np 
 import os
@@ -98,15 +99,38 @@ class Extractor():
         validity = [f'{a}_{b}' for a in valexact for b in self.options_col]
         return [f'{a}_{b}' for a in self.val_option_col for b in validity]
     
-    def process_col(self, df, l, n):
+    def pad_with_nan(self, df, is_selected=False):
+        if not is_selected:
+            nPad = 100 - df.shape[0]
+        else:
+            nPad = 49 - df.shape[0]
+
+        pad = [np.nan]*nPad
+        df = df.append(pad, ignore_index=True)
+        return df
+    
+    def round_frame(self, x):
+        if x >= 2500:
+            return 1
+        else:
+            return 0
+
+    def round_model(self, x):
+        if x >= 250:
+            return 1
+        else:
+            return 0
+    
+    def process_col(self, df, l, n, is_selected=False):
         # made only for peregrine validated
         col_to_drop = ["total_models", "time_models", "total_frames", "total_valuations", "time_frames"]
         df.drop(col_to_drop, axis=1, inplace=True)
         out = pd.DataFrame(columns=self.get_col_per_l_n(l,n))
-        out[f"frame_{l}_{n}_exact"] = df["models"]
-        out[f"frame_{l}_{n}_rounded"] = 
-        out[f"model_{l}_{n}_exact"] = df["frames"]
-        out[f"model_{l}_{n}_rounded"] = 
+        out[f"frame_{l}_{n}_exact"] = self.pad_with_nan(df["frames"], is_selected)
+        out[f"frame_{l}_{n}_rounded"] = out[f"frame_{l}_{n}_exact"].apply(self.round_frame)
+        out[f"model_{l}_{n}_exact"] = self.pad_with_nan(df["models"], is_selected)
+        out[f"model_{l}_{n}_rounded"] = out[f"model_{l}_{n}_exact"].apply(self.round_model)
+        return out
 
 
     def extract_validation(self):
@@ -119,10 +143,9 @@ class Extractor():
                     for depth in self.depths:
                         file = os.path.join(self.validated_path, str(language), str(n), f"formulas {formulaSet}", f"depth {depth}.txt")
                         data = self.read_txt(file, data_col)
-
-
-                        df_l = df_l.append(data, ignore_index=True)
-
+                        data = self.process_col(data, language, n)
+                        df_ln = df_ln.append(data, ignore_index=True)
+                
                 file = os.path.join(self.asymptotic_path, str(language), str(n), "formulas 0", "selected.txt")
                 data = self.read_txt(file, col)
                 df_l = df_l.append(data, ignore_index=True)
