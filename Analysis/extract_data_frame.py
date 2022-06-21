@@ -145,16 +145,23 @@ class Extractor():
                         data = self.read_txt(file, data_col)
                         data = self.process_col(data, language, n)
                         df_ln = df_ln.append(data, ignore_index=True)
-                
-                file = os.path.join(self.asymptotic_path, str(language), str(n), "formulas 0", "selected.txt")
+
+                file = os.path.join(self.validated_path, str(language), str(n), "formulas 0", "selected.txt")
                 data = self.read_txt(file, col)
-                df_l = df_l.append(data, ignore_index=True)
-                self.add_col(df_l)
-        pass
+                data = self.process_col(data, language, n, True)
+                df_ln = df_ln.append(data, ignore_index=True)
+                self.add_col(df_ln)
     
+    def change_to_bool(self, x):
+        if x in ["True", "true"]:
+            return True
+        if x in ["False", "false"]:
+            return False
+        return x
 
+    def convert_to_bool(self):
+        self.df = self.df.apply(self.change_to_bool)
         
-
     def extract(self):
         # just the formulas
         # asymptotic model experiment
@@ -163,6 +170,8 @@ class Extractor():
         self.extract_formulas()
         self.extract_metaData()
         self.extract_asymptotic()
+        self.extract_validation()
+        self.convert_to_bool()
         #convert all true false to 0 1
         print(e.get_df())
 
