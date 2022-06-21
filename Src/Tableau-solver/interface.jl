@@ -174,7 +174,7 @@ function isTautology(formula::Tree, constrains::String)
 end
 
 function isContradiction(formula::Tree, constrains::String)
-    return Interface.validate(premise=formula,constraints = constrains)
+    return Interface.validate(premise=formula, constraints = constrains)
 end
 
 function isTautOrCont(formula::Tree, constrains::String)
