@@ -1,0 +1,72 @@
+ERROR: LoadError: SystemError: opening file "Src/Experiment/selectedExperiment1.jl": No such file or directory
+Stacktrace:
+  [1] systemerror(p::String, errno::Int32; extrainfo::Nothing)
+    @ Base ./error.jl:174
+  [2] #systemerror#68
+    @ ./error.jl:173 [inlined]
+  [3] systemerror
+    @ ./error.jl:173 [inlined]
+  [4] open(fname::String; lock::Bool, read::Nothing, write::Nothing, create::Nothing, truncate::Bool, append::Nothing)
+    @ Base ./iostream.jl:293
+  [5] open(fname::String, mode::String; lock::Bool)
+    @ Base ./iostream.jl:355
+  [6] open(fname::String, mode::String)
+    @ Base ./iostream.jl:355
+  [7] open(::Main.ExperimentalSetup.var"#23#24"{Int64, String}, ::String, ::Vararg{String}; kwargs::Base.Pairs{Symbol, Union{}, Tuple{}, NamedTuple{(), Tuple{}}})
+    @ Base ./io.jl:328
+  [8] open
+    @ ./io.jl:328 [inlined]
+  [9] prepareJobArrayScriptsSelected(languages::Vector{String}, nodes::Vector{Int64})
+    @ Main.ExperimentalSetup ~/zero-one-laws/Src/Experiment/experimentalSetup.jl:251
+ [10] prepareJobArrayScriptsSelected()
+    @ Main.ExperimentalSetup ~/zero-one-laws/Src/Experiment/experimentalSetup.jl:243
+ [11] top-level scope
+    @ ~/zero-one-laws/Src/Experiment/experimentalSetup.jl:262
+ [12] include(fname::String)
+    @ Base.MainInclude ./client.jl:451
+ [13] top-level scope
+    @ ~/zero-one-laws/Src/Experiment/finishExperiment20.jl:1
+in expression starting at /home/s3986209/zero-one-laws/Src/Experiment/experimentalSetup.jl:1
+in expression starting at /home/s3986209/zero-one-laws/Src/Experiment/finishExperiment20.jl:1
+
+
+###############################################################################
+Peregrine Cluster
+Job 24737087 for user 's3986209'
+Finished at: Mon Jun 20 18:49:01 CEST 2022
+
+Job details:
+============
+
+Job ID              : 24737061_20
+Name                : zero-one-laws-sim-finish-experiment
+User                : s3986209
+Partition           : regular
+Nodes               : pg-node202
+Number of Nodes     : 1
+Cores               : 1
+Number of Tasks     : 1
+State               : FAILED
+Submit              : 2022-06-20T18:48:02
+Start               : 2022-06-20T18:48:52
+End                 : 2022-06-20T18:49:00
+Reserved walltime   : 3-00:00:00
+Used walltime       :   00:00:08
+Used CPU time       :   00:00:04 (efficiency: 55.64%)
+% User (Computation): 87.73%
+% System (I/O)      : 12.24%
+Mem reserved        : 2G
+Max Mem (Node/step) : 0.00  (Node unknown, N/A)
+Full Max Mem usage  : 0.00 
+Total Disk Read     : 0.00 
+Total Disk Write    : 0.00 
+
+
+Acknowledgements:
+=================
+
+Please see this page for information about acknowledging Peregrine in your publications:
+
+https://wiki.hpc.rug.nl/peregrine/introduction/scientific_output
+
+################################################################################
