@@ -36,7 +36,10 @@ class Extractor():
         self.df = pd.DataFrame(columns=self.formula_col)
     
     def read_txt(self, path, columns):
-        df = pd.read_csv(path, sep=',',header=None)
+        try:
+            df = pd.read_csv(path, sep=',',header=None)
+        except:
+            df = pd.DataFrame(np.empty((100, 7)))
         df.columns = columns
         return df
 
@@ -172,7 +175,7 @@ class Extractor():
         self.extract_metaData()
         self.extract_asymptotic()
         self.extract_validation()
-        self.convert_to_bool() #convert all true false to 0 1
+        # self.convert_to_bool() #convert all true false to 0 1
         print(e.get_df())
         self.save()
 
