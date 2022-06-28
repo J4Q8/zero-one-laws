@@ -173,8 +173,9 @@ class Extractor():
     def extract(self):
         self.extract_formulas()
         self.extract_metaData()
+        # depth does not work
         self.extract_asymptotic()
-        self.extract_validation()
+        self.extract_validation() # check the slope, to see if 0 or 1, compare to model checker
         # self.convert_to_bool() #convert all true false to 0 1
         print(e.get_df())
         self.save()
