@@ -4,6 +4,8 @@ import pandas as pd
 import numpy as np 
 import os
 
+from torch import index_copy
+
 class Extractor():
     def __init__(self) -> None:
         self.asymptotic_path = "asymptoticModelExperiment"
@@ -106,7 +108,7 @@ class Extractor():
             nPad = 49 - df.shape[0]
 
         pad = [np.nan]*nPad
-        df = df.append(pad, ignore_index=True)
+        df = df.append(pd.Series(pad, dtype='float64'), ignore_index=True)
         return df
     
     def round_frame(self, x):
@@ -126,9 +128,9 @@ class Extractor():
         col_to_drop = ["total_models", "time_models", "total_frames", "total_valuations", "time_frames"]
         df.drop(col_to_drop, axis=1, inplace=True)
         out = pd.DataFrame(columns=self.get_col_per_l_n(l,n))
-        out[f"frame_{l}_{n}_exact"] = self.pad_with_nan(df["frames"], is_selected)
+        out[f"frame_{l}_{n}_exact"] = self.pad_with_nan(pd.to_numeric(df["frames"]), is_selected)
         out[f"frame_{l}_{n}_rounded"] = out[f"frame_{l}_{n}_exact"].apply(self.round_frame)
-        out[f"model_{l}_{n}_exact"] = self.pad_with_nan(df["models"], is_selected)
+        out[f"model_{l}_{n}_exact"] = self.pad_with_nan(pd.to_numeric(df["models"]), is_selected)
         out[f"model_{l}_{n}_rounded"] = out[f"model_{l}_{n}_exact"].apply(self.round_model)
         return out
 
@@ -145,35 +147,34 @@ class Extractor():
                         data = self.read_txt(file, data_col)
                         data = self.process_col(data, language, n)
                         df_ln = df_ln.append(data, ignore_index=True)
-                
-                file = os.path.join(self.asymptotic_path, str(language), str(n), "formulas 0", "selected.txt")
-                data = self.read_txt(file, col)
-                df_l = df_l.append(data, ignore_index=True)
-                self.add_col(df_l)
-        pass
+
+                file = os.path.join(self.validated_path, str(language), str(n), "formulas 0", "selected.txt")
+                data = self.read_txt(file, data_col)
+                data = self.process_col(data, language, n, True)
+                df_ln = df_ln.append(data, ignore_index=True)
+                self.add_col(df_ln)
     
+    def change_to_bool(self, x):
+        if x in ["True", "true"]:
+            return 1
+        if x in ["False", "false"]:
+            return 0
+        return x
 
+    def convert_to_bool(self):
+        self.df = self.df.apply(self.change_to_bool)
+
+    def save(self, path = os.path.join("Analysis", "dataset.xlsx")):
+        self.df.to_excel(path, index=False)
         
-
     def extract(self):
-        # just the formulas
-        # asymptotic model experiment
-        # selected formulas
-        #
         self.extract_formulas()
         self.extract_metaData()
         self.extract_asymptotic()
-        #convert all true false to 0 1
+        self.extract_validation()
+        self.convert_to_bool() #convert all true false to 0 1
         print(e.get_df())
+        self.save()
 
 e = Extractor()
 e.extract()
-
-# >>> df = pd.DataFrame(columns=['a','b','c','d'], index=['x','y','z'])  
-# >>> df.loc['y'] = pd.Series({'a':1, 'b':5, 'c':2})                      
-# >>> df
-#      a    b    c    d
-# x  NaN  NaN  NaN  NaN
-# y  1.0  5.0  2.0  NaN
-# z  NaN  NaN  NaN  NaN
-# >>> pd.concat([df,df2], ignore_index=True) 
