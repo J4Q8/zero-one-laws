@@ -2,4 +2,4 @@ include("experimentalSetup.jl")
 
 using .ExperimentalSetup
 
-runExperiment("s4", 72, 1)
+runExperiment("k4", 72, 3)
