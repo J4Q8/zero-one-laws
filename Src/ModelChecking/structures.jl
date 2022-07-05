@@ -88,7 +88,12 @@ end
 function applyReflexivity!(mat::BitMatrix, sparse::Bool = false)
     n = size(mat)[1]
     if sparse
-        mat[diagind(mat)] = bitrand(n)
+        r = BitArray([true, false])
+        rep = repeat(r,floor(Int, n/2))
+        if length(rep) != n
+            rep = [rep;true]
+        end
+        mat[diagind(mat)] = rep #bitrand(n)
     else
         mat[diagind(mat)] .= true
     end
