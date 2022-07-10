@@ -3,6 +3,7 @@ from codecs import ignore_errors
 import pandas as pd
 import numpy as np 
 import os
+from sympy import true
 
 from torch import index_copy
 
@@ -72,15 +73,18 @@ class Extractor():
         for formulaSet in self.batches:
             for depth in self.depths:
                 file = os.path.join(self.formulas_path, f"metaData {formulaSet}", f"depth {depth}.txt")
-                data = self.read_txt(file, self.metadata_col)
+                data = self.read_txt(file, self.metadata_col).astype("string")
+                print(data.iloc[0].dtype)
                 df = df.append(data, ignore_index=True)
-                df2 = df2.append([depth]*df.shape[0], ignore_index=True)
+                depthpd = pd.DataFrame([depth]*data.shape[0], columns=self.metadata2_col)
+                df2 = df2.append(depthpd, ignore_index=True)
 
         # get metaData of selected formulas
         file = self.selected_formulas_meta_file
         data = self.read_txt(file, self.metadata_col)
         df = df.append(data, ignore_index=True)
-        df2 = df2.append([depth]*df.shape[0], ignore_index=True)
+        depthpd = pd.DataFrame([depth]*data.shape[0], columns=self.metadata2_col)
+        df2 = df2.append(depthpd, ignore_index=True)
 
         self.add_col(df)
         self.add_col(df2)
@@ -108,7 +112,7 @@ class Extractor():
         if not is_selected:
             nPad = 100 - df.shape[0]
         else:
-            nPad = 49 - df.shape[0]
+            nPad = 47 - df.shape[0]
 
         pad = [np.nan]*nPad
         df = df.append(pd.Series(pad, dtype='float64'), ignore_index=True)
@@ -158,14 +162,14 @@ class Extractor():
                 self.add_col(df_ln)
     
     def change_to_bool(self, x):
-        if x in ["True", "true"]:
+        if x in ["True", "true", " true", "TRUE", True]:
             return 1
-        if x in ["False", "false"]:
+        if x in ["False", "false", " false", "FALSE", False]:
             return 0
         return x
 
     def convert_to_bool(self):
-        self.df = self.df.apply(self.change_to_bool)
+        self.df = self.df.applymap(self.change_to_bool)
 
     def save(self, path = os.path.join("Analysis", "dataset.xlsx")):
         self.df.to_excel(path, index=False)
@@ -176,9 +180,12 @@ class Extractor():
         # depth does not work
         self.extract_asymptotic()
         self.extract_validation() # check the slope, to see if 0 or 1, compare to model checker
-        # self.convert_to_bool() #convert all true false to 0 1
+        self.convert_to_bool() #convert all true false to 0 1
         print(e.get_df())
         self.save()
+
+        # to get least squares I can use apply rowwise 
+        # https://www.delftstack.com/howto/python-pandas/pandas-create-column-based-on-other-columns/
 
 e = Extractor()
 e.extract()
