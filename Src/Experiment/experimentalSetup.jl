@@ -260,8 +260,8 @@ function prepareJobArrayScriptsSelected(languages::Vector{String} = ["gl", "k4",
     end
 end
 
-prepareJobArrayScripts()
+# prepareJobArrayScripts()
 # prepareJobArrayScriptsContinued()
-prepareJobArrayScriptsSelected()
+# prepareJobArrayScriptsSelected()
 
 end #module
