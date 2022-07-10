@@ -288,4 +288,31 @@ function runGenerator(nBatches::Int64 = 1, amountPerDepth::Int64=1000, minDepth:
     end
 end
 
+function getSelectedFormulasMetaData()
+    selectedFormulaFile = "SelectedFormulasRaw.txt"
+    selectedFormulaMetaFile = "SelectedFormulasMetaData.txt"
+
+    open(selectedFormulaFile, "r") do io
+        selectedFormulas = readlines(io)
+        print
+        for formula in selectedFormulas
+            formula = Interface.parseFormula(formula)
+            res = timeLimitedTautOrContALL(formula)
+            # return nothing if a formula is Taut or Cont in all three languages
+            if isnothing(res)
+                open(selectedFormulaMetaFile, "a") do io
+                    write(io, ",,,,,\n")
+                end
+            else
+                open(selectedFormulaMetaFile, "a") do io
+                    writeMetaData(io, res)
+                end
+                continue
+            end
+        end
+    end
+end
+
+getSelectedFormulasMetaData()
+
 end #module

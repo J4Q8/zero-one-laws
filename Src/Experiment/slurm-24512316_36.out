@@ -1,0 +1,2 @@
+slurmstepd: error: *** JOB 24512316 ON pg-node007 CANCELLED AT 2022-06-18T14:09:39 DUE TO TIME LIMIT ***
+slurmstepd: error: acct_gather_profile/influxdb _send_data: curl_easy_perform failed to send data (discarded). Reason: Failure when receiving data from the peer

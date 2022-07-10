@@ -3,15 +3,15 @@ include(joinpath("..", joinpath("..", joinpath("FormulaUtils","trees.jl"))))
 include(joinpath("..", joinpath("..", joinpath("FormulaUtils","cleaner.jl"))))
 include(joinpath("..", joinpath("..", joinpath("FormulaUtils","parser.jl"))))
 include(joinpath("..", joinpath("..", joinpath("FormulaUtils","simplifier.jl"))))
-include(joinpath("..", "GeneralStructures.jl"))
+include(joinpath("..", "Structures.jl"))
 include("generalModelCheckerNoCache.jl")
 
 using Test
 using .Trees
 using .Parser
 using .Simplifier
-using .GeneralStructures
-using .GeneralModelChecker
+using .Structures
+using .ModelChecker
 
 
 function isValidModel(formula::String, language::String = "gl")

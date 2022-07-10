@@ -426,7 +426,7 @@ function isInfPossible(constraints::Vector{Char})
     return false
 end
 
-function timeLimitExceeded(startTime::UInt64, timeLimit::Int64 = 30)
+function timeLimitExceeded(startTime::UInt64, timeLimit::Int64 = 30) #should be 30 (in sec)
     endTime = time_ns()
     if (endTime - startTime)*1e-9 > timeLimit
         return true
