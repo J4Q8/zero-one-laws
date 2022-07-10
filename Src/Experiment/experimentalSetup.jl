@@ -260,6 +260,15 @@ function prepareJobArrayScriptsSelected(languages::Vector{String} = ["gl", "k4",
     end
 end
 
+function runAllSelected(languages::Vector{String} = ["gl", "k4", "s4"], nodes::Vector{Int64} = collect(40:8:80))
+
+    for l in languages, n in nodes
+        runSelectedFormulasExperiment(l, n)
+    end
+end
+
+runAllSelected()
+
 # prepareJobArrayScripts()
 # prepareJobArrayScriptsContinued()
 # prepareJobArrayScriptsSelected()
