@@ -133,11 +133,11 @@ function runSelectedFormulasExperiment(language::String, n::Int64, infinitePrope
     
     selectedFile = joinpath("..", joinpath("..", "SelectedFormulasRaw.txt"))
     # VScode path
-    # selectedFile = "SelectedFormulasRaw.txt"
+    selectedFile = "SelectedFormulasRaw.txt"
 
     resultsPath = joinpath("..", joinpath("..", joinpath("validated-Peregrine", joinpath(language, joinpath(string(n), "formulas 0")))))
     # VScode path
-    # resultsPath = joinpath("validated-Peregrine", joinpath(language, joinpath(string(n), "formulas 0")))
+    resultsPath = joinpath("validated-Peregrine", joinpath(language, joinpath(string(n), "formulas 0")))
 
     resultsFile = joinpath(resultsPath, "selected.txt")
 
