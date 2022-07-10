@@ -218,7 +218,7 @@ function prepareJobArrayScripts(languages::Vector{String} = ["gl", "k4", "s4"], 
         open(file, "w") do io
             incl = """include("experimentalSetup.jl")\n\n"""
             use = "using .ExperimentalSetup\n\n"
-            command = "runExperiment(\"" * l *"\", "*string(n)*", "*string(f)*")\n"
+            command = "runExperiment(\"" * l *"\", "*string(n)*", "*string(f)*", false)\n"
             write(io, incl*use*command)
         end
     end
@@ -254,14 +254,14 @@ function prepareJobArrayScriptsSelected(languages::Vector{String} = ["gl", "k4",
         open(file, "w") do io
             incl = """include("experimentalSetup.jl")\n\n"""
             use = "using .ExperimentalSetup\n\n"
-            command = "runSelectedFormulasExperiment(\"" * l *"\", "*string(n)*")\n"
+            command = "runSelectedFormulasExperiment(\"" * l *"\", "*string(n)*", false)\n"
             write(io, incl*use*command)
         end
     end
 end
 
-# prepareJobArrayScripts()
+prepareJobArrayScripts()
 # prepareJobArrayScriptsContinued()
-# prepareJobArrayScriptsSelected()
+prepareJobArrayScriptsSelected()
 
 end #module

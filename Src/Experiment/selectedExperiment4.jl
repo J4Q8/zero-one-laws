@@ -2,4 +2,4 @@ include("experimentalSetup.jl")
 
 using .ExperimentalSetup
 
-runSelectedFormulasExperiment("gl", 64)
+runSelectedFormulasExperiment("gl", 64, false)
