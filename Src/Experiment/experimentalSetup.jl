@@ -267,7 +267,7 @@ function runAllSelected(languages::Vector{String} = ["gl", "k4", "s4"], nodes::V
     end
 end
 
-runAllSelected()
+# runAllSelected()
 
 # prepareJobArrayScripts()
 # prepareJobArrayScriptsContinued()
