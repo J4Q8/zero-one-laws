@@ -1,0 +1,72 @@
+ERROR: LoadError: SystemError: opening file "Src/Experiment/experiment1.jl": No such file or directory
+Stacktrace:
+  [1] systemerror(p::String, errno::Int32; extrainfo::Nothing)
+    @ Base ./error.jl:174
+  [2] #systemerror#68
+    @ ./error.jl:173 [inlined]
+  [3] systemerror
+    @ ./error.jl:173 [inlined]
+  [4] open(fname::String; lock::Bool, read::Nothing, write::Nothing, create::Nothing, truncate::Bool, append::Nothing)
+    @ Base ./iostream.jl:293
+  [5] open(fname::String, mode::String; lock::Bool)
+    @ Base ./iostream.jl:355
+  [6] open(fname::String, mode::String)
+    @ Base ./iostream.jl:355
+  [7] open(::Main.ExperimentalSetup.var"#19#20"{Int64, Int64, String}, ::String, ::Vararg{String}; kwargs::Base.Pairs{Symbol, Union{}, Tuple{}, NamedTuple{(), Tuple{}}})
+    @ Base ./io.jl:328
+  [8] open
+    @ ./io.jl:328 [inlined]
+  [9] prepareJobArrayScripts(languages::Vector{String}, nodes::Vector{Int64}, formulaSets::Vector{Int64})
+    @ Main.ExperimentalSetup ~/zero-one-laws-verification/zero-one-laws/Src/Experiment/experimentalSetup.jl:218
+ [10] prepareJobArrayScripts(languages::Vector{String})
+    @ Main.ExperimentalSetup ~/zero-one-laws-verification/zero-one-laws/Src/Experiment/experimentalSetup.jl:210
+ [11] top-level scope
+    @ ~/zero-one-laws-verification/zero-one-laws/Src/Experiment/experimentalSetup.jl:263
+ [12] include(fname::String)
+    @ Base.MainInclude ./client.jl:451
+ [13] top-level scope
+    @ ~/zero-one-laws-verification/zero-one-laws/Src/Experiment/experiment32.jl:1
+in expression starting at /home/s3986209/zero-one-laws-verification/zero-one-laws/Src/Experiment/experimentalSetup.jl:1
+in expression starting at /home/s3986209/zero-one-laws-verification/zero-one-laws/Src/Experiment/experiment32.jl:1
+
+
+###############################################################################
+Peregrine Cluster
+Job 25023194 for user 's3986209'
+Finished at: Wed Jul  6 11:28:47 CEST 2022
+
+Job details:
+============
+
+Job ID              : 25013301_32
+Name                : simulation-verification
+User                : s3986209
+Partition           : regular
+Nodes               : pg-node111
+Number of Nodes     : 1
+Cores               : 1
+Number of Tasks     : 1
+State               : FAILED
+Submit              : 2022-07-05T17:19:46
+Start               : 2022-07-06T11:28:37
+End                 : 2022-07-06T11:28:47
+Reserved walltime   : 10-00:00:00
+Used walltime       :    00:00:10
+Used CPU time       :    00:00:04 (efficiency: 41.96%)
+% User (Computation): 86.34%
+% System (I/O)      : 13.63%
+Mem reserved        : 2G
+Max Mem (Node/step) : 0.00  (Node unknown, N/A)
+Full Max Mem usage  : 0.00 
+Total Disk Read     : 0.00 
+Total Disk Write    : 0.00 
+
+
+Acknowledgements:
+=================
+
+Please see this page for information about acknowledging Peregrine in your publications:
+
+https://wiki.hpc.rug.nl/peregrine/introduction/scientific_output
+
+################################################################################

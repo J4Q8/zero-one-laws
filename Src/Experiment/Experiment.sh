@@ -1,10 +1,10 @@
 #!/bin/bash
 #SBATCH --job-name=simulation-verification
-#SBATCH --time=10-00:00:00
+#SBATCH --time=3-00:00:00
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1
 #SBATCH --mem-per-cpu=2gb
-#SBATCH --array=1-180
+#SBATCH --array=1-60
 
 
 module purge
