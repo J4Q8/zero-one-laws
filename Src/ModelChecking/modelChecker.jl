@@ -179,10 +179,10 @@ function checkFrameValidity(model::Structure, formula::Tree, nValuations::Int64)
     return true
 end
 
-function serialCheckModelValidity(formula::Tree, language::String, nodes::Int64, nModels::Int64)
+function serialCheckModelValidity(formula::Tree, language::String, nodes::Int64, nModels::Int64, infiniteProperties::Bool)
     validCount = 0
     for _ in 1:nModels
-        model = generateModel(nodes, language)
+        model = generateModel(nodes, language, infiniteProperties)
         if checkModelValidity!(model, formula)
             validCount = validCount + 1
         end
@@ -190,10 +190,10 @@ function serialCheckModelValidity(formula::Tree, language::String, nodes::Int64,
     return validCount
 end
 
-function serialCheckFrameValidity(formula::Tree, language::String, nodes::Int64, nModels::Int64, nFrames::Int64, returnCounts::Bool = false)
+function serialCheckFrameValidity(formula::Tree, language::String, nodes::Int64, nModels::Int64, nFrames::Int64, infiniteProperties::Bool)
     validCount = 0
     for _ in 1:nFrames
-        frame = generateFrame(nodes, language)
+        frame = generateFrame(nodes, language, infiniteProperties)
         if checkFrameValidity(frame, formula, nModels)
             validCount = validCount + 1
         end

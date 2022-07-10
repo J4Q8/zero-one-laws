@@ -24,17 +24,17 @@ function writeResultsData(rFile::IOStream, results::Vector{Float64})
     write(rFile, rData*"\n")
 end
 
-function processFormula(formula::String, resultsFile::String, language::String, n::Int64, nModels::Int64, nFrames::Int64, nValuations::Int64)
+function processFormula(formula::String, resultsFile::String, language::String, n::Int64, nModels::Int64, nFrames::Int64, nValuations::Int64, infiniteProperties::Bool = true)
     #convert formula to tree
     formula = parseFormula(formula)
 
     #check formula in models and frames
     st_time_model = time_ns()
-    modelCount = serialCheckModelValidity(formula, language, n, nModels)
+    modelCount = serialCheckModelValidity(formula, language, n, nModels, infiniteProperties)
     elapsed_time_model = (time_ns() - st_time_model)/1e9
 
     st_time_frame = time_ns()
-    frameCount = serialCheckFrameValidity(formula, language, n, nValuations, nFrames)
+    frameCount = serialCheckFrameValidity(formula, language, n, nValuations, nFrames, infiniteProperties)
     elapsed_time_frame = (time_ns() - st_time_frame)/1e9
 
     results = [modelCount, nModels, elapsed_time_model, frameCount, nFrames, nValuations, elapsed_time_frame]
@@ -57,7 +57,7 @@ function processFormulaInAsymptoticModel(formula::String, resultsFile::String, l
     end
 end
 
-function runExperiment(language::String, n::Int64, formulaSet::Int64, nModels::Int64 = 5000, nFrames::Int64 = 500, nValuations::Int64 = 50)
+function runExperiment(language::String, n::Int64, formulaSet::Int64, infiniteProperties::Bool = true, nModels::Int64 = 5000, nFrames::Int64 = 500, nValuations::Int64 = 50)
 
     formulaRange = 6:13
     formulaPath = joinpath("..", joinpath("..", joinpath("generated", "formulas "*string(formulaSet))))
@@ -77,7 +77,7 @@ function runExperiment(language::String, n::Int64, formulaSet::Int64, nModels::I
 
         open(formulaFile, "r") do fFile
             for formula in eachline(fFile)
-                processFormula(formula, resultsFile, language, n, nModels, nFrames, nValuations)
+                processFormula(formula, resultsFile, language, n, nModels, nFrames, nValuations, infiniteProperties)
             end
         end
     end
@@ -94,7 +94,7 @@ function getNumberOfValidatedFormulas(file::String)
     return length(lines)
 end
 
-function finishExperiment(language::String, nodes::Int64, formulaSet::Int64, nModels::Int64 = 5000, nFrames::Int64 = 500, nValuations::Int64 = 50)
+function finishExperiment(language::String, nodes::Int64, formulaSet::Int64, infiniteProperties::Bool, nModels::Int64 = 5000, nFrames::Int64 = 500, nValuations::Int64 = 50)
     formulaRange = 6:13
     formulaPath = joinpath("..", joinpath("..", joinpath("generated", "formulas "*string(formulaSet))))
     # VScode path
@@ -123,13 +123,13 @@ function finishExperiment(language::String, nodes::Int64, formulaSet::Int64, nMo
                     continue
                 end
 
-                processFormula(formula, resultsFile, language, nodes, nModels, nFrames, nValuations)
+                processFormula(formula, resultsFile, language, nodes, nModels, nFrames, nValuations, infiniteProperties)
             end
         end
     end
 end
 
-function runSelectedFormulasExperiment(language::String, n::Int64, nModels::Int64 = 5000, nFrames::Int64 = 500, nValuations::Int64 = 50)
+function runSelectedFormulasExperiment(language::String, n::Int64, infiniteProperties::Bool = true, nModels::Int64 = 5000, nFrames::Int64 = 500, nValuations::Int64 = 50)
     
     selectedFile = joinpath("..", joinpath("..", "SelectedFormulasRaw.txt"))
     # VScode path
@@ -147,7 +147,7 @@ function runSelectedFormulasExperiment(language::String, n::Int64, nModels::Int6
 
     open(selectedFile, "r") do sFile
         for formula in eachline(sFile)
-            processFormula(formula, resultsFile, language, n, nModels, nFrames, nValuations)
+            processFormula(formula, resultsFile, language, n, nModels, nFrames, nValuations, infiniteProperties)
         end
     end
 end

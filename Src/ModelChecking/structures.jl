@@ -38,7 +38,7 @@ function generateRandomFrame(nStates::Int64, language::String = nothing)
     return Structure(G, worlds)
 end
 
-function generateFrame(n::Int64, language::String)
+function generateFrame(n::Int64, language::String, infiniteProperties::Bool = true)
     # generates KR frame
 
     # n is a total number of states layers will have n/4, n/2, n/4 elements
@@ -46,15 +46,19 @@ function generateFrame(n::Int64, language::String)
     G = falses(n, n)
 
     r12 = bitrand(m, 2m)
-    # first layer points cannot be endpoints
-    while !minimum(maximum.(eachrow(r12))) || !minimum(maximum.(eachcol(r12)))
-        r12 = bitrand(m, 2m)
+    if infiniteProperties
+        # first layer points cannot be endpoints
+        while !minimum(maximum.(eachrow(r12))) || !minimum(maximum.(eachcol(r12)))
+            r12 = bitrand(m, 2m)
+        end
     end
 
     r23 = bitrand(2m, m)
-    # neither can be those in second layer
-    while !minimum(maximum.(eachrow(r23))) || !minimum(maximum.(eachcol(r23)))
-        r23 = bitrand(2m, m)
+    if infiniteProperties
+        # neither can be those in second layer
+        while !minimum(maximum.(eachrow(r23))) || !minimum(maximum.(eachcol(r23)))
+            r23 = bitrand(2m, m)
+        end
     end
 
     G[1:m, m+1:3m] .= G[1:m, m+1:3m] .|| r12
@@ -78,9 +82,9 @@ function generateFrame(n::Int64, language::String)
     return Structure(G, worlds)
 end
 
-function generateModel(n::Int64, language::String)
+function generateModel(n::Int64, language::String, infiniteProperties::Bool = true)
     # again KR model
-    frame = generateFrame(n, language)
+    frame = generateFrame(n, language, infiniteProperties)
     addRandomValuations!(frame)
     return frame
 end
