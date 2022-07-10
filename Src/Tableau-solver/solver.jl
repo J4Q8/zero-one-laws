@@ -467,6 +467,10 @@ end
 function solve!(tableau::Tableau, constraints::Vector{Char}, mode::Int64 = 1)
     #mode == 1 : print, no return
     #mode == 2 : no print, return
+
+    if 'c' ∈ constraints && 't' ∈ constraints
+        deleteat!(constraints, findall(x->x=='t',constraints))
+    end
     
     startTime = time_ns()
     while true

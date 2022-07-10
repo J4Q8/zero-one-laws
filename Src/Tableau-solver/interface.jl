@@ -59,8 +59,7 @@ end
 function parseConstraints(constraint::String)
     restrictions = Char[]
     if constraint == "gl"
-        push!(restrictions, 'c')
-        push!(restrictions, 't')
+        push!(restrictions, 'c') # the rules for converse well founded already have transitivity
     elseif constraint == "s4"
         push!(restrictions, 't')
         push!(restrictions, 'r')
