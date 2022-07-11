@@ -7,7 +7,7 @@ using ..Structures
 
 export checkModelValidity!, checkFrameValidity, serialCheckModelValidity, serialCheckFrameValidity
 
-TESTMODE = true
+TESTMODE = false
 
 function checkTF(t::Tree)
     if t.connective in ['⊤','⊥'] && isdefined(t, :left) && isdefined(t, :right)
@@ -15,13 +15,14 @@ function checkTF(t::Tree)
     end
 end
 
-function simplifyInWorldRec(world::Dict{Tree, Char}, formula::Tree)
+function simplifyInWorldRec(world::Dict{Tree, Bool}, formula::Tree)
     if TESTMODE
         checkTF(formula)
     end
 
     if haskey(world, formula)
-        return Tree(world[formula])
+        symbol = world[formula] ? '⊤' : '⊥'
+        return Tree(symbol)
     elseif formula.connective ∉ ['◻', '◇']
         root = Tree(formula.connective)
         if isdefined(formula, :left)
@@ -36,7 +37,7 @@ function simplifyInWorldRec(world::Dict{Tree, Char}, formula::Tree)
     end
 end
 
-function simplifyInWorld(world::Dict{Tree, Char}, formula::Tree)
+function simplifyInWorld(world::Dict{Tree, Bool}, formula::Tree)
     formula = simplifyInWorldRec(world, formula)
     return simplify(formula)
 end
@@ -44,7 +45,7 @@ end
 function cacheFormula!(model::Structure, formula::Tree, world::Int64, result::Bool)
     # IMPORTANT
     # we cache only the children, because the top most formula is never checked again in the same world
-    model.worlds[world][formula] = result ? '⊤' : '⊥'
+    model.worlds[world][formula] = result
 end
 
 function checkConj!(model::Structure, formula::Tree, world::Int64)

@@ -15,7 +15,7 @@ export Structure, generateRandomFrame, generateFrame, generateModel, addRandomVa
 
 mutable struct Structure
     frame::DiGraph
-    worlds::Vector{Dict{Tree, Char}}
+    worlds::Vector{Dict{Tree, Bool}}
 end
 
 function generateRandomFrame(nStates::Int64, language::String = nothing)
@@ -31,7 +31,7 @@ function generateRandomFrame(nStates::Int64, language::String = nothing)
         makeConverseWellFounded!(G)
     end
 
-    worlds = vec([Dict{Tree, Char}() for _ in 1:n])
+    worlds = vec([Dict{Tree, Bool}() for _ in 1:n])
 
     G = DiGraph(G)
 
@@ -75,7 +75,7 @@ function generateFrame(n::Int64, language::String, infiniteProperties::Bool = tr
         applyReflexivity!(G, true)
     end
 
-    worlds = vec([Dict{Tree, Char}() for _ in 1:n])
+    worlds = vec([Dict{Tree, Bool}() for _ in 1:n])
 
     G = DiGraph(G)
 
@@ -90,17 +90,23 @@ function generateModel(n::Int64, language::String, infiniteProperties::Bool = tr
 end
 
 function applyReflexivity!(mat::BitMatrix, sparse::Bool = false)
+    #sparse means that every second world is reflexive if you want to have random reflexive relations use addRandomReflexiveRelations!
     n = size(mat)[1]
     if sparse
         r = BitArray([true, false])
         rep = repeat(r,floor(Int, n/2))
         if length(rep) != n
-            rep = [rep;true]
+            rep = [rep; true]
         end
         mat[diagind(mat)] = rep #bitrand(n)
     else
         mat[diagind(mat)] .= true
     end
+end
+
+function addRandomReflexiveRelations!(mat::BitMatrix)
+    n = size(mat)[1]
+    mat[diagind(mat)] = bitrand(n)
 end
 
 function applyTransitiveClosure!(structure::Structure)
@@ -135,7 +141,7 @@ function addRandomValuations!(frame::Structure, atoms::Vector{Char} = ['p', 'q']
         valuation = bitrand(length(atoms))
         for (v, atom) in enumerate(atoms)
             root = Tree(atom)
-            frame.worlds[idx][root] = valuation[v] ? '⊤' : '⊥' 
+            frame.worlds[idx][root] = valuation[v]
         end
     end
 end
@@ -146,7 +152,7 @@ function addValuations!(frame::Structure, valuations::Vector{Vector{Bool}}, atom
         @assert length(valuation) == length(atoms)
         for (v, atom) in enumerate(atoms)
             root = Tree(atom)
-            frame.worlds[idx][root] = valuation[v] ? '⊤' : '⊥' 
+            frame.worlds[idx][root] = valuation[v]
         end
     end
 end
@@ -165,7 +171,7 @@ function getAsymptoticModel(language::String)
         applyReflexivity!(G, true)
     end
 
-    worlds = vec([Dict{Tree, Char}() for _ in 1:12])
+    worlds = vec([Dict{Tree, Bool}() for _ in 1:12])
     G = DiGraph(G)
     frame = Structure(G, worlds)
 

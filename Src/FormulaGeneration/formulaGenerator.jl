@@ -38,6 +38,43 @@ function getBanned(connective::Char)
     end
 end
 
+function generateFormulaTrivial(depth::Int64, modal::Int64, banned::Vector{Char} = ATOMS)
+
+    if depth == 1
+        choice = sample(ATOMS)
+        leaf = Interface.Tree(choice)
+        return leaf 
+    else
+        possible = [CONNECTIVES; ATOMS]
+        possible = [possible; NEG]
+        if modal > 0
+            possible = [possible; MODALS]
+        end
+        setdiff!(possible, banned)
+        choice = sample(possible)
+        root = Interface.Tree(choice)
+        if choice in NEG
+            # neg does not reset the modal depth, neg T and neg F do not make sense
+            child1 = generateFormula(depth-1, modal, true, Char[])
+            Interface.addrightchild!(root, child1)
+            return root
+        elseif choice in MODALS
+            child1 = generateFormula(depth-1, modal-1, false, Char[])
+            Interface.addrightchild!(root, child1)
+            return root
+        elseif choice in CONNECTIVES
+            child1 = generateFormula(depth-1, modal, false, Char[])
+            child2 = generateFormula(depth-1, modal, false, Char[])
+            Interface.addleftchild!(root, child1)
+            Interface.addrightchild!(root, child2)
+            return root
+        else
+            leaf = Interface.Tree(choice)
+            return leaf
+        end
+    end
+end
+
 function generateFormula(depth::Int64, modal::Int64, prevNeg::Bool, banned::Vector{Char} = ATOMS)
 
     if depth == 1
@@ -129,9 +166,14 @@ function generateFormulaOld(maxdepth::Int64, depth::Int64, modal::Int64, prevNeg
     end
 end
 
-function generateFormulaOfDepth(depth::Int64, maxConseqModal::Int64)
+function generateFormulaOfDepth(depth::Int64, maxConseqModal::Int64, nonTrivial::Bool = true)
     while true
-        f = generateFormula(depth, maxConseqModal, false)
+        if nonTrivial
+            f = generateFormula(depth, maxConseqModal, false)
+        else
+            f = generateFormulaTrivial(depth, maxConseqModal, false)
+        end
+
         if Interface.height(f) >= depth
             return f
         end
@@ -224,6 +266,17 @@ function getPrevFormulas(curBatch::Int64, depth::Int64, path::String)
     return formulas
 end
 
+function generateFormulas(number::Int64, depth::Int64, maxModalDepth::Int64, nonTrivial::Bool)
+    formulas = Interface.Tree[]
+    for n in 1:number
+        formula = generateFormulaOfDepth(depth, maxModalDepth, nonTrivial)
+        while formula ∈ formulas
+            formula = generateFormulaOfDepth(depth, maxModalDepth, nonTrivial)
+        end
+        push!(formulas, formula)
+    end
+end
+
 function runGenerator(nBatches::Int64 = 1, amountPerDepth::Int64=1000, minDepth::Int64 = 6, maxDepth::Int64=13, maxConseqModal::Int64=5, path::String = "generated")
     #=
         minDepth indicates the minimum depth of a tree of a formula.
@@ -298,6 +351,7 @@ function getSelectedFormulasMetaData()
         for formula in selectedFormulas
             formula = Interface.parseFormula(formula)
             res = timeLimitedTautOrContALL(formula)
+            depth = Interface.height(formula)
             # return nothing if a formula is Taut or Cont in all three languages
             if isnothing(res)
                 open(selectedFormulaMetaFile, "a") do io
@@ -305,7 +359,7 @@ function getSelectedFormulasMetaData()
                 end
             else
                 open(selectedFormulaMetaFile, "a") do io
-                    writeMetaData(io, res)
+                    writeMetaData(io, res, depth)
                 end
                 continue
             end
