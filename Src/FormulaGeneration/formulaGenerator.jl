@@ -351,6 +351,7 @@ function getSelectedFormulasMetaData()
         for formula in selectedFormulas
             formula = Interface.parseFormula(formula)
             res = timeLimitedTautOrContALL(formula)
+            depth = Interface.height(formula)
             # return nothing if a formula is Taut or Cont in all three languages
             if isnothing(res)
                 open(selectedFormulaMetaFile, "a") do io
@@ -358,7 +359,7 @@ function getSelectedFormulasMetaData()
                 end
             else
                 open(selectedFormulaMetaFile, "a") do io
-                    writeMetaData(io, res)
+                    writeMetaData(io, res, depth)
                 end
                 continue
             end
