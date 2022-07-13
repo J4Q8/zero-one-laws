@@ -30,7 +30,7 @@ class Extractor():
         self.asymptotic_col = [asymptotic+f"_{l}" for l in self.languages_col]
         self.nodes_col = list(range(40, 81, 8))
         self.val_option_col = ["frame", "model"]
-        self.trends = [f'trend_{a}_{b}' for a in self.languages_col for b in self.val_option_col]
+        self.trends = [f'empirical_val_{a}_{b}' for a in self.languages_col for b in self.val_option_col]
         # self.options_col = ["exact", "rounded"]
 
         valexact = [f'{a}_{b}' for a in self.languages_col for b in self.nodes_col]
@@ -186,10 +186,9 @@ class Extractor():
                         trend = 1
                     else:
                         trend = 0
-                    print(row.to_numpy(), trend)
                     rows.append(trend)
 
-                col = f"trend_{l}_{v}"
+                col = f"empirical_val_{l}_{v}"
                 df = pd.DataFrame(rows, columns=[col])
                 self.add_col(df)
     
@@ -213,7 +212,6 @@ class Extractor():
         self.extract_validation() # check the slope, to see if 0 or 1, compare to model checker
         self.convert_to_bool() #convert all true false to 0 1
         self.get_trends()
-        print(e.get_df())
         self.save()
 
         # to get least squares I can use apply rowwise 
