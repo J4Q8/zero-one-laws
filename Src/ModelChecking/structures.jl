@@ -158,6 +158,26 @@ function addValuations!(frame::Structure, valuations::Vector{Vector{Bool}}, atom
 end
 
 function getAsymptoticModel(language::String)
+
+    if language == "k4"
+        # asymptitic model has 12 nodes
+        G = falses(24, 24)
+        G[1:8, 9:16] .= trues(8, 8) #connections between bottom and middle layer
+        G[9:16, 17:24] .= trues(8,8) #connections between middle and upper layer
+        G[1:8, 17:24] .= trues(8,8) #connections between bottom and upper layer
+
+        applyReflexivity!(G, true)
+
+        worlds = vec([Dict{Tree, Bool}() for _ in 1:24])
+        G = DiGraph(G)
+        frame = Structure(G, worlds)
+
+        val = [[false, false], [false, false], [false, true], [false, true], [true, false], [true, false], [true, true], [true, true]]
+        allVal = repeat(val, 3)
+        addValuations!(frame, allVal)
+        return frame
+    end
+
     # asymptitic model has 12 nodes
     G = falses(12, 12)
     G[1:4, 5:8] .= trues(4, 4) #connections between bottom and middle layer
@@ -167,8 +187,6 @@ function getAsymptoticModel(language::String)
     #add reflexivity and random reflexivity
     if language == "s4"
         applyReflexivity!(G)
-    elseif language == "k4"
-        applyReflexivity!(G, true)
     end
 
     worlds = vec([Dict{Tree, Bool}() for _ in 1:12])
