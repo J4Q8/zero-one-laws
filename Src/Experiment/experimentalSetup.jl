@@ -60,11 +60,11 @@ end
 function runExperiment(language::String, n::Int64, formulaSet::Int64, infiniteProperties::Bool, resultsFolder::String, preselectedValuations::Bool = true, nModels::Int64 = 5000, nFrames::Int64 = 500, nValuations::Int64 = 50)
 
     formulaRange = 6:13
-    formulaPath = joinpath("..", joinpath("..", joinpath("generated", "formulas "*string(formulaSet))))
+    formulaPath = joinpath("..", joinpath("..", joinpath("..", joinpath("generated", "formulas "*string(formulaSet)))))
     # VScode path
     # formulaPath = joinpath("generated", "formulas "*string(formulaSet))
 
-    resultsPath = joinpath("..", joinpath("..", joinpath(resultsFolder, joinpath(language, joinpath(string(n), "formulas "*string(formulaSet))))))
+    resultsPath = joinpath("..", joinpath("..", joinpath("..", joinpath(resultsFolder, joinpath(language, joinpath(string(n), "formulas "*string(formulaSet)))))))
     # VScode path
     # resultsPath = joinpath(resultsFolder, joinpath(language, joinpath(string(n), "formulas "*string(formulaSet))))
 
@@ -97,11 +97,11 @@ end
 
 function finishExperiment(language::String, nodes::Int64, formulaSet::Int64, infiniteProperties::Bool, resultsFolder::String, preselectedValuations::Bool=true, nModels::Int64 = 5000, nFrames::Int64 = 500, nValuations::Int64 = 50)
     formulaRange = 6:13
-    formulaPath = joinpath("..", joinpath("..", joinpath("generated", "formulas "*string(formulaSet))))
+    formulaPath = joinpath("..", joinpath("..", joinpath("..", joinpath("generated", "formulas "*string(formulaSet)))))
     # VScode path
     # formulaPath = joinpath("generated", "formulas "*string(formulaSet))
 
-    resultsPath = joinpath("..", joinpath("..", joinpath(resultsFolder, joinpath(language, joinpath(string(nodes), "formulas "*string(formulaSet))))))
+    resultsPath = joinpath("..", joinpath("..", joinpath("..", joinpath(resultsFolder, joinpath(language, joinpath(string(nodes), "formulas "*string(formulaSet)))))))
     # VScode path
     # resultsPath = joinpath(resultsFolder, joinpath(language, joinpath(string(nodes), "formulas "*string(formulaSet))))
 
@@ -132,11 +132,11 @@ end
 
 function runSelectedFormulasExperiment(language::String, n::Int64, infiniteProperties::Bool, resultsFolder::String, preselectedValuations::Bool=true, nModels::Int64 = 5000, nFrames::Int64 = 500, nValuations::Int64 = 50)
     
-    selectedFile = joinpath("..", joinpath("..", "SelectedFormulasRaw.txt"))
+    selectedFile = joinpath("..", joinpath("..", joinpath("..", "SelectedFormulasRaw.txt")))
     # VScode path
     # selectedFile = "SelectedFormulasRaw.txt"
 
-    resultsPath = joinpath("..", joinpath("..", joinpath(resultsFolder, joinpath(language, joinpath(string(n), "formulas 0")))))
+    resultsPath = joinpath("..", joinpath("..", joinpath("..", joinpath(resultsFolder, joinpath(language, joinpath(string(n), "formulas 0"))))))
     # VScode path
     # resultsPath = joinpath(resultsFolder, joinpath(language, joinpath(string(n), "formulas 0")))
 
