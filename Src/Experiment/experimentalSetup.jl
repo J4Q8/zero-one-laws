@@ -63,6 +63,7 @@ function runExperiment(language::String, n::Int64, formulaSet::Int64, infinitePr
     formulaPath = joinpath("..", joinpath("..", joinpath("generated", "formulas "*string(formulaSet))))
     # VScode path
     # formulaPath = joinpath("generated", "formulas "*string(formulaSet))
+    
     resultsPath = joinpath("..", joinpath("..", joinpath(resultsFolder, joinpath(language, joinpath(string(n), "formulas "*string(formulaSet))))))
     # VScode path
     # resultsPath = joinpath(resultsFolder, joinpath(language, joinpath(string(n), "formulas "*string(formulaSet))))
@@ -231,7 +232,7 @@ function prepareJobArrayScriptsInf(languages::Vector{String} = ["gl", "k4", "s4"
     for f in formulaSets, l in languages, n in nodes
 
         count = count+1
-        file = joinpath(path, "experiment"*string(count)*".jl")
+        file = joinpath(path, "experimentINF"*string(count)*".jl")
 
         open(file, "w") do io
             incl = """include(joinpath("..","experimentalSetup.jl"))\n\n"""
@@ -279,6 +280,24 @@ function prepareJobArrayScriptsSelected(languages::Vector{String} = ["gl", "k4",
     end
 end
 
+function prepareJobArrayScriptsSelectedInf(languages::Vector{String} = ["gl", "k4", "s4"], nodes::Vector{Int64} = collect(40:8:80))
+    path = joinpath("Src", joinpath("Experiment", "Scripts"))
+
+    count = 0
+    for l in languages, n in nodes
+
+        count = count+1
+        file = joinpath(path, "selectedExperimentINF"*string(count)*".jl")
+
+        open(file, "w") do io
+            incl = """include(joinpath("..","experimentalSetup.jl"))\n\n"""
+            use = "using .ExperimentalSetup\n\n"
+            command = "runSelectedFormulasExperiment(\"" * l *"\", "*string(n)*", true, \"validated-Peregrine-inf-prop\")\n"
+            write(io, incl*use*command)
+        end
+    end
+end
+
 function runAllSelected(infiniteProperties::Bool, resultsFolder::String = "validated-Peregrine", languages::Vector{String} = ["gl", "k4", "s4"], nodes::Vector{Int64} = collect(40:8:80))
 
     for l in languages, n in nodes
@@ -291,7 +310,9 @@ end
 
 # prepareJobArrayScripts()
 # prepareJobArrayScriptsInf()
-# prepareJobArrayScriptsContinued()
 # prepareJobArrayScriptsSelected()
+# prepareJobArrayScriptsSelectedInf()
+
+# prepareJobArrayScriptsContinued()
 
 end #module

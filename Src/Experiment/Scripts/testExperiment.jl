@@ -2,4 +2,4 @@ include(joinpath("..","experimentalSetup.jl"))
 
 using .ExperimentalSetup
 
-runSelectedFormulasExperiment("s4", 40)
+runExperiment("s4", 40, 6, false, "validated-Peregrine")
