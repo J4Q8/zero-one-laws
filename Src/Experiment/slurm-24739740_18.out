@@ -1,9 +1,0 @@
-ERROR: LoadError: UndefVarError: resultsPath not defined
-Stacktrace:
- [1] runSelectedFormulasExperiment(language::String, n::Int64, nModels::Int64, nFrames::Int64, nValuations::Int64)
-   @ Main.ExperimentalSetup ~/zero-one-laws/Src/Experiment/experimentalSetup.jl:138
- [2] runSelectedFormulasExperiment(language::String, n::Int64)
-   @ Main.ExperimentalSetup ~/zero-one-laws/Src/Experiment/experimentalSetup.jl:134
- [3] top-level scope
-   @ ~/zero-one-laws/Src/Experiment/selectedExperiment18.jl:5
-in expression starting at /home/s3986209/zero-one-laws/Src/Experiment/selectedExperiment18.jl:5
