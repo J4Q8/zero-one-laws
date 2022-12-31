@@ -2,4 +2,4 @@ include(joinpath("..","experimentalSetup.jl"))
 
 using .ExperimentalSetup
 
-runAsymptoticModelExperiment()
+runSelectedFormulasExperiment("s4", 40)

@@ -24,7 +24,7 @@ function writeResultsData(rFile::IOStream, results::Vector{Float64})
     write(rFile, rData*"\n")
 end
 
-function processFormula(formula::String, resultsFile::String, language::String, n::Int64, nModels::Int64, nFrames::Int64, nValuations::Int64, infiniteProperties::Bool = true)
+function processFormula(formula::String, resultsFile::String, language::String, n::Int64, nModels::Int64, nFrames::Int64, nValuations::Int64, infiniteProperties::Bool, preselectedValuations::Bool)
     #convert formula to tree
     formula = parseFormula(formula)
 
@@ -34,7 +34,7 @@ function processFormula(formula::String, resultsFile::String, language::String, 
     elapsed_time_model = (time_ns() - st_time_model)/1e9
 
     st_time_frame = time_ns()
-    frameCount = serialCheckFrameValidity(formula, language, n, nValuations, nFrames, infiniteProperties)
+    frameCount = serialCheckFrameValidity(formula, language, n, nValuations, nFrames, infiniteProperties, preselectedValuations)
     elapsed_time_frame = (time_ns() - st_time_frame)/1e9
 
     results = [modelCount, nModels, elapsed_time_model, frameCount, nFrames, nValuations, elapsed_time_frame]
@@ -57,15 +57,15 @@ function processFormulaInAsymptoticModel(formula::String, resultsFile::String, l
     end
 end
 
-function runExperiment(language::String, n::Int64, formulaSet::Int64, infiniteProperties::Bool = true, nModels::Int64 = 5000, nFrames::Int64 = 500, nValuations::Int64 = 50)
+function runExperiment(language::String, n::Int64, formulaSet::Int64, infiniteProperties::Bool, resultsFolder::String, preselectedValuations::Bool = true, nModels::Int64 = 5000, nFrames::Int64 = 500, nValuations::Int64 = 50)
 
     formulaRange = 6:13
     formulaPath = joinpath("..", joinpath("..", joinpath("generated", "formulas "*string(formulaSet))))
     # VScode path
     # formulaPath = joinpath("generated", "formulas "*string(formulaSet))
-    resultsPath = joinpath("..", joinpath("..", joinpath("validated-Peregrine", joinpath(language, joinpath(string(n), "formulas "*string(formulaSet))))))
+    resultsPath = joinpath("..", joinpath("..", joinpath(resultsFolder, joinpath(language, joinpath(string(n), "formulas "*string(formulaSet))))))
     # VScode path
-    # resultsPath = joinpath("validated-Peregrine", joinpath(language, joinpath(string(n), "formulas "*string(formulaSet))))
+    # resultsPath = joinpath(resultsFolder, joinpath(language, joinpath(string(n), "formulas "*string(formulaSet))))
 
     if !isdir(resultsPath)
         mkpath(resultsPath)
@@ -77,7 +77,7 @@ function runExperiment(language::String, n::Int64, formulaSet::Int64, infinitePr
 
         open(formulaFile, "r") do fFile
             for formula in eachline(fFile)
-                processFormula(formula, resultsFile, language, n, nModels, nFrames, nValuations, infiniteProperties)
+                processFormula(formula, resultsFile, language, n, nModels, nFrames, nValuations, infiniteProperties, preselectedValuations)
             end
         end
     end
@@ -94,15 +94,15 @@ function getNumberOfValidatedFormulas(file::String)
     return length(lines)
 end
 
-function finishExperiment(language::String, nodes::Int64, formulaSet::Int64, infiniteProperties::Bool, nModels::Int64 = 5000, nFrames::Int64 = 500, nValuations::Int64 = 50)
+function finishExperiment(language::String, nodes::Int64, formulaSet::Int64, infiniteProperties::Bool, resultsFolder::String, preselectedValuations::Bool=true, nModels::Int64 = 5000, nFrames::Int64 = 500, nValuations::Int64 = 50)
     formulaRange = 6:13
     formulaPath = joinpath("..", joinpath("..", joinpath("generated", "formulas "*string(formulaSet))))
     # VScode path
     # formulaPath = joinpath("generated", "formulas "*string(formulaSet))
 
-    resultsPath = joinpath("..", joinpath("..", joinpath("validated-Peregrine", joinpath(language, joinpath(string(nodes), "formulas "*string(formulaSet))))))
+    resultsPath = joinpath("..", joinpath("..", joinpath(resultsFolder, joinpath(language, joinpath(string(nodes), "formulas "*string(formulaSet))))))
     # VScode path
-    # resultsPath = joinpath("validated-Peregrine", joinpath(language, joinpath(string(nodes), "formulas "*string(formulaSet))))
+    # resultsPath = joinpath(resultsFolder, joinpath(language, joinpath(string(nodes), "formulas "*string(formulaSet))))
 
     if !isdir(resultsPath)
         mkpath(resultsPath)
@@ -123,21 +123,21 @@ function finishExperiment(language::String, nodes::Int64, formulaSet::Int64, inf
                     continue
                 end
 
-                processFormula(formula, resultsFile, language, nodes, nModels, nFrames, nValuations, infiniteProperties)
+                processFormula(formula, resultsFile, language, nodes, nModels, nFrames, nValuations, infiniteProperties, preselectedValuations)
             end
         end
     end
 end
 
-function runSelectedFormulasExperiment(language::String, n::Int64, infiniteProperties::Bool = true, nModels::Int64 = 5000, nFrames::Int64 = 500, nValuations::Int64 = 50)
+function runSelectedFormulasExperiment(language::String, n::Int64, infiniteProperties::Bool, resultsFolder::String, preselectedValuations::Bool=true, nModels::Int64 = 5000, nFrames::Int64 = 500, nValuations::Int64 = 50)
     
     selectedFile = joinpath("..", joinpath("..", "SelectedFormulasRaw.txt"))
     # VScode path
     # selectedFile = "SelectedFormulasRaw.txt"
 
-    resultsPath = joinpath("..", joinpath("..", joinpath("validated-Peregrine", joinpath(language, joinpath(string(n), "formulas 0")))))
+    resultsPath = joinpath("..", joinpath("..", joinpath(resultsFolder, joinpath(language, joinpath(string(n), "formulas 0")))))
     # VScode path
-    # resultsPath = joinpath("validated-Peregrine", joinpath(language, joinpath(string(n), "formulas 0")))
+    # resultsPath = joinpath(resultsFolder, joinpath(language, joinpath(string(n), "formulas 0")))
 
     resultsFile = joinpath(resultsPath, "selected.txt")
 
@@ -147,7 +147,7 @@ function runSelectedFormulasExperiment(language::String, n::Int64, infinitePrope
 
     open(selectedFile, "r") do sFile
         for formula in eachline(sFile)
-            processFormula(formula, resultsFile, language, n, nModels, nFrames, nValuations, infiniteProperties)
+            processFormula(formula, resultsFile, language, n, nModels, nFrames, nValuations, infiniteProperties, preselectedValuations)
         end
     end
 end
@@ -207,7 +207,7 @@ function runAsymptoticModelExperiment(languages::Vector{String} = ["gl", "k4", "
 end
 
 function prepareJobArrayScripts(languages::Vector{String} = ["gl", "k4", "s4"], nodes::Vector{Int64} = collect(40:8:80), formulaSets::Vector{Int64} = collect(1:10))
-    path = joinpath("Src", "Experiment")
+    path = joinpath("Src", joinpath("Experiment", "Scripts"))
 
     count = 0
     for f in formulaSets, l in languages, n in nodes
@@ -216,16 +216,35 @@ function prepareJobArrayScripts(languages::Vector{String} = ["gl", "k4", "s4"], 
         file = joinpath(path, "experiment"*string(count)*".jl")
 
         open(file, "w") do io
-            incl = """include("experimentalSetup.jl")\n\n"""
+            incl = """include(joinpath("..","experimentalSetup.jl"))\n\n"""
             use = "using .ExperimentalSetup\n\n"
-            command = "runExperiment(\"" * l *"\", "*string(n)*", "*string(f)*")\n"
+            command = "runExperiment(\"" * l *"\", "*string(n)*", "*string(f)*", false, \"validated-Peregrine\")\n"
             write(io, incl*use*command)
         end
     end
 end
 
+function prepareJobArrayScriptsInf(languages::Vector{String} = ["gl", "k4", "s4"], nodes::Vector{Int64} = collect(40:8:80), formulaSets::Vector{Int64} = collect(1:10))
+    path = joinpath("Src", joinpath("Experiment", "Scripts"))
+
+    count = 0
+    for f in formulaSets, l in languages, n in nodes
+
+        count = count+1
+        file = joinpath(path, "experiment"*string(count)*".jl")
+
+        open(file, "w") do io
+            incl = """include(joinpath("..","experimentalSetup.jl"))\n\n"""
+            use = "using .ExperimentalSetup\n\n"
+            command = "runExperiment(\"" * l *"\", "*string(n)*", "*string(f)*", true, \"validated-Peregrine-inf-prop\")\n"
+            write(io, incl*use*command)
+        end
+    end
+end
+
+
 function prepareJobArrayScriptsContinued(languages::Vector{String} = ["k4", "s4"], nodes::Vector{Int64} = collect(40:8:80), formulaSets::Vector{Int64} = collect(1:10))
-    path = joinpath("Src", "Experiment")
+    path = joinpath("Src", joinpath("Experiment", "Scripts"))
 
     count = 0
     for f in formulaSets, l in languages, n in nodes
@@ -234,16 +253,16 @@ function prepareJobArrayScriptsContinued(languages::Vector{String} = ["k4", "s4"
         file = joinpath(path, "finishExperiment"*string(count)*".jl")
 
         open(file, "w") do io
-            incl = """include("experimentalSetup.jl")\n\n"""
+            incl = """include(joinpath("..","experimentalSetup.jl"))\n\n"""
             use = "using .ExperimentalSetup\n\n"
-            command = "finishExperiment(\"" * l *"\", "*string(n)*", "*string(f)*")\n"
+            command = "finishExperiment(\"" * l *"\", "*string(n)*", "*string(f)*", false, \"validated-Peregrine\")\n"
             write(io, incl*use*command)
         end
     end
 end
 
 function prepareJobArrayScriptsSelected(languages::Vector{String} = ["gl", "k4", "s4"], nodes::Vector{Int64} = collect(40:8:80))
-    path = joinpath("Src", "Experiment")
+    path = joinpath("Src", joinpath("Experiment", "Scripts"))
 
     count = 0
     for l in languages, n in nodes
@@ -252,24 +271,26 @@ function prepareJobArrayScriptsSelected(languages::Vector{String} = ["gl", "k4",
         file = joinpath(path, "selectedExperiment"*string(count)*".jl")
 
         open(file, "w") do io
-            incl = """include("experimentalSetup.jl")\n\n"""
+            incl = """include(joinpath("..","experimentalSetup.jl"))\n\n"""
             use = "using .ExperimentalSetup\n\n"
-            command = "runSelectedFormulasExperiment(\"" * l *"\", "*string(n)*")\n"
+            command = "runSelectedFormulasExperiment(\"" * l *"\", "*string(n)*", false, \"validated-Peregrine\")\n"
             write(io, incl*use*command)
         end
     end
 end
 
-function runAllSelected(languages::Vector{String} = ["gl", "k4", "s4"], nodes::Vector{Int64} = collect(40:8:80))
+function runAllSelected(infiniteProperties::Bool, resultsFolder::String = "validated-Peregrine", languages::Vector{String} = ["gl", "k4", "s4"], nodes::Vector{Int64} = collect(40:8:80))
 
     for l in languages, n in nodes
-        runSelectedFormulasExperiment(l, n)
+        runSelectedFormulasExperiment(l, n, infiniteProperties, resultsFolder)
     end
 end
 
-# runAllSelected()
+# runAllSelected(false, "validated-Peregrine")
+# runAllSelected(true, "validated-Peregrine-inf-prop")
 
 # prepareJobArrayScripts()
+# prepareJobArrayScriptsInf()
 # prepareJobArrayScriptsContinued()
 # prepareJobArrayScriptsSelected()
 

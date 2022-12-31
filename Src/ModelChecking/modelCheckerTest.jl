@@ -29,8 +29,8 @@ end
 
 function isValidFrame(formula::String, language::String = "gl")
     formula = parseFormula(formula)
-    for _ in 1:10
-        model = generateFrame(20, language)
+    for _ in 1:100
+        model = generateFrame(80, language)
         if !checkFrameValidity(model, formula, 10, true)
             println("frame done")
             return false
@@ -44,7 +44,7 @@ end
     @testset verbose = true "ModelCheckerTest" begin
 
         @testset "Propositional tautologies" begin
-            # @test isValidModel("( p ↔ q ) ↔ ( ¬ p ↔ ¬ q )") == true
+            @test isValidModel("( p ↔ q ) ↔ ( ¬ p ↔ ¬ q )") == true
             @test isValidFrame("( p ↔ q ) ↔ ( ¬ p ↔ ¬ q )") == true
             @test isValidModel("( ( p → q ) ∧ ( p → q ) ) → ( p → ( q ∧ q ) )") == true
             @test isValidFrame("( ( p → q ) ∧ ( p → q ) ) → ( p → ( q ∧ q ) )") == true
