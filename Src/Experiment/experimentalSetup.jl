@@ -63,7 +63,7 @@ function runExperiment(language::String, n::Int64, formulaSet::Int64, infinitePr
     formulaPath = joinpath("..", joinpath("..", joinpath("generated", "formulas "*string(formulaSet))))
     # VScode path
     # formulaPath = joinpath("generated", "formulas "*string(formulaSet))
-    
+
     resultsPath = joinpath("..", joinpath("..", joinpath(resultsFolder, joinpath(language, joinpath(string(n), "formulas "*string(formulaSet))))))
     # VScode path
     # resultsPath = joinpath(resultsFolder, joinpath(language, joinpath(string(n), "formulas "*string(formulaSet))))
