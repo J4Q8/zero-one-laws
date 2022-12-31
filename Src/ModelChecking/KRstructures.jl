@@ -1,5 +1,8 @@
 module KRStructures
 
+#depreciated - uses specialistic architecture which was supposed to improve performance
+#               the improvement was barely noticeable whereas the code complexity increased significantly
+
 using ..Trees
 using LinearAlgebra
 using Random: bitrand

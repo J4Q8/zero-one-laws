@@ -13,6 +13,8 @@ using .Simplifier
 using .KRStructures
 using .SpecializedModelChecker
 
+# uses depreciated modules
+
 
 function isValidModel(formula::String, language::String = "gl")
     formula = parseFormula(formula)

@@ -158,6 +158,7 @@ function addValuations!(frame::Structure, valuations::Vector{Vector{Bool}}, atom
 end
 
 function getAsymptoticModel(language::String)
+    #implemented only for 2 atoms
 
     if language == "k4"
         # asymptitic model has 12 nodes
