@@ -4,10 +4,11 @@ using ..Trees
 using ..Parser
 using ..Simplifier
 using ..Structures
+using Combinatorics
 
 export checkModelValidity!, checkFrameValidity, serialCheckModelValidity, serialCheckFrameValidity
 
-TESTMODE = false
+# TESTMODE = false
 
 function checkTF(t::Tree)
     if t.connective in ['⊤','⊥'] && isdefined(t, :left) && isdefined(t, :right)
@@ -16,9 +17,9 @@ function checkTF(t::Tree)
 end
 
 function simplifyInWorldRec(world::Dict{Tree, Bool}, formula::Tree)
-    if TESTMODE
-        checkTF(formula)
-    end
+    # if TESTMODE
+    #     checkTF(formula)
+    # end
 
     if haskey(world, formula)
         symbol = world[formula] ? '⊤' : '⊥'
@@ -169,7 +170,27 @@ function checkModelValidity!(model::Structure, formula::Tree)
     return true
 end
 
-function checkFrameValidity(model::Structure, formula::Tree, nValuations::Int64)
+function checkPreselectedValuations(model::Structure, formula::Tree)
+    options = [0,1,2]
+    combs = sort(unique(collect(combinations(repeat(options, 4),4))))
+    for comb in combs
+        model_copy = deepcopy(model)
+        addPreselectedValuation!(model_copy, comb)
+        if !checkModelValidity!(model_copy, formula)
+            return false
+        end
+    end
+    return true
+end
+
+function checkFrameValidity(model::Structure, formula::Tree, nValuations::Int64, preselectedValuations::Bool)
+    #check preselectedValuations
+    if preselectedValuations
+        if !checkPreselectedValuations(model, formula)
+            return false
+        end
+    end
+
     for _ in 1:nValuations
         model_copy = deepcopy(model)
         addRandomValuations!(model_copy)
@@ -191,11 +212,11 @@ function serialCheckModelValidity(formula::Tree, language::String, nodes::Int64,
     return validCount
 end
 
-function serialCheckFrameValidity(formula::Tree, language::String, nodes::Int64, nModels::Int64, nFrames::Int64, infiniteProperties::Bool)
+function serialCheckFrameValidity(formula::Tree, language::String, nodes::Int64, nModels::Int64, nFrames::Int64, infiniteProperties::Bool, preselectedValuations::Bool)
     validCount = 0
     for _ in 1:nFrames
         frame = generateFrame(nodes, language, infiniteProperties)
-        if checkFrameValidity(frame, formula, nModels)
+        if checkFrameValidity(frame, formula, nModels, preselectedValuations)
             validCount = validCount + 1
         end
     end

@@ -11,7 +11,7 @@ using LightGraphs
 # transpose
 #  neighbors(G,5)
 
-export Structure, generateRandomFrame, generateFrame, generateModel, addRandomValuations!, neighbors, getAsymptoticModel
+export Structure, generateRandomFrame, generateFrame, generateModel, addRandomValuations!, addPreselectedValuation!, neighbors, getAsymptoticModel
 
 mutable struct Structure
     frame::DiGraph
@@ -77,6 +77,7 @@ function generateFrame(n::Int64, language::String, infiniteProperties::Bool = tr
 
     worlds = vec([Dict{Tree, Bool}() for _ in 1:n])
 
+    #check speed with SimpleDiGraph
     G = DiGraph(G)
 
     return Structure(G, worlds)
@@ -145,6 +146,59 @@ function addRandomValuations!(frame::Structure, atoms::Vector{Char} = ['p', 'q']
         end
     end
 end
+
+function addPreselectedValuation!(frame::Structure, settings::Vector{Int64})
+    #this is supported only for p and q
+    l = length(frame.worlds)
+    @assert mod(l, 4) == 0
+    nodes_per_layer = l ÷ 4
+    atoms = ['p', 'q']
+
+    for idx in 1:length(frame.worlds)
+        layer = (idx-1) ÷ nodes_per_layer
+        valuations = bitrand(length(atoms))
+
+        if layer == 0
+            for (v, atom) in enumerate(atoms)
+                root = Tree(atom)
+                frame.worlds[idx][root] = valuations[v]
+            end
+        elseif layer ∈ [1,2]
+            for (v, atom) in enumerate(atoms)
+                if settings[v] == 0
+                    valuation = true
+                elseif settings[v] == 1
+                    valuation = false
+                else
+                    valuation = valuations[v]
+                end
+                root = Tree(atom)
+                frame.worlds[idx][root] = valuation
+            end
+        else
+            for (v, atom) in enumerate(atoms)
+                if settings[v+2] == 0
+                    valuation = false
+                elseif settings[v+2] == 1
+                    valuation = true
+                else
+                    valuation = valuations[v]
+                end
+                root = Tree(atom)
+                frame.worlds[idx][root] = valuation
+            end
+        end
+    end
+    # Uncomment to check if the above structure is correct
+    # println("Options: ", settings)
+    # println("bottom_p ",[d[Tree('p')] for d in frame.worlds[1:nodes_per_layer]])
+    # println("bottom_q ", [d[Tree('q')] for d in frame.worlds[1:nodes_per_layer]])
+    # println("middle_p ", [d[Tree('p')] for d in frame.worlds[nodes_per_layer+1:nodes_per_layer*3]])
+    # println("middle_q ", [d[Tree('q')] for d in frame.worlds[nodes_per_layer+1:nodes_per_layer*3]])
+    # println("upper_p ", [d[Tree('p')] for d in frame.worlds[nodes_per_layer*3+1:end]])
+    # println("upper_q ", [d[Tree('q')] for d in frame.worlds[nodes_per_layer*3+1:end]])
+end
+
 
 function addValuations!(frame::Structure, valuations::Vector{Vector{Bool}}, atoms::Vector{Char} = ['p', 'q'])
     for idx in 1:length(frame.worlds)
