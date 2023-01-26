@@ -330,8 +330,8 @@ end
 # prepareJobArrayScriptsInf()
 # prepareJobArrayScriptsSelected()
 # prepareJobArrayScriptsSelectedInf()
-prepareJobArrayScriptsContinued()
-prepareJobArrayScriptsContinuedInf()
+# prepareJobArrayScriptsContinued()
+# prepareJobArrayScriptsContinuedInf()
 
 
 # prepareJobArrayScriptsContinued()
