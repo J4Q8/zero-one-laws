@@ -244,7 +244,7 @@ function prepareJobArrayScriptsInf(languages::Vector{String} = ["gl", "k4", "s4"
 end
 
 
-function prepareJobArrayScriptsContinued(languages::Vector{String} = ["k4", "s4"], nodes::Vector{Int64} = collect(40:8:80), formulaSets::Vector{Int64} = collect(1:10))
+function prepareJobArrayScriptsContinued(languages::Vector{String} = ["s4"], nodes::Vector{Int64} = collect(56:8:80), formulaSets::Vector{Int64} = collect(1:10))
     path = joinpath("Src", joinpath("Experiment", "Scripts"))
 
     count = 0
@@ -257,6 +257,24 @@ function prepareJobArrayScriptsContinued(languages::Vector{String} = ["k4", "s4"
             incl = """include(joinpath("..","experimentalSetup.jl"))\n\n"""
             use = "using .ExperimentalSetup\n\n"
             command = "finishExperiment(\"" * l *"\", "*string(n)*", "*string(f)*", false, \"validated-Peregrine\")\n"
+            write(io, incl*use*command)
+        end
+    end
+end
+
+function prepareJobArrayScriptsContinuedInf(languages::Vector{String} = ["s4"], nodes::Vector{Int64} = collect(56:8:80), formulaSets::Vector{Int64} = collect(1:10))
+    path = joinpath("Src", joinpath("Experiment", "Scripts"))
+
+    count = 0
+    for f in formulaSets, l in languages, n in nodes
+
+        count = count+1
+        file = joinpath(path, "finishExperimentINF"*string(count)*".jl")
+
+        open(file, "w") do io
+            incl = """include(joinpath("..","experimentalSetup.jl"))\n\n"""
+            use = "using .ExperimentalSetup\n\n"
+            command = "finishExperiment(\"" * l *"\", "*string(n)*", "*string(f)*", true, \"validated-Peregrine-inf-prop\")\n"
             write(io, incl*use*command)
         end
     end
@@ -312,6 +330,9 @@ end
 # prepareJobArrayScriptsInf()
 # prepareJobArrayScriptsSelected()
 # prepareJobArrayScriptsSelectedInf()
+prepareJobArrayScriptsContinued()
+prepareJobArrayScriptsContinuedInf()
+
 
 # prepareJobArrayScriptsContinued()
 
