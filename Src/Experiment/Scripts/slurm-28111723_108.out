@@ -1,0 +1,43 @@
+slurmstepd: error: *** JOB 28111911 ON pg-node032 CANCELLED AT 2023-01-10T15:53:48 DUE TO TIME LIMIT ***
+
+
+###############################################################################
+Peregrine Cluster
+Job 28111911 for user 's3986209'
+Finished at: Tue Jan 10 15:53:50 CET 2023
+
+Job details:
+============
+
+Job ID              : 28111723_108
+Name                : simulation-verification
+User                : s3986209
+Partition           : regular
+Nodes               : pg-node032
+Number of Nodes     : 1
+Cores               : 1
+Number of Tasks     : 1
+State               : CANCELLED,TIMEOUT
+Submit              : 2022-12-31T15:50:42
+Start               : 2022-12-31T15:53:24
+End                 : 2023-01-10T15:53:49
+Reserved walltime   : 10-00:00:00
+Used walltime       : 10-00:00:25
+Used CPU time       : 9-09:58:41 (efficiency: 94.15%)
+% User (Computation): 99.37%
+% System (I/O)      :  0.63%
+Mem reserved        : 2G
+Max Mem (Node/step) : 452.94M (pg-node032, per node)
+Full Max Mem usage  : 452.94M
+Total Disk Read     : 1.60M
+Total Disk Write    : 9.69K
+
+
+Acknowledgements:
+=================
+
+Please see this page for information about acknowledging Peregrine in your publications:
+
+https://wiki.hpc.rug.nl/peregrine/introduction/scientific_output
+
+################################################################################

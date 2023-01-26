@@ -1,0 +1,80 @@
+ERROR: LoadError: SystemError: opening file "../../../validated-Peregrine-inf-prop/k4/56/formulas 6/depth 11.txt": Input/output error
+Stacktrace:
+  [1] systemerror(p::String, errno::Int32; extrainfo::Nothing)
+    @ Base ./error.jl:174
+  [2] #systemerror#68
+    @ ./error.jl:173 [inlined]
+  [3] systemerror
+    @ ./error.jl:173 [inlined]
+  [4] open(fname::String; lock::Bool, read::Nothing, write::Nothing, create::Nothing, truncate::Nothing, append::Bool)
+    @ Base ./iostream.jl:293
+  [5] open(fname::String, mode::String; lock::Bool)
+    @ Base ./iostream.jl:355
+  [6] open(fname::String, mode::String)
+    @ Base ./iostream.jl:355
+  [7] open(::Main.ExperimentalSetup.var"#1#2"{Vector{Float64}}, ::String, ::Vararg{String}; kwargs::Base.Pairs{Symbol, Union{}, Tuple{}, NamedTuple{(), Tuple{}}})
+    @ Base ./io.jl:328
+  [8] open
+    @ ./io.jl:328 [inlined]
+  [9] processFormula(formula::String, resultsFile::String, language::String, n::Int64, nModels::Int64, nFrames::Int64, nValuations::Int64, infiniteProperties::Bool, preselectedValuations::Bool)
+    @ Main.ExperimentalSetup ~/zero-one-laws/Src/Experiment/experimentalSetup.jl:42
+ [10] (::Main.ExperimentalSetup.var"#5#6"{String, Int64, Bool, Bool, Int64, Int64, Int64, String})(fFile::IOStream)
+    @ Main.ExperimentalSetup ~/zero-one-laws/Src/Experiment/experimentalSetup.jl:81
+ [11] open(::Main.ExperimentalSetup.var"#5#6"{String, Int64, Bool, Bool, Int64, Int64, Int64, String}, ::String, ::Vararg{String}; kwargs::Base.Pairs{Symbol, Union{}, Tuple{}, NamedTuple{(), Tuple{}}})
+    @ Base ./io.jl:330
+ [12] open
+    @ ./io.jl:328 [inlined]
+ [13] runExperiment(language::String, n::Int64, formulaSet::Int64, infiniteProperties::Bool, resultsFolder::String, preselectedValuations::Bool, nModels::Int64, nFrames::Int64, nValuations::Int64)
+    @ Main.ExperimentalSetup ~/zero-one-laws/Src/Experiment/experimentalSetup.jl:79
+ [14] runExperiment(language::String, n::Int64, formulaSet::Int64, infiniteProperties::Bool, resultsFolder::String)
+    @ Main.ExperimentalSetup ~/zero-one-laws/Src/Experiment/experimentalSetup.jl:62
+ [15] top-level scope
+    @ ~/zero-one-laws/Src/Experiment/Scripts/experimentINF99.jl:5
+in expression starting at /home/s3986209/zero-one-laws/Src/Experiment/Scripts/experimentINF99.jl:5
+
+
+###############################################################################
+Peregrine Cluster
+Job 28111902 for user 's3986209'
+Finished at: Sun Jan  1 17:40:26 CET 2023
+
+Job details:
+============
+
+Job ID              : 28111723_99
+Name                : simulation-verification
+User                : s3986209
+Partition           : regular
+Nodes               : pg-node037
+Number of Nodes     : 1
+Cores               : 1
+Number of Tasks     : 1
+State               : FAILED
+Submit              : 2022-12-31T15:50:42
+Start               : 2022-12-31T15:53:24
+End                 : 2023-01-01T17:40:26
+Reserved walltime   : 10-00:00:00
+Used walltime       : 1-01:47:02
+Used CPU time       :    12:19:05 (efficiency: 47.77%)
+% User (Computation): 99.85%
+% System (I/O)      :  0.15%
+Mem reserved        : 2G
+Max Mem (Node/step) : 298.02M (pg-node037, per node)
+Full Max Mem usage  : 298.02M
+Total Disk Read     : 1.60M
+Total Disk Write    : 9.69K
+Hints and tips      :
+ 1) The program efficiency is low.
+    Check the file in- and output pattern of your application.
+ *) For more information on these issues see:
+    https://wiki.hpc.rug.nl/peregrine/additional_information/job_hints
+
+
+Acknowledgements:
+=================
+
+Please see this page for information about acknowledging Peregrine in your publications:
+
+https://wiki.hpc.rug.nl/peregrine/introduction/scientific_output
+
+################################################################################

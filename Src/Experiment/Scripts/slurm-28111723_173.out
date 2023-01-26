@@ -1,0 +1,42 @@
+
+
+###############################################################################
+Peregrine Cluster
+Job 28111976 for user 's3986209'
+Finished at: Tue Jan  3 07:02:59 CET 2023
+
+Job details:
+============
+
+Job ID              : 28111723_173
+Name                : simulation-verification
+User                : s3986209
+Partition           : regular
+Nodes               : pg-node059
+Number of Nodes     : 1
+Cores               : 1
+Number of Tasks     : 1
+State               : COMPLETED
+Submit              : 2022-12-31T15:50:42
+Start               : 2022-12-31T15:57:25
+End                 : 2023-01-03T07:02:59
+Reserved walltime   : 10-00:00:00
+Used walltime       : 2-15:05:34
+Used CPU time       : 1-23:27:01 (efficiency: 75.21%)
+% User (Computation): 99.92%
+% System (I/O)      :  0.08%
+Mem reserved        : 2G
+Max Mem (Node/step) : 309.89M (pg-node059, per node)
+Full Max Mem usage  : 309.89M
+Total Disk Read     : 1.60M
+Total Disk Write    : 9.69K
+
+
+Acknowledgements:
+=================
+
+Please see this page for information about acknowledging Peregrine in your publications:
+
+https://wiki.hpc.rug.nl/peregrine/introduction/scientific_output
+
+################################################################################
