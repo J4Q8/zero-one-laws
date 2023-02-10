@@ -1,0 +1,72 @@
+ERROR: LoadError: SystemError: opening file "Src/Experiment/Scripts/finishExperiment1.jl": No such file or directory
+Stacktrace:
+  [1] systemerror(p::String, errno::Int32; extrainfo::Nothing)
+    @ Base ./error.jl:174
+  [2] #systemerror#68
+    @ ./error.jl:173 [inlined]
+  [3] systemerror
+    @ ./error.jl:173 [inlined]
+  [4] open(fname::String; lock::Bool, read::Nothing, write::Nothing, create::Nothing, truncate::Bool, append::Nothing)
+    @ Base ./iostream.jl:293
+  [5] open(fname::String, mode::String; lock::Bool)
+    @ Base ./iostream.jl:355
+  [6] open(fname::String, mode::String)
+    @ Base ./iostream.jl:355
+  [7] open(::Main.ExperimentalSetup.var"#23#24"{Int64, Int64, String}, ::String, ::Vararg{String}; kwargs::Base.Pairs{Symbol, Union{}, Tuple{}, NamedTuple{(), Tuple{}}})
+    @ Base ./io.jl:328
+  [8] open
+    @ ./io.jl:328 [inlined]
+  [9] prepareJobArrayScriptsContinued(languages::Vector{String}, nodes::Vector{Int64}, formulaSets::Vector{Int64})
+    @ Main.ExperimentalSetup ~/zero-one-laws/Src/Experiment/experimentalSetup.jl:256
+ [10] prepareJobArrayScriptsContinued()
+    @ Main.ExperimentalSetup ~/zero-one-laws/Src/Experiment/experimentalSetup.jl:248
+ [11] top-level scope
+    @ ~/zero-one-laws/Src/Experiment/experimentalSetup.jl:333
+ [12] include(fname::String)
+    @ Base.MainInclude ./client.jl:451
+ [13] top-level scope
+    @ ~/zero-one-laws/Src/Experiment/Scripts/finishExperimentINF21.jl:1
+in expression starting at /home/s3986209/zero-one-laws/Src/Experiment/experimentalSetup.jl:1
+in expression starting at /home/s3986209/zero-one-laws/Src/Experiment/Scripts/finishExperimentINF21.jl:1
+
+
+###############################################################################
+Peregrine Cluster
+Job 28373156 for user 's3986209'
+Finished at: Thu Jan 26 22:07:26 CET 2023
+
+Job details:
+============
+
+Job ID              : 28373098_21
+Name                : finish_experiment_inf
+User                : s3986209
+Partition           : regular
+Nodes               : pg-node209
+Number of Nodes     : 1
+Cores               : 1
+Number of Tasks     : 1
+State               : FAILED
+Submit              : 2023-01-26T22:06:10
+Start               : 2023-01-26T22:07:18
+End                 : 2023-01-26T22:07:26
+Reserved walltime   : 10-00:00:00
+Used walltime       :    00:00:08
+Used CPU time       :    00:00:03 (efficiency: 49.70%)
+% User (Computation): 87.17%
+% System (I/O)      : 12.83%
+Mem reserved        : 2G
+Max Mem (Node/step) : 0.00  (Node unknown, N/A)
+Full Max Mem usage  : 0.00 
+Total Disk Read     : 0.00 
+Total Disk Write    : 0.00 
+
+
+Acknowledgements:
+=================
+
+Please see this page for information about acknowledging Peregrine in your publications:
+
+https://wiki.hpc.rug.nl/peregrine/introduction/scientific_output
+
+################################################################################
