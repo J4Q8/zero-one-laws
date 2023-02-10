@@ -2,4 +2,4 @@ Validated-Peregrine - folder with data of the experiment without infinite proper
 Validated-Peregrine-before-preselected-total_valuations - data used in the bachelor thesis
 Validated-Peregrine-inf-prop - folder containing data of the experiment with infinite properties and preselected valuations
 Validated-Peregrine-old - first run of the experiment - some manual fixes - do not use
-Validated-Peregrine-NoInfinitePropertiesExperiment - a git branch containing the experiment with no preselected valuations and no infinite properties
+Validated-Peregrine-no-inf-prop-before-preselected-valuations - folder with data from experiment with no preselected valuations and no infinite properties
