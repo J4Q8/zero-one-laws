@@ -2,4 +2,4 @@ include(joinpath("..","experimentalSetup.jl"))
 
 using .ExperimentalSetup
 
-finishExperiment("s4", 80, 9, false, "validated-Peregrine")
+finishExperiment("gl", 80, 2, false, "validated-Peregrine")

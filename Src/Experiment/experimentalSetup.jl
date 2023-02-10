@@ -244,7 +244,7 @@ function prepareJobArrayScriptsInf(languages::Vector{String} = ["gl", "k4", "s4"
 end
 
 
-function prepareJobArrayScriptsContinued(languages::Vector{String} = ["s4"], nodes::Vector{Int64} = collect(56:8:80), formulaSets::Vector{Int64} = collect(1:10))
+function prepareJobArrayScriptsContinued(languages::Vector{String} = ["s4", "k4", "gl"], nodes::Vector{Int64} = collect(40:8:80), formulaSets::Vector{Int64} = collect(1:10))
     path = joinpath("Src", joinpath("Experiment", "Scripts"))
 
     count = 0
@@ -262,7 +262,7 @@ function prepareJobArrayScriptsContinued(languages::Vector{String} = ["s4"], nod
     end
 end
 
-function prepareJobArrayScriptsContinuedInf(languages::Vector{String} = ["s4"], nodes::Vector{Int64} = collect(56:8:80), formulaSets::Vector{Int64} = collect(1:10))
+function prepareJobArrayScriptsContinuedInf(languages::Vector{String} = ["s4", "k4", "gl"], nodes::Vector{Int64} = collect(40:8:80), formulaSets::Vector{Int64} = collect(1:10))
     path = joinpath("Src", joinpath("Experiment", "Scripts"))
 
     count = 0
@@ -330,8 +330,8 @@ end
 # prepareJobArrayScriptsInf()
 # prepareJobArrayScriptsSelected()
 # prepareJobArrayScriptsSelectedInf()
-# prepareJobArrayScriptsContinued()
-# prepareJobArrayScriptsContinuedInf()
+prepareJobArrayScriptsContinued()
+prepareJobArrayScriptsContinuedInf()
 
 
 # prepareJobArrayScriptsContinued()
